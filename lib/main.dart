@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-<<<<<<< HEAD
 import 'package:flutter_svg/flutter_svg.dart';
 import './config/size_config.dart';
 import 'item.dart';
-=======
-import './config/size_config.dart';
->>>>>>> a1b213e (size)
+
 
 void main() {
   runApp(const MyApp());
