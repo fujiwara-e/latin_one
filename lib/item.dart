@@ -24,7 +24,6 @@ class ProductItem extends StatelessWidget {
             image: AssetImage(image),
             fit: BoxFit.cover,
           ),
-          color: Colors.blue,
           border: Border(
             bottom: BorderSide(
               color: Colors.white,
