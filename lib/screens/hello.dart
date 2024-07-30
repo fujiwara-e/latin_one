@@ -13,7 +13,7 @@ class _HelloState extends State<Hello> {
 
   void _time_check() {
     setState(() {
-      if( 5 <= now.hour && now.hour <= 10) {
+      if( 5 <= now.hour && now.hour < 10) {
         _flag = 0;
       } else if( 10 <= now.hour && now.hour <= 17 ) {
         _flag = 1;

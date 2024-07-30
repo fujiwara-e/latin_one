@@ -8,11 +8,6 @@ class SizeConfig {
   static double blockSizeHorizontal = 0.0;
   static double blockSizeVertical = 0.0;
 
-  static double _safeAreaHorizontal = 0.0;
-  static double _safeAreaVertical = 0.0;
-  static double safeBlockHorizontal = 0.0;
-  static double safeBlockVertical = 0.0;
-
   void init(BuildContext context) {
     _mediaQueryData = MediaQuery.of(context);
     screenWidth = _mediaQueryData!.size.width;

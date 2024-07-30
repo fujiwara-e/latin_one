@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:latin_one/shops.dart';
+import 'package:latin_one/screens/shops.dart';
 import './config/size_config.dart';
-import 'home.dart';
-import 'order.dart';
+import 'screens/home.dart';
+import 'screens/order.dart';
+import 'screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -29,12 +30,12 @@ class MyApp extends StatelessWidget {
               TargetPlatform.windows: FadeUpwardsPageTransitionsBuilder(),
             }),
       ),
-      home: MyHomePage(title: 'Latin One'),
-      initialRoute: '/home',
+      home: Screen(title: 'Latin One'),
       routes: {
         "/home": (BuildContext context) => MyHomePage(title: 'hoge'),
         "/shops": (BuildContext context) => ShopsPage(title: 'hoge'),
         "/order": (BuildContext context) => OrderPage(title: 'hoge'),
+        "/shops/shop": (BuildContext context) => ShopPage(title: 'hoge'),
       },
     );
   }
