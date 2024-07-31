@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../config/size_config.dart';
 
 class UrlLauncher {
   Future makePhoneCall(String phoneNumber) async {
@@ -22,15 +24,19 @@ class AddressItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        SizedBox(
-          height: 80,
-          child: Row(
+    return
+        Column(
+          children: <Widget>[
+            SizedBox(
+              width:SizeConfig.screenWidth,
+              height: SizeConfig.blockSizeVertical * 10,
+              child :Row(
             children: <Widget>[
             Container(
               alignment: Alignment.centerLeft,
-              width: 300,
+              margin: EdgeInsets.only(left: 20,top: 0, right: 0, bottom: 0),
+              height: SizeConfig.blockSizeVertical * 10,
+              width: SizeConfig.screenWidth * 0.8,
               child: Text(
                   text,
                   style: TextStyle(fontSize:10,
@@ -39,15 +45,16 @@ class AddressItem extends StatelessWidget {
               ),
             ),
               IconButton(onPressed: () {
+                print(SizeConfig.blockSizeVertical);
                 final urlLauncher = UrlLauncher();
                 urlLauncher.makePhoneCall('088-846-0408'); }, icon: Icon(Icons.phone))
           ]
         ),
-        ),
+            ),
         Container(height: 2,
-          width: 1000,
+          width: SizeConfig.screenWidth,
           color: Colors.black12,),
-      ],
+    ]
     );
     }
   }
@@ -67,12 +74,13 @@ class AddressItem extends StatelessWidget {
       return Column(
           children: <Widget>[
             SizedBox(
-              height: 80,
+              height: SizeConfig.blockSizeVertical * 10,
               child:Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
                     Container(
                         alignment: Alignment.centerLeft,
+                        margin: EdgeInsets.only(left: 20,top: 0, right: 0, bottom: 0),
                         width: 100,
                         child:Text(
                           column_name,

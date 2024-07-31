@@ -39,7 +39,7 @@ class _ShopPageState extends State<ShopPage> {
                 ),
               ),
               SliverFixedExtentList(
-                itemExtent: SizeConfig.blockSizeVertical * 10,
+                itemExtent: SizeConfig.blockSizeVertical * 10 + 2,
                 delegate: SliverChildListDelegate([
                   AddressItem(text: "高知県 高知市 布師田3061 ラテンコーヒー"),
                   ShopItem(column_name: '営業時間',text: "9:00-18:00"),
