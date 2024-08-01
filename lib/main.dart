@@ -4,8 +4,17 @@ import './config/size_config.dart';
 import 'screens/home.dart';
 import 'screens/order.dart';
 import 'screen.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase/firebase_options.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-void main() {
+FirebaseFirestore db = FirebaseFirestore.instance;
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
@@ -32,9 +41,6 @@ class MyApp extends StatelessWidget {
       ),
       home: Screen(title: 'Latin One'),
       routes: {
-        "/home": (BuildContext context) => MyHomePage(title: 'hoge'),
-        "/shops": (BuildContext context) => ShopsPage(title: 'hoge'),
-        "/order": (BuildContext context) => OrderPage(title: 'hoge'),
         "/shops/shop": (BuildContext context) => ShopPage(title: 'hoge'),
       },
     );

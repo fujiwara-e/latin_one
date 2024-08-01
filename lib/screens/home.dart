@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../config/size_config.dart';
 import 'item.dart';
 import 'hello.dart';
+import '../main.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -51,6 +53,16 @@ class _MyHomePageState extends State<MyHomePage> {
                         MaterialStateProperty.all<Color>(Colors.black),
                   ),
                   onPressed: () {
+                    final docRef = db.collection("hoge").doc("8VZckds981jpR4mHQJuD");
+                    docRef.get().then(
+                          (DocumentSnapshot doc) {
+                            if (doc.exists) {
+                              print('Value of key1: ${doc['ueno']}');
+                            } else {
+                              print('Document does not exist');
+                            }
+                          }
+                          );
                     print("クリックされたぞ");
                     print(SizeConfig.blockSizeVertical);
                     print(SizeConfig.blockSizeHorizontal);
