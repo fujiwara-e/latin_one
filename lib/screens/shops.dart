@@ -34,8 +34,7 @@ class _ShopPageState extends State<ShopPage> {
                         fontFamily: 'gothic',),
                     )
                   ),
-                  titlePadding:
-                  EdgeInsets.only(top: 0, right: 0, bottom: 0, left: 20),
+                  titlePadding: EdgeInsets.only(top: 0, right: 0, bottom: 0, left: 20),
                   collapseMode: CollapseMode.parallax,
                 ),
               ),
@@ -80,12 +79,12 @@ class _ShopsPageState extends State<ShopsPage> {
         child: Scaffold(
           appBar:
             PreferredSize(
-            preferredSize: Size.fromHeight(SizeConfig.blockSizeVertical * 8),
+            preferredSize: Size.fromHeight(SizeConfig.blockSizeVertical * 10),
             child: AppBar(
               backgroundColor: Colors.white,
               title: Align(
                 alignment: Alignment.bottomLeft,
-                child: Text('Stores', style: TextStyle(fontSize:40,
+                child: Text('Shops', style: TextStyle(fontSize:20,
                   color: Colors.black,
                   fontFamily: 'gothic',)),
               ),
