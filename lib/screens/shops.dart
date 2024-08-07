@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:latin_one/screen.dart';
 import 'package:latin_one/screens/item.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../config/size_config.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -55,9 +56,9 @@ class _ShopPageState extends State<ShopPage> {
 
 
 class ShopsPage extends StatefulWidget {
-  const ShopsPage({super.key, required this.title});
+  const ShopsPage({super.key, required this.onChangeIndex});
 
-  final String title;
+  final Function(int) onChangeIndex;
 
   @override
   State<ShopsPage> createState() => _ShopsPageState();
@@ -73,8 +74,7 @@ class _ShopsPageState extends State<ShopsPage> {
         canPop: false,
         onPopInvoked: (bool didpop){
           setState(() {
-            selectedIndex = 0;
-            print(selectedIndex);
+            widget.onChangeIndex(0);
           });
           },
         child: Scaffold(
@@ -122,6 +122,13 @@ class _ShopsPageState extends State<ShopsPage> {
                   ),
                 ],
               ),
+              RichAttributionWidget(
+                attributions: [
+                  TextSourceAttribution('MapTiler', onTap: () => launchUrl(Uri.parse("https://www.maptiler.com/copyright/"))),
+                  TextSourceAttribution('OpenStreetMap contributors', onTap: () => launchUrl(Uri.parse("https://www.openstreetmap.org/copyright"))),
+                  TextSourceAttribution('MIERUNE', onTap: () => launchUrl(Uri.parse("https://maptiler.jp/"))),
+                ],
+              )
             ],
           )
           )

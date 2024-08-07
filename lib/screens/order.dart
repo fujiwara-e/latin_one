@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:latin_one/screen.dart';
 
 class OrderPage extends StatefulWidget {
-  const OrderPage({super.key, required this.title});
+  const OrderPage({super.key, required this.onChangeIndex});
 
-  final String title;
+  final Function(int) onChangeIndex;
 
   @override
   State<OrderPage> createState() => _OrderPageState();
@@ -18,7 +18,11 @@ class _OrderPageState extends State<OrderPage> {
 
     return PopScope(
         canPop: false,
-        onPopInvoked: (bool didpop){selectedIndex = 0;},
+        onPopInvoked: (bool didpop){
+          setState(() {
+            widget.onChangeIndex(0);
+          });
+        },
         child: Scaffold(
           body:Text('Order'),
         )
