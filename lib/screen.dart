@@ -17,23 +17,26 @@ class Screen extends StatefulWidget {
 
 class _ScreenState extends State<Screen> {
 
-
   void _onItemTapped(int index) {
     setState(() {
       selectedIndex = index;
     });
-
   }
-  
-  final List<Widget> screens = [
-    MyHomePage(title: 'hoge'),
-    ShopsPage(title: 'hoge'),
-    OrderPage(title: 'hoge'),
-  ];
+
+  final List<Widget> screens = [];
+
+  @override
+  void initState() {
+    super.initState();
+    screens.addAll([
+      MyHomePage(onChangeIndex: _onItemTapped),
+      ShopsPage(onChangeIndex: _onItemTapped),
+      OrderPage(onChangeIndex:_onItemTapped),
+    ]);
+  }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
         body:screens[selectedIndex],
         bottomNavigationBar: BottomNavigationBar(
