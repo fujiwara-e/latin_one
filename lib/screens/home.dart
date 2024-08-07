@@ -6,6 +6,8 @@ import '../main.dart';
 import '../screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+int homeIndex = 0;
+
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.onChangeIndex});
 
@@ -16,6 +18,41 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final List<Widget> homes = [];
+
+  void _onInboxTapped (int index){
+    setState(() {
+      homeIndex = index;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    homes.addAll([
+      HomePage(onChangeIndex: widget.onChangeIndex,onChangeHomeIndex: _onInboxTapped),
+      InboxPage(onChangeHomeIndex: _onInboxTapped),
+    ]);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return homes[homeIndex];
+  }
+}
+
+class HomePage extends StatefulWidget {
+  const HomePage({super.key, required this.onChangeIndex, required this.onChangeHomeIndex});
+
+  final Function(int) onChangeIndex;
+  final Function(int) onChangeHomeIndex;
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -23,7 +60,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Scaffold(
           body: CustomScrollView(
             slivers: <Widget>[
-            SliverAppBar(
+              SliverAppBar(
                 backgroundColor: Colors.white,
                 expandedHeight: SizeConfig.blockSizeVertical * 8,
                 flexibleSpace: FlexibleSpaceBar(
@@ -32,7 +69,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: Hello(),
                   ),
                   titlePadding:
-                      EdgeInsets.only(top: 0, right: 0, bottom: 0, left: 20),
+                  EdgeInsets.only(top: 0, right: 0, bottom: 0, left: 20),
                   collapseMode: CollapseMode.parallax,
                 ),
               ),
@@ -51,27 +88,24 @@ class _MyHomePageState extends State<MyHomePage> {
                   label: const Text('inbox'),
                   style: ButtonStyle(
                     foregroundColor:
-                        MaterialStateProperty.all<Color>(Colors.black),
+                    MaterialStateProperty.all<Color>(Colors.black),
                   ),
                   onPressed: () {
                     final docRef = db.collection("shops").doc("javanican");
                     docRef.get().then(
-                          (DocumentSnapshot doc) {
-                            if (doc.exists) {
-                              print('Value of key1: ${doc['address']}');
-                            } else {
-                              print('Document does not exist');
-                            }
+                            (DocumentSnapshot doc) {
+                          if (doc.exists) {
+                            print('Value of key1: ${doc['address']}');
+                          } else {
+                            print('Document does not exist');
                           }
-                          );
+                        }
+                    );
 
-
-
-
-
+                    setState(() {
+                      widget.onChangeHomeIndex(1);
+                    });
                     print("クリックされたぞ");
-                    print(SizeConfig.blockSizeVertical);
-                    print(SizeConfig.blockSizeHorizontal);
                   },
                 ),
               ),
@@ -120,50 +154,69 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-class InboxPage extends StatefulWidget{
-  const InboxPage({super.key, required this.title});
 
-  final String title;
+
+class InboxPage extends StatefulWidget{
+  const InboxPage({super.key, required this.onChangeHomeIndex});
+
+  final Function(int) onChangeHomeIndex;
 
   @override
   State<InboxPage> createState() => _InboxPageState();
 
 }
 class _InboxPageState extends State<InboxPage> {
+
+
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
-        child: Scaffold(
-          body: CustomScrollView(
-            slivers: <Widget>[
-              SliverAppBar(
-                backgroundColor: Colors.white,
-                expandedHeight: SizeConfig.blockSizeVertical * 8,
-                flexibleSpace: FlexibleSpaceBar(
-                  title: Align(
-                      alignment: Alignment.bottomLeft,
-                      child: Text("JAVANICAN",
-                        style: TextStyle(fontSize:20,
-                          color: Colors.black,
-                          fontFamily: 'gothic',),
-                      )
+        canPop: false,
+        onPopInvoked: (bool didpop){
+          setState(() {
+            widget.onChangeHomeIndex(0);
+          });
+        },
+        child: DefaultTabController(
+          length: 2,
+          child: Scaffold(
+            body: NestedScrollView(
+              headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+                return <Widget>[
+                  SliverAppBar(
+                    pinned:true,
+                    backgroundColor: Colors.white,
+                    expandedHeight: SizeConfig.blockSizeVertical * 8,
+                    flexibleSpace: FlexibleSpaceBar(
+                      title: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text("Inbox",
+                            style: TextStyle(fontSize: 20,
+                              color: Colors.black,
+                              fontFamily: 'gothic',),
+                          )
+                      ),
+                      titlePadding: EdgeInsets.only(top: 0, right: 0, bottom: 0, left: 20),
+                      collapseMode: CollapseMode.parallax,
+                    ),
+                    bottom: TabBar(tabs: [
+                      Tab(text: 'Tab 1'),
+                      Tab(text: 'Tab 2'),
+                    ],
+                    ),
                   ),
-                  titlePadding:
-                  EdgeInsets.only(top: 0, right: 0, bottom: 0, left: 20),
-                  collapseMode: CollapseMode.parallax,
+                ];
+              },
+            body: TabBarView(
+                  children: [
+                    Center(child: Text('Tab 1 Content')),
+                    Center(child: Text('Tab 2 Content')),
+                  ],
                 ),
-              ),
-              SliverFixedExtentList(
-                itemExtent: SizeConfig.blockSizeVertical * 10 + 2,
-                delegate: SliverChildListDelegate([
-                  AddressItem(text: "高知県 高知市 布師田3061 ラテンコーヒー"),
-                  ShopItem(column_name: '営業時間',text: "9:00-18:00"),
-                  ShopItem(column_name: '定休日',text: "不定休"),
-                  ShopItem(column_name: 'モバイル決済',text: "現金のみ！！"),
-                ]),
-              ),
-            ],
           ),
-        ));
+        )
+        )
+    );
   }
 }
