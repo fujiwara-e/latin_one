@@ -3,6 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../config/size_config.dart';
+import 'order.dart';
+
+enum TabItem {
+  home,
+  shops,
+  order,
+}
 
 class UrlLauncher {
   Future makePhoneCall(String phoneNumber) async {
@@ -12,6 +19,142 @@ class UrlLauncher {
     );
     await launchUrl(getPhoneNumber);
   }
+}
+
+class OrderItem extends StatelessWidget{
+  final String text;
+  final Image image;
+  final Widget widget;
+  final int selectedstore;
+
+  const OrderItem({
+    Key? key,
+    required this.text,
+    required this.image,
+    required this.widget,
+    required this.selectedstore,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    bool isGrayedOut = selectedstore == 0;
+
+    return Opacity(opacity: isGrayedOut ? 0.5 :1.0 ,
+      child:
+      InkWell(
+          onTap: isGrayedOut ? null : () {
+            print("on tap\n");
+          },
+          child: Column(
+            children: <Widget>[
+              SizedBox(
+                width:SizeConfig.screenWidth,
+                height: SizeConfig.blockSizeVertical * 10,
+                child :Row(
+                    children: <Widget>[
+                      Container(
+                        alignment: Alignment.centerLeft,
+                        margin: EdgeInsets.only(left: 20,top: 0, right: 0, bottom: 0),
+                        child: image,
+                      ),
+                      Container(
+                        alignment: Alignment.centerLeft,
+                        margin: EdgeInsets.only(left: 20,top: 0, right: 0, bottom: 0),
+                        height: SizeConfig.blockSizeVertical * 10,
+                        width: SizeConfig.screenWidth * 0.73,
+                        child: Text(
+                            text,
+                            style: TextStyle(fontSize:12,
+                              color: Colors.black,
+                              fontFamily: 'gothic',)
+                        ),
+                      ),
+                      Container(
+                        alignment: Alignment.centerLeft,
+                        margin: EdgeInsets.only(left: 0,top: 0, right: 0, bottom: 0),
+                        child: Icon(Icons.arrow_forward_ios),
+                      )
+                    ]
+                ),
+              ),
+              Container(height: 2,
+                width: SizeConfig.screenWidth,
+                color: Colors.black12,),
+            ],
+          )
+      )
+      );
+
+  }// widget build
+}
+
+class StoreItem extends StatefulWidget{
+  const StoreItem({
+    Key? key,
+    required this.text,
+    required this.image,
+    required this.widget,
+    required this.selectstore,
+  }) : super(key: key);
+
+  final String text;
+  final Image image;
+  final Widget widget;
+  final Function(int) selectstore;
+
+  @override
+  State<StoreItem> createState() => _StoreItemState();
+}
+
+class _StoreItemState extends State<StoreItem> {
+  @override
+  Widget build(BuildContext context) {
+
+    return
+      InkWell(
+          onTap:(){
+            print("on tap\n");
+            setState((){widget.selectstore(1);});
+          },
+          child: Column(
+            children: <Widget>[
+              SizedBox(
+                width:SizeConfig.screenWidth,
+                height: SizeConfig.blockSizeVertical * 10,
+                child :Row(
+                    children: <Widget>[
+                      Container(
+                        alignment: Alignment.centerLeft,
+                        margin: EdgeInsets.only(left: 20,top: 0, right: 0, bottom: 0),
+                        child: widget.image,
+                      ),
+                      Container(
+                        alignment: Alignment.centerLeft,
+                        margin: EdgeInsets.only(left: 20,top: 0, right: 0, bottom: 0),
+                        height: SizeConfig.blockSizeVertical * 10,
+                        width: SizeConfig.screenWidth * 0.73,
+                        child: Text(
+                            widget.text,
+                            style: TextStyle(fontSize:12,
+                              color: Colors.black,
+                              fontFamily: 'gothic',)
+                        ),
+                      ),
+                      Container(
+                        alignment: Alignment.centerLeft,
+                        margin: EdgeInsets.only(left: 0,top: 0, right: 0, bottom: 0),
+                        child: Icon(Icons.arrow_forward_ios),
+                      )
+                    ]
+                ),
+              ),
+              Container(height: 2,
+                width: SizeConfig.screenWidth,
+                color: Colors.black12,),
+            ],
+          )
+        );
+  }// widget build
 }
 
 class AddressItem extends StatelessWidget {
@@ -36,7 +179,7 @@ class AddressItem extends StatelessWidget {
                   alignment: Alignment.centerLeft,
                   margin: EdgeInsets.only(left: 20,top: 0, right: 0, bottom: 0),
                   height: SizeConfig.blockSizeVertical * 10,
-                  width: SizeConfig.screenWidth * 0.7,
+                  width: SizeConfig.screenWidth * 0.67,
                   child: Text(
                     text,
                     style: TextStyle(fontSize:10,
