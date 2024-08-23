@@ -31,25 +31,31 @@ class AddressItem extends StatelessWidget {
               width:SizeConfig.screenWidth,
               height: SizeConfig.blockSizeVertical * 10,
               child :Row(
-            children: <Widget>[
-            Container(
-              alignment: Alignment.centerLeft,
-              margin: EdgeInsets.only(left: 20,top: 0, right: 0, bottom: 0),
-              height: SizeConfig.blockSizeVertical * 10,
-              width: SizeConfig.screenWidth * 0.8,
-              child: Text(
-                  text,
-                  style: TextStyle(fontSize:10,
-                    color: Colors.black,
-                    fontFamily: 'gothic',)
+                children: <Widget>[
+                Container(
+                  alignment: Alignment.centerLeft,
+                  margin: EdgeInsets.only(left: 20,top: 0, right: 0, bottom: 0),
+                  height: SizeConfig.blockSizeVertical * 10,
+                  width: SizeConfig.screenWidth * 0.7,
+                  child: Text(
+                    text,
+                    style: TextStyle(fontSize:10,
+                      color: Colors.black,
+                      fontFamily: 'gothic',)
+                  ),
+                ),
+                IconButton(onPressed: () {
+                  print(SizeConfig.blockSizeVertical);
+                  final urlLauncher = UrlLauncher();
+                  urlLauncher.makePhoneCall('088-846-0408'); }, icon: Icon(Icons.phone)
+                ),
+                  IconButton(onPressed: () async{
+                    print(SizeConfig.blockSizeVertical);
+                    final url = Uri.parse("https://maps.app.goo.gl/zTAPviyi3NyRxvwt5");
+                    await launchUrl(url);
+                    }, icon: Icon(Icons.map_outlined))
+                ]
               ),
-            ),
-              IconButton(onPressed: () {
-                print(SizeConfig.blockSizeVertical);
-                final urlLauncher = UrlLauncher();
-                urlLauncher.makePhoneCall('088-846-0408'); }, icon: Icon(Icons.phone))
-          ]
-        ),
             ),
         Container(height: 2,
           width: SizeConfig.screenWidth,
