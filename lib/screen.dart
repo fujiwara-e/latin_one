@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:latin_one/screens/home.dart';
 import 'package:latin_one/screens/order.dart';
 import 'package:latin_one/screens/shops.dart';
+import 'package:latin_one/screens/item.dart';
 
 int selectedIndex = 0;
+
+
 
 class Screen extends StatefulWidget {
   const Screen({super.key, required this.title});
@@ -16,6 +19,12 @@ class Screen extends StatefulWidget {
 }
 
 class _ScreenState extends State<Screen> {
+  TabItem _currentTab = TabItem.home;
+  Map<TabItem, GlobalKey<NavigatorState>> _navigatorKeys = {
+    TabItem.home: GlobalKey<NavigatorState>(),
+    TabItem.shops: GlobalKey<NavigatorState>(),
+    TabItem.order: GlobalKey<NavigatorState>(),
+  };
 
   void _onItemTapped(int index) {
     setState(() {

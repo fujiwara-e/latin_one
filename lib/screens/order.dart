@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:latin_one/screen.dart';
 import '../config/size_config.dart';
+import '../screens/item.dart';
 
 class OrderPage extends StatefulWidget {
   const OrderPage({super.key, required this.onChangeIndex});
@@ -9,96 +10,68 @@ class OrderPage extends StatefulWidget {
 
   @override
   State<OrderPage> createState() => _OrderPageState();
-
 }
 
 class _OrderPageState extends State<OrderPage> {
-  String selectedStore = 'No store selected';
-  List<Map<String, dynamic>> selectedProducts = [];
+  int selected_store = 0;
+  List<Map<int, dynamic>> selectedProducts = [];
   String selectedProduct = 'No product selected';
   int selectedQuantity = 0;
 
+  void _onItemTapped(int id) {
+    setState(() {
+      selected_store = id;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-
     return PopScope(
-        canPop: false,
-        onPopInvoked: (bool didpop){
-          setState(() {
-            widget.onChangeIndex(0);
-          });
-        },
+      canPop: false,
+      onPopInvoked: (bool didpop) {
+        setState(() {
+          widget.onChangeIndex(0);
+        });
+      },
       child: Scaffold(
         body: CustomScrollView(
-            slivers: <Widget>[
-              SliverAppBar(
-                backgroundColor: Colors.white,
-                expandedHeight: SizeConfig.blockSizeVertical * 8,
-                flexibleSpace: FlexibleSpaceBar(
-                  title: Align(
+          slivers: <Widget>[
+            SliverAppBar(
+              backgroundColor: Colors.white,
+              expandedHeight: SizeConfig.blockSizeVertical * 8,
+              pinned: true,
+              flexibleSpace: FlexibleSpaceBar(
+                title: Align(
                     alignment: Alignment.bottomLeft,
-                    child: Text("Order",
-                      style: TextStyle(fontSize:20,
-                      color: Colors.black,
-                      fontFamily: 'gothic',),
-                    )
-                  ),
-                  titlePadding: EdgeInsets.only(top: 0, right: 0, bottom: 0, left: 20),
-                  collapseMode: CollapseMode.parallax,
-                ),
+                    child: Text(
+                      "Order",
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.black,
+                        fontFamily: 'gothic',
+                      ),
+                    )),
+                titlePadding:
+                    EdgeInsets.only(top: 0, right: 0, bottom: 0, left: 20),
+                collapseMode: CollapseMode.parallax,
               ),
-              SliverFixedExtentList(
-                itemExtent: SizeConfig.blockSizeVertical * 10 + 2,
-                delegate: SliverChildListDelegate([
-                   OutlinedButton(
-                     onPressed: () async {
-                       final result = await Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => StoreSelectionPage()),
-                    );
-
-                    if (result != null) {
-                      setState(() {
-                        selectedStore = result;
-                        selectedProducts.clear(); //when be changed store
-                        });
-                      }
-                    },
-                    child: Text('Selected Store: $selectedStore'),
-                   ),
-                  ...selectedProducts.map((product) => ListTile(
-                    title: Text('${product['product']} x ${product['quantity']}'),
-                  )).toList(),
-                  OutlinedButton(
-                    onPressed: selectedStore != 'No store selected' ? () async {
-                      final result = await Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => ProductSelectionPage()),
-                      );
-
-                      if (result != null) {
-                        setState(() {
-                          selectedProducts.add({
-                            'product': result['product'],
-                            'quantity': result['quantity'],
-                          });
-                        });
-                      }
-                    }: null,
-                    child: Text(selectedProducts.isEmpty
-                        ? 'Select a Product'
-                        : 'Add Another Product'),
-                  ),
-                 ],
-                ),
+            ),
+            SliverFixedExtentList(
+              itemExtent: SizeConfig.blockSizeVertical * 10 + 2,
+              delegate: SliverChildListDelegate(
+                [
+                  StoreItem(text: 'お店を選択してください', image: Image.asset('assets/images/store.png', width: 20, height: 20,), widget: Container(), selectstore: _onItemTapped,),
+                  OrderItem(text: '商品を選択してください', image: Image.asset('assets/images/coffee.png', width: 20, height: 20,), widget: Container(), selectedstore: selected_store),
+                ],
               ),
-        ],
-
-      ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
+
 // Select Store Page
 class StoreSelectionPage extends StatelessWidget {
   @override
@@ -129,6 +102,7 @@ class StoreSelectionPage extends StatelessWidget {
     );
   }
 }
+
 // Select Product Page
 class Product {
   final String name;
@@ -136,7 +110,6 @@ class Product {
 
   Product({required this.name, required this.imageUrl});
 }
-
 
 class ProductSelectionPage extends StatelessWidget {
   final List<Product> products = [
@@ -182,7 +155,8 @@ class ProductSelectionPage extends StatelessWidget {
 
                 // Return the product name and quantity to the previous screen
                 if (quantity != null) {
-                  Navigator.pop(context, {'product': product.name, 'quantity': quantity});
+                  Navigator.pop(
+                      context, {'product': product.name, 'quantity': quantity});
                 }
               },
               child: Column(
@@ -204,6 +178,7 @@ class ProductSelectionPage extends StatelessWidget {
     );
   }
 }
+
 //select the number of products page
 class QuantitySelectionPage extends StatefulWidget {
   final String productName;
