@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:latin_one/screens/item.dart';
 
-
 const tabTitle = <TabItem, String>{
   TabItem.home: 'Home',
   TabItem.shops: 'Shops',
@@ -14,8 +13,9 @@ final tabIcon = <TabItem, Widget>{
   TabItem.order: Image.asset('assets/images/coffee.png', width: 25, height: 25,),
 };
 
-class BottomNavigation extends StatelessWidget {
-  const BottomNavigation({
+class BottomNavigation extends StatefulWidget {
+
+  BottomNavigation({
     Key? key,
     required this.currentTab,
     required this.onSelect,
@@ -25,36 +25,45 @@ class BottomNavigation extends StatelessWidget {
   final ValueChanged<TabItem> onSelect;
 
   @override
-  Widget build(BuildContext context) {
-    return BottomNavigationBar(
-      items: <BottomNavigationBarItem>[
-        bottomItem(
-          context,
-          tabItem: TabItem.home,
-        ),
-        bottomItem(
-          context,
-          tabItem: TabItem.shops,
-        ),
-        bottomItem(
-          context,
-          tabItem: TabItem.order,
-        ),
-      ],
-      type: BottomNavigationBarType.fixed,
-      onTap: (index) {
-        onSelect(TabItem.values[index]);
-      },
-    );
-  }
+  State<BottomNavigation> createState() => _BottomNavigationState();
+}
 
-  BottomNavigationBarItem bottomItem(
-      BuildContext context, {
+  class _BottomNavigationState extends State<BottomNavigation> {
+    @override
+    int current_index = 0;
+
+    Widget build(BuildContext context) {
+      return BottomNavigationBar(
+        currentIndex: current_index,
+        items: <BottomNavigationBarItem>[
+          bottomItem(
+            context,
+            tabItem: TabItem.home,
+          ),
+          bottomItem(
+            context,
+            tabItem: TabItem.shops,
+          ),
+          bottomItem(
+            context,
+            tabItem: TabItem.order,
+          ),
+        ],
+        type: BottomNavigationBarType.fixed,
+        onTap: (index) {
+          widget.onSelect(TabItem.values[index]);
+          setState(() {
+            current_index = index;
+          });
+        },
+      );
+    }
+
+      BottomNavigationBarItem bottomItem(BuildContext context, {
         TabItem? tabItem,
       }) {
-    final color = currentTab == tabItem ? Colors.blue : Colors.black26;
-    return BottomNavigationBarItem(
-      icon: tabIcon[tabItem]!,
-      label: tabTitle[tabItem]!,);
-  }
-}
+        return BottomNavigationBarItem(
+          icon: tabIcon[tabItem]!,
+          label: tabTitle[tabItem]!,);
+      }
+    }

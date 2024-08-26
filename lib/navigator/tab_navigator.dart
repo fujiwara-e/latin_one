@@ -17,11 +17,13 @@ class TabNavigator extends StatelessWidget {
   final String routerName;
   final GlobalKey<NavigatorState> navigationKey;
 
-  Map<String, Widget Function(BuildContext)> _routerBuilder(BuildContext context) => {
-    '/home': (context) => const MyHomePage(onChangeIndex: ),
-    '/shops': (context) => const OrderPage(onChangeIndex: onChangeIndex),
-    '/order': (context) => const ShopsPage(onChangeIndex: onChangeIndex),
-  };
+  Map<String, Widget Function(BuildContext)> _routerBuilder(
+          BuildContext context) =>
+      {
+        '/home': (context) => const MyHomePage(),
+        '/shops': (context) => const ShopsPage(),
+        '/order': (context) => const OrderPage(),
+      };
 
   @override
   Widget build(BuildContext context) {
