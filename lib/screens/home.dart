@@ -6,12 +6,6 @@ import '../main.dart';
 import '../screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-int homeIndex = 0;
-// グローバル関数
-void updateHomeIndex(int newIndex) {
-  homeIndex = newIndex;
-}
-
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
 

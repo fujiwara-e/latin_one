@@ -30,7 +30,7 @@ class _ScreenState extends State<Screen> {
   }
 
   void checkTabItem() {
-    if (_currentTab == TabItem.home && homeIndex == 0) {
+    if (_currentTab == TabItem.home) {
       setState(() {
         canPopValue = true;
       });
@@ -49,7 +49,7 @@ class _ScreenState extends State<Screen> {
         onPopInvoked: (bool didpop) {
           onSelect(TabItem.home);
           if (homeIndex == 1) {
-            Navigator.pop;
+            // Navigator.pop;
           }
         },
         child: Scaffold(
