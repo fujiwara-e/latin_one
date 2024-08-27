@@ -28,9 +28,19 @@ class _ScreenState extends State<Screen> {
       selectedIndex = index;
     });
   }
+  // debug 
+  void printNavigationKeys() {
+  print("Home Navigator Key: ${_navigatorKeys[TabItem.home]?.currentState}");
+  print("Shops Navigator Key: ${_navigatorKeys[TabItem.shops]?.currentState}");
+  print("Order Navigator Key: ${_navigatorKeys[TabItem.order]?.currentState}");
+  }
 
   void checkTabItem() {
-    if (_currentTab == TabItem.home) {
+    String? currentRoute = ModalRoute.of(context)?.settings.name;
+    print("current route is $currentRoute");
+    if (ModalRoute.of(context)?.settings.name == null){
+      canPopValue = false;
+    } else if (_currentTab == TabItem.home) {
       setState(() {
         canPopValue = true;
       });
@@ -48,9 +58,7 @@ class _ScreenState extends State<Screen> {
         canPop: canPopValue,
         onPopInvoked: (bool didpop) {
           onSelect(TabItem.home);
-          if (homeIndex == 1) {
-            // Navigator.pop;
-          }
+          
         },
         child: Scaffold(
             body: Stack(children: <Widget>[

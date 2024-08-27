@@ -64,6 +64,8 @@ class _HomePageState extends State<HomePage> {
                 foregroundColor: MaterialStateProperty.all<Color>(Colors.black),
               ),
               onPressed: () {
+                String? currentRoute = ModalRoute.of(context)?.settings.name;
+                print("current route is $currentRoute");
                 final docRef = db.collection("shops").doc("javanican");
                 docRef.get().then((DocumentSnapshot doc) {
                   if (doc.exists) {
@@ -75,7 +77,6 @@ class _HomePageState extends State<HomePage> {
                     context,
                     MaterialPageRoute(builder: (context) => const InboxPage()),
                   );
-                  updateHomeIndex(1);
                 });
 
                 setState(() {
@@ -143,6 +144,7 @@ class InboxPage extends StatefulWidget {
 class _InboxPageState extends State<InboxPage> {
   @override
   Widget build(BuildContext context) {
+    
     return DefaultTabController(
         length: 2,
         child: Scaffold(
