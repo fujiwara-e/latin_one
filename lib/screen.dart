@@ -22,24 +22,28 @@ class _ScreenState extends State<Screen> {
     TabItem.shops: GlobalKey<NavigatorState>(),
     TabItem.order: GlobalKey<NavigatorState>(),
   };
-
   void _onItemTapped(int index) {
     setState(() {
       selectedIndex = index;
     });
   }
-  // debug 
+
+  // debug
   void printNavigationKeys() {
-  print("Home Navigator Key: ${_navigatorKeys[TabItem.home]?.currentState}");
-  print("Shops Navigator Key: ${_navigatorKeys[TabItem.shops]?.currentState}");
-  print("Order Navigator Key: ${_navigatorKeys[TabItem.order]?.currentState}");
+    print("Home Navigator Key: ${_navigatorKeys[TabItem.home]?.currentState}");
+    print(
+        "Shops Navigator Key: ${_navigatorKeys[TabItem.shops]?.currentState}");
+    print(
+        "Order Navigator Key: ${_navigatorKeys[TabItem.order]?.currentState}");
   }
 
   void checkTabItem() {
     String? currentRoute = ModalRoute.of(context)?.settings.name;
     print("current route is $currentRoute");
-    if (ModalRoute.of(context)?.settings.name == null){
+
+    if (currentRoute == null) {
       canPopValue = false;
+      print("ModalRoute is NULL!!!");
     } else if (_currentTab == TabItem.home) {
       setState(() {
         canPopValue = true;
@@ -57,8 +61,12 @@ class _ScreenState extends State<Screen> {
     return PopScope(
         canPop: canPopValue,
         onPopInvoked: (bool didpop) {
+          if (ModalRoute.of(context)?.settings.name == null) {
+            _navigatorKeys[_currentTab]!
+                .currentState!
+                .popUntil((route) => route.isFirst);
+          }
           onSelect(TabItem.home);
-          
         },
         child: Scaffold(
             body: Stack(children: <Widget>[

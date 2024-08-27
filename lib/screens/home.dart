@@ -5,6 +5,7 @@ import 'hello.dart';
 import '../main.dart';
 import '../screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:latin_one/navigator/tab_navigator.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -75,8 +76,14 @@ class _HomePageState extends State<HomePage> {
                   }
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const InboxPage()),
+                    MaterialPageRoute(
+                        settings: RouteSettings(name: "HogeScreen"),
+                        builder: (context) => const InboxPage()),
                   );
+                  setState(() {});
+
+                  // NavigatorState? currentState = _navigatorKeys[TabItem.home]!.currentState;
+                  // print("navigatorkey is $currentState");
                 });
 
                 setState(() {
@@ -144,7 +151,6 @@ class InboxPage extends StatefulWidget {
 class _InboxPageState extends State<InboxPage> {
   @override
   Widget build(BuildContext context) {
-    
     return DefaultTabController(
         length: 2,
         child: Scaffold(
