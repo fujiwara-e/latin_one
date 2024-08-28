@@ -5,6 +5,7 @@ import 'package:latin_one/navigator/bottom_navigator.dart';
 import 'package:latin_one/navigator/tab_navigator.dart';
 
 int selectedIndex = 0;
+bool canPopValue = true;
 
 class Screen extends StatefulWidget {
   const Screen({super.key, required this.title});
@@ -22,11 +23,6 @@ class _ScreenState extends State<Screen> {
     TabItem.shops: GlobalKey<NavigatorState>(),
     TabItem.order: GlobalKey<NavigatorState>(),
   };
-  void _onItemTapped(int index) {
-    setState(() {
-      selectedIndex = index;
-    });
-  }
 
   // debug
   void printNavigationKeys() {
@@ -53,19 +49,12 @@ class _ScreenState extends State<Screen> {
     }
   }
 
-  bool canPopValue = true;
-
   @override
   Widget build(BuildContext context) {
     checkTabItem();
     return PopScope(
         canPop: canPopValue,
         onPopInvoked: (bool didpop) {
-          if (ModalRoute.of(context)?.settings.name == null) {
-            _navigatorKeys[_currentTab]!
-                .currentState!
-                .popUntil((route) => route.isFirst);
-          }
           onSelect(TabItem.home);
         },
         child: Scaffold(
@@ -93,6 +82,10 @@ class _ScreenState extends State<Screen> {
   }
 
   void onSelect(TabItem tabItem) {
+    if (_currentTab == TabItem.home)
+      _navigatorKeys[_currentTab]!
+          .currentState!
+          .popUntil((route) => route.isFirst);
     setState(() {
       _currentTab = tabItem;
     });

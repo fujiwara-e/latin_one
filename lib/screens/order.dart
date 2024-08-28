@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../config/size_config.dart';
 import '../screens/item.dart';
+import 'package:latin_one/screens/product.dart';
 
 class OrderPage extends StatefulWidget {
   const OrderPage({super.key});
@@ -55,7 +56,7 @@ class _OrderPageState extends State<OrderPage> {
                     width: 20,
                     height: 20,
                   ),
-                  widget: Container(),
+                  widget: StorePage(),
                   selectstore: _onItemTapped,
                 ),
                 OrderItem(

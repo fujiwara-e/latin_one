@@ -122,6 +122,10 @@ class _StoreItemState extends State<StoreItem> {
           setState(() {
             widget.selectstore(1);
           });
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => widget.widget),
+          );
         },
         child: Column(
           children: <Widget>[

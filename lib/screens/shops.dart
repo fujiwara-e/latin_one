@@ -101,12 +101,12 @@ class _ShopsPageState extends State<ShopsPage> {
                   point: LatLng(33.57454362494296, 133.578431168963),
                   builder: (ctx) => Container(
                     child: IconButton(
-                      onPressed: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ShopPage(),
-                            fullscreenDialog: true,
-                          )),
+                      onPressed: () =>
+                          Navigator.of(context, rootNavigator: true)
+                              .push(MaterialPageRoute(
+                        builder: (context) => ShopPage(),
+                        fullscreenDialog: true,
+                      )),
                       icon: Icon(
                         Icons.circle,
                         color: Colors.yellow[800],

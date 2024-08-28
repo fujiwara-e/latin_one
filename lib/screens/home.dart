@@ -3,7 +3,7 @@ import '../config/size_config.dart';
 import 'item.dart';
 import 'hello.dart';
 import '../main.dart';
-import '../screen.dart';
+import 'package:latin_one/screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:latin_one/navigator/tab_navigator.dart';
 
@@ -80,15 +80,12 @@ class _HomePageState extends State<HomePage> {
                         settings: RouteSettings(name: "HogeScreen"),
                         builder: (context) => const InboxPage()),
                   );
-                  setState(() {});
-
-                  // NavigatorState? currentState = _navigatorKeys[TabItem.home]!.currentState;
-                  // print("navigatorkey is $currentState");
                 });
 
                 setState(() {
-                  //widget.onChangeHomeIndex(1);
+                  canPopValue = false;
                 });
+                print(canPopValue);
                 print("クリックされたぞ");
               },
             ),
