@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:latin_one/screens/home.dart';
-import 'package:latin_one/screens/order.dart';
-import 'package:latin_one/screens/shops.dart';
 import 'package:latin_one/screens/item.dart';
+import 'package:latin_one/navigator/bottom_navigator.dart';
+import 'package:latin_one/navigator/tab_navigator.dart';
 
 int selectedIndex = 0;
-
-
+bool canPopValue = true;
 
 class Screen extends StatefulWidget {
   const Screen({super.key, required this.title});
@@ -15,7 +14,6 @@ class Screen extends StatefulWidget {
 
   @override
   State<Screen> createState() => _ScreenState();
-
 }
 
 class _ScreenState extends State<Screen> {
@@ -26,38 +24,70 @@ class _ScreenState extends State<Screen> {
     TabItem.order: GlobalKey<NavigatorState>(),
   };
 
-  void _onItemTapped(int index) {
-    setState(() {
-      selectedIndex = index;
-    });
+  // debug
+  void printNavigationKeys() {
+    print("Home Navigator Key: ${_navigatorKeys[TabItem.home]?.currentState}");
+    print(
+        "Shops Navigator Key: ${_navigatorKeys[TabItem.shops]?.currentState}");
+    print(
+        "Order Navigator Key: ${_navigatorKeys[TabItem.order]?.currentState}");
   }
 
-  final List<Widget> screens = [];
+  void checkTabItem() {
+    String? currentRoute = ModalRoute.of(context)?.settings.name;
+    print("current route is $currentRoute");
 
-  @override
-  void initState() {
-    super.initState();
-    screens.addAll([
-      MyHomePage(onChangeIndex: _onItemTapped),
-      ShopsPage(onChangeIndex: _onItemTapped),
-      OrderPage(onChangeIndex:_onItemTapped),
-    ]);
+    if (currentRoute == null) {
+      canPopValue = false;
+      print("ModalRoute is NULL!!!");
+    } else if (_currentTab == TabItem.home) {
+      setState(() {
+        canPopValue = true;
+      });
+    } else {
+      canPopValue = false;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body:screens[selectedIndex],
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: selectedIndex,
-          onTap: _onItemTapped,
-          items:  <BottomNavigationBarItem>[
-            BottomNavigationBarItem(icon: Image.asset('assets/images/home.png', width: 25, height: 25,),label: 'Home'),
-            BottomNavigationBarItem(icon: Image.asset('assets/images/store.png', width: 25, height: 25,), label: 'Shops'),
-            BottomNavigationBarItem(icon: Image.asset('assets/images/coffee.png', width: 25, height: 25,), label: 'Order'),
-          ],
-          type: BottomNavigationBarType.fixed,
-        )
+    checkTabItem();
+    return PopScope(
+        canPop: canPopValue,
+        onPopInvoked: (bool didpop) {
+          onSelect(TabItem.home);
+        },
+        child: Scaffold(
+            body: Stack(children: <Widget>[
+              _buildTabItem(TabItem.home, '/home'),
+              _buildTabItem(TabItem.shops, '/shops'),
+              _buildTabItem(TabItem.order, '/order')
+            ]),
+            bottomNavigationBar:
+                BottomNavigation(currentTab: _currentTab, onSelect: onSelect)));
+  }
+
+  Widget _buildTabItem(
+    TabItem tabItem,
+    String root,
+  ) {
+    return Offstage(
+      offstage: _currentTab != tabItem,
+      child: TabNavigator(
+        navigationKey: _navigatorKeys[tabItem]!,
+        tabItem: tabItem,
+        routerName: root,
+      ),
     );
+  }
+
+  void onSelect(TabItem tabItem) {
+    if (_currentTab == TabItem.home)
+      _navigatorKeys[_currentTab]!
+          .currentState!
+          .popUntil((route) => route.isFirst);
+    setState(() {
+      _currentTab = tabItem;
+    });
   }
 }

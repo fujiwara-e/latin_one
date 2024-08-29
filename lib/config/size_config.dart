@@ -7,6 +7,7 @@ class SizeConfig {
   static double screenHeight = 0.0;
   static double blockSizeHorizontal = 0.0;
   static double blockSizeVertical = 0.0;
+  static double TitleSize = 23;
 
   void init(BuildContext context) {
     _mediaQueryData = MediaQuery.of(context);
