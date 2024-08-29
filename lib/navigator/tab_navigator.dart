@@ -20,7 +20,7 @@ class TabNavigator extends StatelessWidget {
   Map<String, Widget Function(BuildContext)> _routerBuilder(
           BuildContext context) =>
       {
-        '/home': (context) => const MyHomePage(),
+        '/home': (context) => const HomePage(),
         '/shops': (context) => const ShopsPage(),
         '/order': (context) => const OrderPage(),
       };

@@ -1,29 +1,16 @@
 import 'package:flutter/material.dart';
-import '../config/size_config.dart';
+import 'package:latin_one/config/size_config.dart';
 import 'item.dart';
 import 'hello.dart';
-import '../main.dart';
+import 'package:latin_one/main.dart';
 import 'package:latin_one/screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:latin_one/navigator/tab_navigator.dart';
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  @override
-  Widget build(BuildContext context) {
-    return HomePage();
-  }
-}
-
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  const HomePage({super.key /*, required currentTab*/});
 
+  //TabItem currentTab;
   @override
   State<HomePage> createState() => _HomePageState();
 }
@@ -51,7 +38,6 @@ class _HomePageState extends State<HomePage> {
           SliverAppBar(
             backgroundColor: Colors.white,
             expandedHeight: SizeConfig.blockSizeVertical * 0.96,
-            //0.96
             // forceElevated: true,
             // elevation:20,
             pinned: true,
@@ -93,10 +79,10 @@ class _HomePageState extends State<HomePage> {
           SliverFixedExtentList(
             itemExtent: SizeConfig.blockSizeVertical * 29,
             delegate: SliverChildListDelegate([
-              ProductItem(
+              HomeItem(
                 onTap: () {
                   setState(() {
-                    // widget.onChangeIndex(2);
+                    // _currentTab = TabItem.order;
                   });
                   Builder(
                     builder: (BuildContext context) =>
@@ -107,14 +93,12 @@ class _HomePageState extends State<HomePage> {
                 image: 'assets/images/CoffeeBean.jpg',
                 text: 'Order',
               ),
-              ProductItem(
-                onTap: () {
-                  print("クリックされたぞ!!!!!");
-                },
+              HomeItem(
+                onTap: () {},
                 image: 'assets/images/Latte.jpg',
                 text: 'Products',
               ),
-              ProductItem(
+              HomeItem(
                 onTap: () {
                   setState(() {
                     // widget.onChangeIndex(1);
@@ -123,7 +107,7 @@ class _HomePageState extends State<HomePage> {
                 image: 'assets/images/Machine.jpg',
                 text: 'Shops',
               ),
-              ProductItem(
+              HomeItem(
                 onTap: () {
                   print("クリックされたぞ!!!!!");
                 },
@@ -165,9 +149,9 @@ class _InboxPageState extends State<InboxPage> {
                         child: Text(
                           "Inbox",
                           style: TextStyle(
-                            fontSize: 20,
+                            fontSize: SizeConfig.TitleSize,
                             color: Colors.black,
-                            fontFamily: 'gothic',
+                            fontFamily: 'ozworld',
                           ),
                         )),
                     titlePadding:
@@ -176,8 +160,8 @@ class _InboxPageState extends State<InboxPage> {
                   ),
                   bottom: TabBar(
                     tabs: [
-                      Tab(text: 'Tab 1'),
-                      Tab(text: 'Tab 2'),
+                      Tab(text: "What's New"),
+                      Tab(text: "Message"),
                     ],
                   ),
                 ),

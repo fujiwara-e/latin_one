@@ -1,11 +1,101 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import '../config/size_config.dart';
-import '../screens/item.dart';
-
+import 'package:latin_one/config/size_config.dart';
+import 'package:latin_one/screens/item.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_map/flutter_map.dart';
+
+class ProductPage extends StatefulWidget {
+  const ProductPage({super.key});
+
+  @override
+  State<ProductPage> createState() => _ProductPageState();
+}
+
+class _ProductPageState extends State<ProductPage> {
+  final List<ProductItem> _products = [
+    ProductItem(
+        onTap: () {
+          print("ontap");
+        },
+        image: 'assets/images/CoffeeBean.jpg',
+        name: 'Bean A',
+        price: '500'),
+    ProductItem(
+        onTap: () {
+          print("ontap");
+        },
+        image: 'assets/images/CoffeeBean.jpg',
+        name: 'Bean B',
+        price: '500'),
+    ProductItem(
+      onTap: () {
+        print("ontap");
+      },
+      image: 'assets/images/CoffeeBean.jpg',
+      name: "Bean C",
+      price: "1000",
+    ),
+    ProductItem(
+      onTap: () {
+        print("ontap");
+      },
+      image: 'assets/images/CoffeeBean.jpg',
+      name: "Bean D",
+      price: "1000",
+    ),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        body: CustomScrollView(slivers: <Widget>[
+      SliverAppBar(
+        backgroundColor: Colors.white,
+        expandedHeight: SizeConfig.blockSizeVertical * 8,
+        pinned: true,
+        flexibleSpace: FlexibleSpaceBar(
+          title: Align(
+              alignment: Alignment.bottomLeft,
+              child: Text(
+                "Products",
+                style: TextStyle(
+                  fontSize: SizeConfig.TitleSize,
+                  color: Colors.black,
+                  fontFamily: 'ozworld',
+                ),
+              )),
+          titlePadding: EdgeInsets.only(top: 0, right: 0, bottom: 0, left: 20),
+          collapseMode: CollapseMode.parallax,
+        ),
+      ),
+      SliverToBoxAdapter(
+        child: Padding(
+          padding: EdgeInsets.only(left: 15),
+          child: Container(
+              height: SizeConfig.blockSizeVertical * 5,
+              alignment: Alignment.centerLeft,
+              child: Text('表示価格はすべて税込み価格です',
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.black54,
+                    fontFamily: 'gothic',
+                  ))),
+        ),
+      ),
+      SliverText(text: "ITALLEY ROAST"),
+      ProductsItem(products: _products),
+      SliverBorder(),
+      SliverText(text: "FRENCH ROAST"),
+      ProductsItem(products: _products),
+      SliverBorder(),
+      SliverText(text: "SPEACIALTY COFFEE"),
+      ProductsItem(products: _products),
+      SliverBorder(),
+    ]));
+  }
+}
 
 class StorePage extends StatefulWidget {
   const StorePage({super.key});
@@ -33,9 +123,9 @@ class _StorePageState extends State<StorePage> {
                         child: Text(
                           "Store Select",
                           style: TextStyle(
-                            fontSize: 20,
+                            fontSize: SizeConfig.TitleSize,
                             color: Colors.black,
-                            fontFamily: 'gothic',
+                            fontFamily: 'ozworld',
                           ),
                         )),
                     titlePadding:
@@ -77,7 +167,13 @@ class _StorePageState extends State<StorePage> {
                           point: LatLng(33.57454362494296, 133.578431168963),
                           builder: (ctx) => Container(
                             child: IconButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                showModalBottomSheet(
+                                    context: context,
+                                    builder: (context) {
+                                      return _BottomSheet();
+                                    });
+                              },
                               icon: Icon(
                                 Icons.circle,
                                 color: Colors.yellow[800],
@@ -109,5 +205,21 @@ class _StorePageState extends State<StorePage> {
             ),
           ),
         ));
+  }
+}
+
+class _BottomSheet extends StatelessWidget {
+  const _BottomSheet({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: SizeConfig.blockSizeVertical * 30,
+      color: Colors.white,
+      child: BottomSheetItem(
+        onTap: () => {},
+        text: 'hoge',
+      ),
+    );
   }
 }

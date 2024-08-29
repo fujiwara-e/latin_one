@@ -28,9 +28,9 @@ class _ShopPageState extends State<ShopPage> {
                   child: Text(
                     "JAVANICAN",
                     style: TextStyle(
-                      fontSize: 20,
+                      fontSize: SizeConfig.TitleSize,
                       color: Colors.black,
-                      fontFamily: 'gothic',
+                      fontFamily: 'ozworld',
                     ),
                   )),
               titlePadding:
@@ -73,9 +73,9 @@ class _ShopsPageState extends State<ShopsPage> {
                 alignment: Alignment.bottomLeft,
                 child: Text('Shops',
                     style: TextStyle(
-                      fontSize: 20,
+                      fontSize: SizeConfig.TitleSize,
                       color: Colors.black,
-                      fontFamily: 'gothic',
+                      fontFamily: 'ozworld',
                     )),
               ),
             )),

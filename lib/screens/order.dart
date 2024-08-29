@@ -35,9 +35,9 @@ class _OrderPageState extends State<OrderPage> {
                   child: Text(
                     "Order",
                     style: TextStyle(
-                      fontSize: 20,
+                      fontSize: SizeConfig.TitleSize,
                       color: Colors.black,
-                      fontFamily: 'gothic',
+                      fontFamily: 'ozworld',
                     ),
                   )),
               titlePadding:
@@ -66,7 +66,7 @@ class _OrderPageState extends State<OrderPage> {
                       width: 20,
                       height: 20,
                     ),
-                    widget: Container(),
+                    widget: ProductPage(),
                     selectedstore: selected_store),
               ],
             ),
