@@ -42,7 +42,7 @@ class MyApp extends StatelessWidget {
       ),
       home: Screen(title: 'Latin One'),
       routes: {
-        "/shops/shop": (BuildContext context) => ShopPage(title: 'hoge'),
+        "/shops/shop": (BuildContext context) => ShopPage(),
       },
     );
   }
