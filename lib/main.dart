@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:latin_one/entities/cart.dart';
 import 'package:latin_one/screens/shops.dart';
 import './config/size_config.dart';
 import 'screens/home.dart';
@@ -7,6 +8,7 @@ import 'screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase/firebase_options.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
 
 FirebaseFirestore db = FirebaseFirestore.instance;
 
@@ -16,7 +18,12 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => CartModel(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
