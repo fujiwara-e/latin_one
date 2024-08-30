@@ -1,10 +1,16 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latin_one/config/size_config.dart';
+import 'package:latin_one/entities/cart.dart';
 import 'package:latin_one/screens/item.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:latin_one/entities/catalog.dart';
+import 'package:provider/provider.dart';
+import 'package:latin_one/entities/cart.dart';
 
 class ProductPage extends StatefulWidget {
   const ProductPage({super.key});
@@ -14,39 +20,74 @@ class ProductPage extends StatefulWidget {
 }
 
 class _ProductPageState extends State<ProductPage> {
-  final List<ProductItem> _products = [
-    ProductItem(
+
+  late List<ProductItem> _products;
+
+  @override
+  void initState() {
+    super.initState();
+    _products = [
+      ProductItem(
         onTap: () {
-          print("ontap");
+         Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ChoicePage(index: 0),
+              fullscreenDialog: true
+            ),
+          ); 
         },
         image: 'assets/images/CoffeeBean.jpg',
         name: 'Bean A',
-        price: '500'),
-    ProductItem(
+        price: '500',
+      ),
+      ProductItem(
         onTap: () {
-          print("ontap");
+          _handleTap(2);
         },
         image: 'assets/images/CoffeeBean.jpg',
         name: 'Bean B',
-        price: '500'),
-    ProductItem(
-      onTap: () {
-        print("ontap");
-      },
-      image: 'assets/images/CoffeeBean.jpg',
-      name: "Bean C",
-      price: "1000",
-    ),
-    ProductItem(
-      onTap: () {
-        print("ontap");
-      },
-      image: 'assets/images/CoffeeBean.jpg',
-      name: "Bean D",
-      price: "1000",
-    ),
-  ];
+        price: '500',
+      ),
+      ProductItem(
+        onTap: () {
+          _handleTap(3);
+        },
+        image: 'assets/images/CoffeeBean.jpg',
+        name: 'Bean C',
+        price: '1000',
+      ),
+      ProductItem(
+        onTap: () {
+          _handleTap(4);
+        },
+        image: 'assets/images/CoffeeBean.jpg',
+        name: 'Bean D',
+        price: '1000',
+      ),
+    ];
+  }
 
+  void _handleTap(int index) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Add to Cart'),
+          content: _MyListItem(index),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -94,6 +135,96 @@ class _ProductPageState extends State<ProductPage> {
       ProductsItem(products: _products),
       SliverBorder(),
     ]));
+  }
+}
+
+class _AddButton extends StatelessWidget {
+  final Item item;
+
+  const _AddButton({required this.item});
+
+  @override
+  Widget build(BuildContext context) {
+
+    var isInCart = context.select<CartModel, bool>(
+      (cart) => cart.items.contains(item),
+    );
+    
+    return TextButton(
+      onPressed: isInCart
+          ? null
+          : () {
+              var cart = context.read<CartModel>();
+              cart.add(item);
+            },
+      child: isInCart ? const Icon(Icons.check, semanticLabel: 'ADDED') : const Text('ADD'),
+    );
+      
+  }
+}
+class _MyListItem extends StatelessWidget {
+  final int index;
+  const _MyListItem(this.index);
+
+  @override
+  Widget build(BuildContext context) {
+    print("called");
+    var item = context.select<CatalogModel, Item>(
+      (catalog) => catalog.getByPosition(index),
+    );
+
+    print("called");
+    print(item);
+
+    return  _AddButton(item: item);
+  
+  }
+}
+class ChoicePage extends StatelessWidget {
+  final int index;
+  const ChoicePage({
+    Key? key,
+    required this.index,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: CustomScrollView(
+        slivers: <Widget>[
+          SliverAppBar(
+            backgroundColor: Colors.white,
+            expandedHeight: SizeConfig.blockSizeVertical * 8,
+            flexibleSpace: FlexibleSpaceBar(
+              title: Align(
+                  alignment: Alignment.bottomLeft,
+                  child: Text(
+                    "商品選択",
+                    style: TextStyle(
+                      fontSize: SizeConfig.TitleSize,
+                      color: Colors.black,
+                      fontFamily: 'gothic',
+                    ),
+                  )),
+              titlePadding:
+                  EdgeInsets.only(top: 0, right: 0, bottom: 0, left: 20),
+              collapseMode: CollapseMode.parallax,
+            ),
+          ),
+          SliverFixedExtentList(
+            itemExtent: SizeConfig.blockSizeVertical * 10 + 2,
+            delegate: SliverChildListDelegate(
+              [
+                Text("test"),
+                Text("test"),
+                _MyListItem(index),
+              ],
+            ),
+          ),
+
+        ],
+      )
+    );
   }
 }
 

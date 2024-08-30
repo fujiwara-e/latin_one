@@ -1,21 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
+import 'package:latin_one/entities/catalog.dart';
 
 class CartModel extends ChangeNotifier {
-  final List<Item> _items = [];
+  late CatalogModel _catalog;
+  final List<int> _itemIds = [];
 
-  UnmodifiableListView<Item> get items => UnmodifiableListView(_items);
+  CatalogModel get catalog => _catalog;
 
-  int get totalPrice => _items.length * 42;
-
-  void add(Item item) {
-    _items.add(item);
+  set catalog(CatalogModel newCatalog) {
+    _catalog = newCatalog;
     notifyListeners();
   }
 
-  void removeAll() {
-    _items.clear();
+  List<Item> get items => _itemIds.map((id) => _catalog.getById(id)).toList();
+
+  int get totalPrice => items.fold(0, (total, current) => total + current.price);
+
+
+  void add(Item item) {
+    _itemIds.add(item.id);
+    notifyListeners();
+  }
+
+  void remove(Item item) {
+    _itemIds.remove(item.id);
     notifyListeners();
   }
 }
