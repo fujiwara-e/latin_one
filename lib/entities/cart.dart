@@ -28,4 +28,10 @@ class CartModel extends ChangeNotifier {
     _itemIds.remove(item.id);
     notifyListeners();
   }
+
+  int count(Item item) {
+    int count = _itemIds.where((_itemIds) => _itemIds == item.id).length; 
+    return count;
+  }
+
 }

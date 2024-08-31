@@ -43,7 +43,13 @@ class _ProductPageState extends State<ProductPage> {
       ),
       ProductItem(
         onTap: () {
-          _handleTap(2);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ChoicePage(index: 1),
+              fullscreenDialog: true
+            ),
+          );
         },
         image: 'assets/images/CoffeeBean.jpg',
         name: 'Bean B',
@@ -150,14 +156,44 @@ class _AddButton extends StatelessWidget {
       (cart) => cart.items.contains(item),
     );
     
-    return TextButton(
-      onPressed: isInCart
-          ? null
-          : () {
-              var cart = context.read<CartModel>();
-              cart.add(item);
-            },
-      child: isInCart ? const Icon(Icons.check, semanticLabel: 'ADDED') : const Text('ADD'),
+    // TODO: ボタンを右に寄せる
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Container(
+          child:Column(
+            children: [
+              Text("数量"),
+              Text(
+                '${context.select<CartModel, int>((cart) => cart.count(item))}',
+                style: TextStyle(fontSize: 20),
+              ),
+            ],
+        ),),
+        Container(
+          child: Row(
+            children: [
+       IconButton(
+        icon: const Icon(Icons.remove),
+          onPressed: () {
+            var cart = context.read<CartModel>();
+              if (isInCart && cart.count(item) > 0) {
+              cart.remove(item);
+            }
+          },
+          tooltip: 'Decrease quantity',
+        ),
+
+        IconButton(
+          icon: const Icon(Icons.add),
+          onPressed: () {
+            var cart = context.read<CartModel>();
+            cart.add(item);
+          },
+          tooltip: 'Increase quantity',
+        ),
+            ],),),
+      ],
     );
       
   }
@@ -168,16 +204,10 @@ class _MyListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print("called");
     var item = context.select<CatalogModel, Item>(
       (catalog) => catalog.getByPosition(index),
     );
-
-    print("called");
-    print(item);
-
     return  _AddButton(item: item);
-  
   }
 }
 class ChoicePage extends StatelessWidget {
@@ -215,12 +245,47 @@ class ChoicePage extends StatelessWidget {
             itemExtent: SizeConfig.blockSizeVertical * 10 + 2,
             delegate: SliverChildListDelegate(
               [
-                Text("test"),
-                Text("test"),
-                _MyListItem(index),
+                Row(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(left: 20),
+                      child:
+                        Image(
+                          image: AssetImage('assets/images/CoffeeBean.jpg'),
+                          width: SizeConfig.blockSizeHorizontal * 20,
+                          height: SizeConfig.blockSizeVertical * 20,
+                          ),
+                          ),
+                          Padding(padding: EdgeInsets.only(left: 20),
+                          child:
+                       Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("サンセットフラペチーノ"),
+                            Text("¥500"),
+                            Text("価格は税込み価格です"),
+                          ],
+                        ),),
+                      ],
+                    ),
+                    Column(
+                    children:[
+                      Container(
+                      height: 2,
+                      width: SizeConfig.screenWidth,
+                      color: Colors.black12,
+                    ),
+                    Text("商品の説明"),
+                    Row(
+                      children: [
+                        _MyListItem(index),
+                        
+                      ],
+                    ),
+                  ],),
               ],
+                ),
             ),
-          ),
 
         ],
       )
