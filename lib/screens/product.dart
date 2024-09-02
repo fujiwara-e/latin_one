@@ -20,22 +20,21 @@ class ProductPage extends StatefulWidget {
 }
 
 class _ProductPageState extends State<ProductPage> {
-
   late List<ProductItem> _products;
 
   @override
   void initState() {
     super.initState();
+    //TODO: CatalogModelを使って商品情報を取得する
     _products = [
       ProductItem(
         onTap: () {
-         Navigator.push(
+          Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => ChoicePage(index: 0),
-              fullscreenDialog: true
-            ),
-          ); 
+                builder: (context) => ChoicePage(index: 0),
+                fullscreenDialog: true),
+          );
         },
         image: 'assets/images/CoffeeBean.jpg',
         name: 'Bean A',
@@ -46,9 +45,8 @@ class _ProductPageState extends State<ProductPage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => ChoicePage(index: 1),
-              fullscreenDialog: true
-            ),
+                builder: (context) => ChoicePage(index: 1),
+                fullscreenDialog: true),
           );
         },
         image: 'assets/images/CoffeeBean.jpg',
@@ -56,17 +54,13 @@ class _ProductPageState extends State<ProductPage> {
         price: '500',
       ),
       ProductItem(
-        onTap: () {
-          _handleTap(3);
-        },
+        onTap: () {},
         image: 'assets/images/CoffeeBean.jpg',
         name: 'Bean C',
         price: '1000',
       ),
       ProductItem(
-        onTap: () {
-          _handleTap(4);
-        },
+        onTap: () {},
         image: 'assets/images/CoffeeBean.jpg',
         name: 'Bean D',
         price: '1000',
@@ -74,26 +68,6 @@ class _ProductPageState extends State<ProductPage> {
     ];
   }
 
-  void _handleTap(int index) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Add to Cart'),
-          content: _MyListItem(index),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Close'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -151,17 +125,16 @@ class _AddButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     var isInCart = context.select<CartModel, bool>(
       (cart) => cart.items.contains(item),
     );
-    
-    // TODO: ボタンを右に寄せる
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Container(
-          child:Column(
+        Padding(
+          padding: EdgeInsets.only(left: 20),
+          child: Column(
             children: [
               Text("数量"),
               Text(
@@ -169,35 +142,37 @@ class _AddButton extends StatelessWidget {
                 style: TextStyle(fontSize: 20),
               ),
             ],
-        ),),
-        Container(
-          child: Row(
-            children: [
-       IconButton(
-        icon: const Icon(Icons.remove),
-          onPressed: () {
-            var cart = context.read<CartModel>();
-              if (isInCart && cart.count(item) > 0) {
-              cart.remove(item);
-            }
-          },
-          tooltip: 'Decrease quantity',
+          ),
         ),
-
-        IconButton(
-          icon: const Icon(Icons.add),
-          onPressed: () {
-            var cart = context.read<CartModel>();
-            cart.add(item);
-          },
-          tooltip: 'Increase quantity',
+        Row(
+          children: [
+            IconButton(
+              icon: const Icon(Icons.remove_circle_outline),
+              onPressed: isInCart
+                  ? () {
+                      var cart = context.read<CartModel>();
+                      if (cart.count(item) > 0) {
+                        cart.remove(item);
+                      }
+                    }
+                  : null,
+              tooltip: 'Decrease quantity',
+            ),
+            IconButton(
+              icon: const Icon(Icons.add_circle_outline),
+              onPressed: () {
+                var cart = context.read<CartModel>();
+                cart.add(item);
+              },
+              tooltip: 'Increase quantity',
+            ),
+          ],
         ),
-            ],),),
       ],
     );
-      
   }
 }
+
 class _MyListItem extends StatelessWidget {
   final int index;
   const _MyListItem(this.index);
@@ -207,9 +182,10 @@ class _MyListItem extends StatelessWidget {
     var item = context.select<CatalogModel, Item>(
       (catalog) => catalog.getByPosition(index),
     );
-    return  _AddButton(item: item);
+    return _AddButton(item: item);
   }
 }
+
 class ChoicePage extends StatelessWidget {
   final int index;
   const ChoicePage({
@@ -220,76 +196,86 @@ class ChoicePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: CustomScrollView(
-        slivers: <Widget>[
-          SliverAppBar(
-            backgroundColor: Colors.white,
-            expandedHeight: SizeConfig.blockSizeVertical * 8,
-            flexibleSpace: FlexibleSpaceBar(
-              title: Align(
-                  alignment: Alignment.bottomLeft,
-                  child: Text(
-                    "商品選択",
-                    style: TextStyle(
-                      fontSize: SizeConfig.TitleSize,
-                      color: Colors.black,
-                      fontFamily: 'gothic',
-                    ),
-                  )),
-              titlePadding:
-                  EdgeInsets.only(top: 0, right: 0, bottom: 0, left: 20),
-              collapseMode: CollapseMode.parallax,
-            ),
+        body: CustomScrollView(
+      slivers: <Widget>[
+        SliverAppBar(
+          backgroundColor: Colors.white,
+          expandedHeight: SizeConfig.blockSizeVertical * 8,
+          flexibleSpace: FlexibleSpaceBar(
+            title: Align(
+                alignment: Alignment.bottomLeft,
+                child: Text(
+                  "商品選択",
+                  style: TextStyle(
+                    fontSize: SizeConfig.TitleSize,
+                    color: Colors.black,
+                    fontFamily: 'gothic',
+                  ),
+                )),
+            titlePadding:
+                EdgeInsets.only(top: 0, right: 0, bottom: 0, left: 20),
+            collapseMode: CollapseMode.parallax,
           ),
-          SliverFixedExtentList(
-            itemExtent: SizeConfig.blockSizeVertical * 10 + 2,
-            delegate: SliverChildListDelegate(
-              [
-                Row(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(left: 20),
-                      child:
-                        Image(
-                          image: AssetImage('assets/images/CoffeeBean.jpg'),
-                          width: SizeConfig.blockSizeHorizontal * 20,
-                          height: SizeConfig.blockSizeVertical * 20,
-                          ),
-                          ),
-                          Padding(padding: EdgeInsets.only(left: 20),
-                          child:
-                       Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("サンセットフラペチーノ"),
-                            Text("¥500"),
-                            Text("価格は税込み価格です"),
-                          ],
-                        ),),
-                      ],
+        ),
+        SliverFixedExtentList(
+          itemExtent: SizeConfig.blockSizeVertical * 10 + 2,
+          delegate: SliverChildListDelegate(
+            [
+              Row(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(left: 20),
+                    child: Image(
+                      image: AssetImage('assets/images/CoffeeBean.jpg'),
+                      width: SizeConfig.blockSizeHorizontal * 20,
+                      height: SizeConfig.blockSizeVertical * 20,
                     ),
-                    Column(
-                    children:[
-                      Container(
-                      height: 2,
-                      width: SizeConfig.screenWidth,
-                      color: Colors.black12,
-                    ),
-                    Text("商品の説明"),
-                    Row(
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(left: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _MyListItem(index),
-                        
+                        Text("サンセットフラペチーノ"),
+                        Text("¥500"),
+                        Text("価格は税込み価格です"),
                       ],
                     ),
-                  ],),
-              ],
-                ),
-            ),
-
-        ],
-      )
-    );
+                  ),
+                ],
+              ),
+              Column(
+                children: [
+                  Container(
+                    height: 2,
+                    width: SizeConfig.screenWidth,
+                    color: Colors.black12,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(left: 20),
+                    child: Container(
+                      alignment: Alignment.centerLeft,
+                      child: Text("甘い風味，すっきりとした苦味"),
+                    ),
+                  ),
+                  Container(
+                    height: 2,
+                    width: SizeConfig.screenWidth,
+                    color: Colors.black12,
+                  ),
+                  _MyListItem(index),
+                  Container(
+                    height: 2,
+                    width: SizeConfig.screenWidth,
+                    color: Colors.black12,
+                  )
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
+    ));
   }
 }
 
