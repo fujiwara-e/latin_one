@@ -11,6 +11,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latin_one/entities/catalog.dart';
 import 'package:provider/provider.dart';
 import 'package:latin_one/entities/cart.dart';
+import 'package:latin_one/screens/order.dart';
 
 class ProductPage extends StatefulWidget {
   const ProductPage({super.key});
@@ -196,86 +197,103 @@ class ChoicePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: CustomScrollView(
-      slivers: <Widget>[
-        SliverAppBar(
-          backgroundColor: Colors.white,
-          expandedHeight: SizeConfig.blockSizeVertical * 8,
-          flexibleSpace: FlexibleSpaceBar(
-            title: Align(
-                alignment: Alignment.bottomLeft,
-                child: Text(
-                  "商品選択",
-                  style: TextStyle(
-                    fontSize: SizeConfig.TitleSize,
-                    color: Colors.black,
-                    fontFamily: 'gothic',
-                  ),
-                )),
-            titlePadding:
-                EdgeInsets.only(top: 0, right: 0, bottom: 0, left: 20),
-            collapseMode: CollapseMode.parallax,
+        body: Stack(children: [
+      CustomScrollView(
+        slivers: <Widget>[
+          SliverAppBar(
+            backgroundColor: Colors.white,
+            expandedHeight: SizeConfig.blockSizeVertical * 8,
+            flexibleSpace: FlexibleSpaceBar(
+              title: Align(
+                  alignment: Alignment.bottomLeft,
+                  child: Text(
+                    "商品選択",
+                    style: TextStyle(
+                      fontSize: SizeConfig.TitleSize,
+                      color: Colors.black,
+                      fontFamily: 'gothic',
+                    ),
+                  )),
+              titlePadding:
+                  EdgeInsets.only(top: 0, right: 0, bottom: 0, left: 20),
+              collapseMode: CollapseMode.parallax,
+            ),
+          ),
+          SliverFixedExtentList(
+            itemExtent: SizeConfig.blockSizeVertical * 10 + 2,
+            delegate: SliverChildListDelegate(
+              [
+                Row(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(left: 20),
+                      child: Image(
+                        image: AssetImage('assets/images/CoffeeBean.jpg'),
+                        width: SizeConfig.blockSizeHorizontal * 20,
+                        height: SizeConfig.blockSizeVertical * 20,
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(left: 20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("サンセットフラペチーノ"),
+                          Text("¥500"),
+                          Text("価格は税込み価格です"),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                Column(
+                  children: [
+                    Container(
+                      height: 2,
+                      width: SizeConfig.screenWidth,
+                      color: Colors.black12,
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(left: 20),
+                      child: Container(
+                        alignment: Alignment.centerLeft,
+                        child: Text("甘い風味，すっきりとした苦味"),
+                      ),
+                    ),
+                    Container(
+                      height: 2,
+                      width: SizeConfig.screenWidth,
+                      color: Colors.black12,
+                    ),
+                    _MyListItem(index),
+                    Container(
+                      height: 2,
+                      width: SizeConfig.screenWidth,
+                      color: Colors.black12,
+                    )
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+      Positioned(
+        bottom: 10,
+        right: 10,
+        child: TextButton(
+          onPressed: () => Navigator.popUntil(
+            context,
+            ModalRoute.withName('/order'),
+          ),
+          child: Text('決定する'),
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.white,
+            backgroundColor: Colors.yellow[800],
           ),
         ),
-        SliverFixedExtentList(
-          itemExtent: SizeConfig.blockSizeVertical * 10 + 2,
-          delegate: SliverChildListDelegate(
-            [
-              Row(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.only(left: 20),
-                    child: Image(
-                      image: AssetImage('assets/images/CoffeeBean.jpg'),
-                      width: SizeConfig.blockSizeHorizontal * 20,
-                      height: SizeConfig.blockSizeVertical * 20,
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(left: 20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("サンセットフラペチーノ"),
-                        Text("¥500"),
-                        Text("価格は税込み価格です"),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              Column(
-                children: [
-                  Container(
-                    height: 2,
-                    width: SizeConfig.screenWidth,
-                    color: Colors.black12,
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(left: 20),
-                    child: Container(
-                      alignment: Alignment.centerLeft,
-                      child: Text("甘い風味，すっきりとした苦味"),
-                    ),
-                  ),
-                  Container(
-                    height: 2,
-                    width: SizeConfig.screenWidth,
-                    color: Colors.black12,
-                  ),
-                  _MyListItem(index),
-                  Container(
-                    height: 2,
-                    width: SizeConfig.screenWidth,
-                    color: Colors.black12,
-                  )
-                ],
-              ),
-            ],
-          ),
-        ),
-      ],
-    ));
+      )
+    ]));
   }
 }
 
