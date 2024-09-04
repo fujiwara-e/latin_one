@@ -71,51 +71,61 @@ class _ProductPageState extends State<ProductPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: CustomScrollView(slivers: <Widget>[
-      SliverAppBar(
-        backgroundColor: Colors.white,
-        expandedHeight: SizeConfig.blockSizeVertical * 8,
-        pinned: true,
-        flexibleSpace: FlexibleSpaceBar(
-          title: Align(
-              alignment: Alignment.bottomLeft,
-              child: Text(
-                "Products",
-                style: TextStyle(
-                  fontSize: SizeConfig.TitleSize,
-                  color: Colors.black,
-                  fontFamily: 'ozworld',
-                ),
-              )),
-          titlePadding: EdgeInsets.only(top: 0, right: 0, bottom: 0, left: 20),
-          collapseMode: CollapseMode.parallax,
-        ),
-      ),
-      SliverToBoxAdapter(
-        child: Padding(
-          padding: EdgeInsets.only(left: 15),
-          child: Container(
-              height: SizeConfig.blockSizeVertical * 5,
-              alignment: Alignment.centerLeft,
-              child: Text('表示価格はすべて税込み価格です',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Colors.black54,
-                    fontFamily: 'gothic',
-                  ))),
-        ),
-      ),
-      SliverText(text: "ITALLEY ROAST"),
-      ProductsItem(products: _products),
-      SliverBorder(),
-      SliverText(text: "FRENCH ROAST"),
-      ProductsItem(products: _products),
-      SliverBorder(),
-      SliverText(text: "SPEACIALTY COFFEE"),
-      ProductsItem(products: _products),
-      SliverBorder(),
-    ]));
+    return PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (bool didPop, Object? result) {
+          if (didPop) {
+            return;
+          }
+          Navigator.popUntil(context, ModalRoute.withName('/order/storepage'));
+          Navigator.pop(context);
+        },
+        child: Scaffold(
+            body: CustomScrollView(slivers: <Widget>[
+          SliverAppBar(
+            backgroundColor: Colors.white,
+            expandedHeight: SizeConfig.blockSizeVertical * 8,
+            pinned: true,
+            flexibleSpace: FlexibleSpaceBar(
+              title: Align(
+                  alignment: Alignment.bottomLeft,
+                  child: Text(
+                    "Products",
+                    style: TextStyle(
+                      fontSize: SizeConfig.TitleSize,
+                      color: Colors.black,
+                      fontFamily: 'ozworld',
+                    ),
+                  )),
+              titlePadding:
+                  EdgeInsets.only(top: 0, right: 0, bottom: 0, left: 20),
+              collapseMode: CollapseMode.parallax,
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.only(left: 15),
+              child: Container(
+                  height: SizeConfig.blockSizeVertical * 5,
+                  alignment: Alignment.centerLeft,
+                  child: Text('表示価格はすべて税込み価格です',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.black54,
+                        fontFamily: 'gothic',
+                      ))),
+            ),
+          ),
+          SliverText(text: "ITALLEY ROAST"),
+          ProductsItem(products: _products),
+          SliverBorder(),
+          SliverText(text: "FRENCH ROAST"),
+          ProductsItem(products: _products),
+          SliverBorder(),
+          SliverText(text: "SPEACIALTY COFFEE"),
+          ProductsItem(products: _products),
+          SliverBorder(),
+        ])));
   }
 }
 
@@ -282,10 +292,11 @@ class ChoicePage extends StatelessWidget {
         bottom: 10,
         right: 10,
         child: TextButton(
-          onPressed: () => Navigator.popUntil(
-            context,
-            ModalRoute.withName('/order'),
-          ),
+          onPressed: () => {
+            Navigator.popUntil(
+                context, ModalRoute.withName('/order/storepage')),
+            Navigator.pop(context),
+          },
           child: Text('決定する'),
           style: TextButton.styleFrom(
             foregroundColor: Colors.white,

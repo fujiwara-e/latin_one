@@ -126,7 +126,9 @@ class _StoreItemState extends State<StoreItem> {
           });
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => widget.widget),
+            MaterialPageRoute(
+                settings: RouteSettings(name: '/order/storepage'),
+                builder: (context) => widget.widget),
           );
         },
         child: Column(
@@ -414,10 +416,9 @@ class BottomSheetItem extends StatelessWidget {
                       backgroundColor: Colors.yellow[800],
                       foregroundColor: Colors.white,
                     ),
-                    onPressed: () => Navigator.pushAndRemoveUntil(
+                    onPressed: () => Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => ProductPage()),
-                      (route) => route.isFirst,
                     ),
                     child: Text('選択する'),
                   ),
@@ -556,5 +557,3 @@ class ProductItem extends StatelessWidget {
     );
   }
 }
-
-
