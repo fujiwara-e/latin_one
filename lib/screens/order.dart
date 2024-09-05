@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:latin_one/entities/cart.dart';
 import '../config/size_config.dart';
 import '../screens/item.dart';
+
+import 'package:provider/provider.dart';
 import 'package:latin_one/screens/product.dart';
 
 class OrderPage extends StatefulWidget {
@@ -21,6 +24,7 @@ class _OrderPageState extends State<OrderPage> {
 
   @override
   Widget build(BuildContext context) {
+    var cart = context.read<CartModel>();
     return Scaffold(
       body: CustomScrollView(
         slivers: <Widget>[
@@ -71,6 +75,17 @@ class _OrderPageState extends State<OrderPage> {
               ],
             ),
           ),
+          // TODO: cart に追加された商品を表示する
+          SliverList(
+              delegate: SliverChildBuilderDelegate(
+            (context, index) {
+              final item = cart.items[index];
+              return ListTile(
+                title: Text(item.name),
+              );
+            },
+            childCount: cart.items.length,
+          ))
         ],
       ),
     );
