@@ -7,11 +7,8 @@ import 'package:latin_one/entities/cart.dart';
 import 'package:latin_one/screens/item.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter_map/flutter_map.dart';
 import 'package:latin_one/entities/catalog.dart';
 import 'package:provider/provider.dart';
-import 'package:latin_one/entities/cart.dart';
-import 'package:latin_one/screens/order.dart';
 
 class ProductPage extends StatefulWidget {
   const ProductPage({super.key});
@@ -21,66 +18,41 @@ class ProductPage extends StatefulWidget {
 }
 
 class _ProductPageState extends State<ProductPage> {
-  late List<ProductItem> _products;
+  List<ProductItem> _products =[];
 
   @override
   void initState() {
     super.initState();
     //TODO: CatalogModelを使って商品情報を取得する
-    _products = [
-      ProductItem(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => ChoicePage(index: 0),
-                fullscreenDialog: true),
-          );
-        },
-        image: 'assets/images/CoffeeBean.jpg',
-        name: 'Bean A',
-        price: '500',
-      ),
-      ProductItem(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => ChoicePage(index: 1),
-                fullscreenDialog: true),
-          );
-        },
-        image: 'assets/images/CoffeeBean.jpg',
-        name: 'Bean B',
-        price: '500',
-      ),
-      ProductItem(
-        onTap: () {},
-        image: 'assets/images/CoffeeBean.jpg',
-        name: 'Bean C',
-        price: '1000',
-      ),
-      ProductItem(
-        onTap: () {},
-        image: 'assets/images/CoffeeBean.jpg',
-        name: 'Bean D',
-        price: '1000',
-      ),
-    ];
+    CatalogModel catalog = CatalogModel();
+    final ItemList =[];
+    for (int i = 0; i < CatalogModel.itemNames.length; i++) {
+      Item item = catalog.getById(i);
+      ItemList.add(item);
+    }
+    
+    for (int i = 0; i < ItemList.length; i++) {
+      _products.add(
+        ProductItem(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => ChoicePage(item: ItemList[i]),
+                  fullscreenDialog: true),
+            );
+          },
+          image: 'assets/images/CoffeeBean.jpg',
+          name: ItemList[i].name,
+          price: ItemList[i].price.toString(),
+        )
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-        canPop: false,
-        onPopInvokedWithResult: (bool didPop, Object? result) {
-          if (didPop) {
-            return;
-          }
-          Navigator.popUntil(context, ModalRoute.withName('/order/storepage'));
-          Navigator.pop(context);
-        },
-        child: Scaffold(
+    return Scaffold(
             body: CustomScrollView(slivers: <Widget>[
           SliverAppBar(
             backgroundColor: Colors.white,
@@ -125,7 +97,7 @@ class _ProductPageState extends State<ProductPage> {
           SliverText(text: "SPEACIALTY COFFEE"),
           ProductsItem(products: _products),
           SliverBorder(),
-        ])));
+        ]));
   }
 }
 
@@ -185,23 +157,20 @@ class _AddButton extends StatelessWidget {
 }
 
 class _MyListItem extends StatelessWidget {
-  final int index;
-  const _MyListItem(this.index);
+  final Item item;
+  const _MyListItem(this.item);
 
   @override
   Widget build(BuildContext context) {
-    var item = context.select<CatalogModel, Item>(
-      (catalog) => catalog.getByPosition(index),
-    );
     return _AddButton(item: item);
   }
 }
 
 class ChoicePage extends StatelessWidget {
-  final int index;
+  final Item item;
   const ChoicePage({
     Key? key,
-    required this.index,
+    required this.item,
   }) : super(key: key);
 
   @override
@@ -248,8 +217,8 @@ class ChoicePage extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text("サンセットフラペチーノ"),
-                          Text("¥500"),
+                          Text(item.name),
+                          Text(item.price.toString()),
                           Text("価格は税込み価格です"),
                         ],
                       ),
@@ -275,7 +244,7 @@ class ChoicePage extends StatelessWidget {
                       width: SizeConfig.screenWidth,
                       color: Colors.black12,
                     ),
-                    _MyListItem(index),
+                    _MyListItem(item),
                     Container(
                       height: 2,
                       width: SizeConfig.screenWidth,
@@ -294,8 +263,7 @@ class ChoicePage extends StatelessWidget {
         child: TextButton(
           onPressed: () => {
             Navigator.popUntil(
-                context, ModalRoute.withName('/order/storepage')),
-            Navigator.pop(context),
+                context, (route) => route.isFirst,),
           },
           child: Text('決定する'),
           style: TextButton.styleFrom(
