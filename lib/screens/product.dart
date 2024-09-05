@@ -262,8 +262,12 @@ class ChoicePage extends StatelessWidget {
         right: 10,
         child: TextButton(
           onPressed: () => {
-            Navigator.popUntil(
-                context, (route) => route.isFirst,),
+            // Future.delayed(Duration(milliseconds: 100), () {
+            // Navigator.popUntil(context, (route) => route.isFirst,)
+            // })
+            // Navigator.popUntil(context, ModalRoute.withName('/'))
+            Navigator.popUntil(context, ModalRoute.withName('/order/storepage')),
+            Navigator.pop(context),
           },
           child: Text('決定する'),
           style: TextButton.styleFrom(
