@@ -5,7 +5,7 @@ import 'package:latin_one/entities/catalog.dart';
 
 class CartModel extends ChangeNotifier {
   late CatalogModel _catalog;
-  final List<int> _itemIds = [];
+  final List<Item> _items = [];
 
   CatalogModel get catalog => _catalog;
 
@@ -14,24 +14,38 @@ class CartModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  List<Item> get items => _itemIds.map((id) => _catalog.getById(id)).toList();
-
-  int get totalPrice => items.fold(0, (total, current) => total + current.price);
-
+  List<Item> get items => _items;
+  int get totalPrice => items.fold(
+      0, (total, current) => total + (current.price * current.quantity));
 
   void add(Item item) {
-    _itemIds.add(item.id);
+    final existingItem = _items.firstWhere((i) => i.id == item.id,
+        orElse: () => Item(item.id, item.name, item.price, 0));
+    if (existingItem.quantity == 0) {
+      _items.add(Item(item.id, item.name, item.price, 1));
+    } else {
+      _items[_items.indexOf(existingItem)] =
+          Item(item.id, item.name, item.price, existingItem.quantity + 1);
+    }
     notifyListeners();
   }
 
   void remove(Item item) {
-    _itemIds.remove(item.id);
+    final existingItem = _items.firstWhere((i) => i.id == item.id,
+        orElse: () => Item(item.id, item.name, item.price, 0));
+
+    if (existingItem.quantity > 1) {
+      _items[_items.indexOf(existingItem)] =
+          Item(item.id, item.name, item.price, existingItem.quantity - 1);
+    } else {
+      _items.remove(existingItem);
+    }
     notifyListeners();
   }
 
   int count(Item item) {
-    int count = _itemIds.where((_itemIds) => _itemIds == item.id).length; 
-    return count;
+    final existingItem = _items.firstWhere((i) => i.id == item.id,
+        orElse: () => Item(item.id, item.name, item.price, 0));
+    return existingItem.quantity;
   }
-
 }

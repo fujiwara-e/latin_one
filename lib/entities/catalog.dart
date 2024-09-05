@@ -14,7 +14,8 @@ class CatalogModel {
     530,
   ];
 
-  Item getById(int id) => Item(id, itemNames[id], itemPrices[id]);
+  Item getById(int id, {int quantity = 0}) =>
+      Item(id, itemNames[id], itemPrices[id], quantity);
 
   Item getByPosition(int position) => getById(position);
 }
@@ -24,7 +25,9 @@ class Item {
   final int id;
   final String name;
   final int price;
-  Item(this.id, this.name, this.price);
+  final int quantity;
+
+  Item(this.id, this.name, this.price, this.quantity);
 
   @override
   int get hashCode => id;
