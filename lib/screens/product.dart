@@ -56,8 +56,12 @@ class _ProductPageState extends State<ProductPage> {
           if (didpop) {
             return;
           }
-          Navigator.popUntil(context, ModalRoute.withName('/order/storepage'));
-          Navigator.pop(context);
+          Navigator.popUntil(
+            context,
+            (route) => route.isFirst,
+          );
+          // Navigator.popUntil(context, ModalRoute.withName('/order/storepage'));
+          // Navigator.pop(context);
         },
         child: Scaffold(
             body: CustomScrollView(slivers: <Widget>[
@@ -269,13 +273,10 @@ class ChoicePage extends StatelessWidget {
         right: 10,
         child: TextButton(
           onPressed: () => {
-            // Future.delayed(Duration(milliseconds: 100), () {
-            // Navigator.popUntil(context, (route) => route.isFirst,)
-            // })
-            // Navigator.popUntil(context, ModalRoute.withName('/'))
             Navigator.popUntil(
-                context, ModalRoute.withName('/order/storepage')),
-            Navigator.pop(context),
+              context,
+              (route) => route.isFirst,
+            )
           },
           child: Text('決定する'),
           style: TextButton.styleFrom(
