@@ -18,41 +18,48 @@ class ProductPage extends StatefulWidget {
 }
 
 class _ProductPageState extends State<ProductPage> {
-  List<ProductItem> _products =[];
+  List<ProductItem> _products = [];
 
   @override
   void initState() {
     super.initState();
     //TODO: CatalogModelを使って商品情報を取得する
     CatalogModel catalog = CatalogModel();
-    final ItemList =[];
+    final ItemList = [];
     for (int i = 0; i < CatalogModel.itemNames.length; i++) {
       Item item = catalog.getById(i);
       ItemList.add(item);
     }
-    
+
     for (int i = 0; i < ItemList.length; i++) {
-      _products.add(
-        ProductItem(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => ChoicePage(item: ItemList[i]),
-                  fullscreenDialog: true),
-            );
-          },
-          image: 'assets/images/CoffeeBean.jpg',
-          name: ItemList[i].name,
-          price: ItemList[i].price.toString(),
-        )
-      );
+      _products.add(ProductItem(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => ChoicePage(item: ItemList[i]),
+                fullscreenDialog: true),
+          );
+        },
+        image: 'assets/images/CoffeeBean.jpg',
+        name: ItemList[i].name,
+        price: ItemList[i].price.toString(),
+      ));
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (bool didpop, Object? result) {
+          if (didpop) {
+            return;
+          }
+          Navigator.popUntil(context, ModalRoute.withName('/order/storepage'));
+          Navigator.pop(context);
+        },
+        child: Scaffold(
             body: CustomScrollView(slivers: <Widget>[
           SliverAppBar(
             backgroundColor: Colors.white,
@@ -97,7 +104,7 @@ class _ProductPageState extends State<ProductPage> {
           SliverText(text: "SPEACIALTY COFFEE"),
           ProductsItem(products: _products),
           SliverBorder(),
-        ]));
+        ])));
   }
 }
 
@@ -266,7 +273,8 @@ class ChoicePage extends StatelessWidget {
             // Navigator.popUntil(context, (route) => route.isFirst,)
             // })
             // Navigator.popUntil(context, ModalRoute.withName('/'))
-            Navigator.popUntil(context, ModalRoute.withName('/order/storepage')),
+            Navigator.popUntil(
+                context, ModalRoute.withName('/order/storepage')),
             Navigator.pop(context),
           },
           child: Text('決定する'),
