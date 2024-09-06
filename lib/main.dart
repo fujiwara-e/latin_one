@@ -11,6 +11,7 @@ import 'firebase/firebase_options.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 import 'screens/product.dart';
+import 'entities/shop.dart';
 
 FirebaseFirestore db = FirebaseFirestore.instance;
 
@@ -43,6 +44,16 @@ class MyApp extends StatelessWidget {
               }
               cart.catalog = catalog;
               return cart;
+            }),
+        Provider(create: (context) => ShopModel()),
+        ChangeNotifierProxyProvider<ShopModel, SelectedShopModel>(
+            create: (context) => SelectedShopModel(),
+            update: (context, shopList, selectedShop) {
+              if (selectedShop == null) {
+                throw ArgumentError.notNull('selectedShop');
+              }
+              selectedShop.shopList = shopList;
+              return selectedShop;
             }),
       ],
       child: MaterialApp(

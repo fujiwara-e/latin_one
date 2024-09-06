@@ -8,6 +8,7 @@ import 'package:latin_one/screens/item.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:latin_one/entities/catalog.dart';
+import 'package:latin_one/entities/shop.dart';
 import 'package:provider/provider.dart';
 
 class ProductPage extends StatefulWidget {
@@ -23,7 +24,6 @@ class _ProductPageState extends State<ProductPage> {
   @override
   void initState() {
     super.initState();
-    //TODO: CatalogModelを使って商品情報を取得する
     CatalogModel catalog = CatalogModel();
     final ItemList = [];
     for (int i = 0; i < CatalogModel.itemNames.length; i++) {
@@ -52,7 +52,7 @@ class _ProductPageState extends State<ProductPage> {
   Widget build(BuildContext context) {
     return PopScope(
         canPop: false,
-        onPopInvokedWithResult: (bool didpop, Object? result) {
+        onPopInvoked: (bool didpop) {
           if (didpop) {
             return;
           }
@@ -60,8 +60,6 @@ class _ProductPageState extends State<ProductPage> {
             context,
             (route) => route.isFirst,
           );
-          // Navigator.popUntil(context, ModalRoute.withName('/order/storepage'));
-          // Navigator.pop(context);
         },
         child: Scaffold(
             body: CustomScrollView(slivers: <Widget>[
@@ -299,6 +297,7 @@ class StorePage extends StatefulWidget {
 class _StorePageState extends State<StorePage> {
   @override
   Widget build(BuildContext context) {
+    ShopModel shopList = ShopModel();
     return DefaultTabController(
         length: 3,
         child: Scaffold(
@@ -363,7 +362,9 @@ class _StorePageState extends State<StorePage> {
                                 showModalBottomSheet(
                                     context: context,
                                     builder: (context) {
-                                      return _BottomSheet();
+                                      return BottomSheetItem(
+                                          onTap: () {},
+                                          shop: shopList.getById(0));
                                     });
                               },
                               icon: Icon(
@@ -397,21 +398,5 @@ class _StorePageState extends State<StorePage> {
             ),
           ),
         ));
-  }
-}
-
-class _BottomSheet extends StatelessWidget {
-  const _BottomSheet({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: SizeConfig.blockSizeVertical * 30,
-      color: Colors.white,
-      child: BottomSheetItem(
-        onTap: () => {},
-        text: 'hoge',
-      ),
-    );
   }
 }
