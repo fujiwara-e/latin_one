@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:latin_one/entities/cart.dart';
 import '../config/size_config.dart';
 import '../screens/item.dart';
-
+import 'package:latin_one/entities/shop.dart';
 import 'package:provider/provider.dart';
 import 'package:latin_one/screens/product.dart';
 
@@ -24,7 +24,6 @@ class _OrderPageState extends State<OrderPage> {
 
   @override
   Widget build(BuildContext context) {
-    var cart = context.read<CartModel>();
     return Scaffold(
       body: CustomScrollView(
         slivers: <Widget>[
@@ -49,33 +48,35 @@ class _OrderPageState extends State<OrderPage> {
               collapseMode: CollapseMode.parallax,
             ),
           ),
-          SliverFixedExtentList(
-            itemExtent: SizeConfig.blockSizeVertical * 10 + 2,
-            delegate: SliverChildListDelegate(
-              [
-                StoreItem(
-                  text: 'お店を選択してください',
-                  image: Image.asset(
-                    'assets/images/store.png',
-                    width: 20,
-                    height: 20,
-                  ),
-                  widget: StorePage(),
-                  selectstore: _onItemTapped,
-                ),
-                OrderItem(
-                    text: '商品を選択してください',
-                    image: Image.asset(
-                      'assets/images/coffee.png',
-                      width: 20,
-                      height: 20,
-                    ),
-                    widget: ProductPage(),
-                    selectedstore: selected_store),
-              ],
+
+          // Consumer<SelectedShopModel>(builder: (context, selectedshop, child) {
+          // if (selectedshop.isSelected) {
+          /*return*/ SliverToBoxAdapter(
+            child: StoreItem(
+              text: 'お店を選択してください',
+              image: Image.asset(
+                'assets/images/store.png',
+                width: 20,
+                height: 20,
+              ),
+              widget: StorePage(),
+              selectstore: _onItemTapped,
             ),
           ),
           // TODO: cart に追加された商品を表示する
+          // Consumer<CartModel>(builder: (context, cart, child) {
+          //   if (cart.items.length == 0) {
+          /*return*/ SliverToBoxAdapter(
+            child: OrderItem(
+                text: '商品を選択してください',
+                image: Image.asset(
+                  'assets/images/coffee.png',
+                  width: 20,
+                  height: 20,
+                ),
+                widget: ProductPage(),
+                selectedstore: selected_store),
+          ),
           Consumer<CartModel>(builder: (context, cart, child) {
             return SliverList(
                 delegate: SliverChildBuilderDelegate(
