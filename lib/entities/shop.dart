@@ -65,7 +65,7 @@ class Shop {
 
 class SelectedShopModel extends ChangeNotifier {
   late ShopModel _shopList;
-  late Shop _selectedShop;
+  Shop? _selectedShop;
   bool _isSelected = false;
 
   bool get isSelected => _isSelected;
@@ -76,9 +76,9 @@ class SelectedShopModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Shop get selectedShop => _selectedShop;
+  Shop? get selectedShop => _selectedShop;
 
-  set selectedShop(Shop newSelectedShop) {
+  set selectedShop(Shop? newSelectedShop) {
     _selectedShop = newSelectedShop;
     notifyListeners();
   }

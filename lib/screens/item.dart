@@ -34,7 +34,7 @@ class OrderItem extends StatelessWidget {
   final String text;
   final Image image;
   final Widget widget;
-  final int selectedstore;
+  final bool selectedstore;
 
   const OrderItem({
     Key? key,
@@ -46,21 +46,19 @@ class OrderItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool isGrayedOut = selectedstore == 0;
-
     return Opacity(
-        opacity: isGrayedOut ? 0.5 : 1.0,
+        opacity: selectedstore ? 1.0 : 0.5,
         child: InkWell(
-            onTap: isGrayedOut
-                ? null
-                : () {
+            onTap: selectedstore
+                ? () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                           settings: RouteSettings(name: '/order/storepage'),
                           builder: (context) => widget),
                     );
-                  },
+                  }
+                : null,
             child: Column(
               children: <Widget>[
                 SizedBox(
@@ -435,9 +433,8 @@ class BottomSheetItem extends StatelessWidget {
                               builder: (context) => ProductPage()),
                         );
                         var currentShop = context.read<SelectedShopModel>();
-                        print(currentShop.selectedShop.name);
                         currentShop.set(shop);
-                        print(currentShop.selectedShop.name);
+                        print(currentShop.selectedShop!.name);
                       },
                       child: Text('選択する'),
                     ),

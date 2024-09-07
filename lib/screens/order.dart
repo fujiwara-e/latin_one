@@ -64,18 +64,20 @@ class _OrderPageState extends State<OrderPage> {
             ),
           ),
           // TODO: cart に追加された商品を表示する
-          // Consumer<CartModel>(builder: (context, cart, child) {
-          //   if (cart.items.length == 0) {
-          /*return*/ SliverToBoxAdapter(
-            child: OrderItem(
-                text: '商品を選択してください',
-                image: Image.asset(
-                  'assets/images/coffee.png',
-                  width: 20,
-                  height: 20,
-                ),
-                widget: ProductPage(),
-                selectedstore: selected_store),
+          Consumer<SelectedShopModel>(
+            builder: (context, selectedShopModel, child) {
+              return SliverToBoxAdapter(
+                child: OrderItem(
+                    text: '商品を選択してください',
+                    image: Image.asset(
+                      'assets/images/coffee.png',
+                      width: 20,
+                      height: 20,
+                    ),
+                    widget: ProductPage(),
+                    selectedstore: selectedShopModel.isSelected),
+              );
+            },
           ),
           Consumer<CartModel>(builder: (context, cart, child) {
             return SliverList(
