@@ -49,26 +49,32 @@ class _OrderPageState extends State<OrderPage> {
             ),
           ),
 
-          // Consumer<SelectedShopModel>(builder: (context, selectedshop, child) {
-          // if (selectedshop.isSelected) {
-          /*return*/ SliverToBoxAdapter(
-            child: StoreItem(
-              text: 'お店を選択してください',
-              image: Image.asset(
-                'assets/images/store.png',
-                width: 20,
-                height: 20,
+          Consumer<SelectedShopModel>(builder: (context, selectedshop, child) {
+            String text = selectedshop.isSelected
+                ? selectedshop.selectedShop!.name
+                : 'お店を選択してください';
+            return SliverToBoxAdapter(
+              child: StoreItem(
+                text: text,
+                image: Image.asset(
+                  'assets/images/store.png',
+                  width: 20,
+                  height: 20,
+                ),
+                widget: StorePage(),
+                selectstore: _onItemTapped,
               ),
-              widget: StorePage(),
-              selectstore: _onItemTapped,
-            ),
-          ),
+            );
+          }),
           // TODO: cart に追加された商品を表示する
           Consumer<SelectedShopModel>(
             builder: (context, selectedShopModel, child) {
+              var cart = context.read<CartModel>();
+              String text = cart.items.isEmpty ? '商品を選択してください' : '商品を追加';
+              print(cart.items.length);
               return SliverToBoxAdapter(
                 child: OrderItem(
-                    text: '商品を選択してください',
+                    text: text,
                     image: Image.asset(
                       'assets/images/coffee.png',
                       width: 20,
