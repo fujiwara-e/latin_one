@@ -149,6 +149,7 @@ class AddButton extends StatelessWidget {
               onPressed: () {
                 var cart = context.read<CartModel>();
                 cart.add(item);
+                //Provider.of<CartModel>(context, listen: false).add(item);
               },
               tooltip: 'Increase quantity',
             ),

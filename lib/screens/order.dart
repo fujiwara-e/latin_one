@@ -93,6 +93,9 @@ class _OrderPageState extends State<OrderPage> {
             return SliverList(
                 delegate: SliverChildBuilderDelegate(
                     childCount: cart.items.length, (context, index) {
+              if (index >= cart.items.length) {
+                return null;
+              }
               final item = cart.items[index];
               // TODO: item.dart に 定義しておく?
               return Column(
@@ -146,8 +149,8 @@ class _OrderPageState extends State<OrderPage> {
               );
             }));
           }),
-          Consumer<CartModel>(builder: (context, cart0, child) {
-            int total = cart0.totalPrice;
+          Consumer<CartModel>(builder: (context, cart, child) {
+            final total = cart.totalPrice;
             print(total);
             return SliverToBoxAdapter(
               child: Container(
@@ -168,13 +171,13 @@ class _OrderPageState extends State<OrderPage> {
                     Container(
                       alignment: Alignment.centerRight,
                       margin: EdgeInsets.only(right: 10),
-                      child: Text('￥' /*total.toString()*/,
+                      child: Text('￥',
                           style: TextStyle(
                             fontSize: 12,
                             color: Colors.black,
                             fontFamily: 'gothic',
                           )),
-                    )
+                    ),
                   ],
                 ),
               ),
