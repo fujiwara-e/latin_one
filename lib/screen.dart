@@ -56,7 +56,7 @@ class ScreenState extends State<Screen> {
     return PopScope(
         canPop: canPopValue,
         onPopInvoked: (bool didpop) {
-          onSelect(TabItem.home, 0);
+          onSelect(TabItem.home);
         },
         child: Scaffold(
             body: Stack(children: <Widget>[
@@ -64,8 +64,11 @@ class ScreenState extends State<Screen> {
               _buildTabItem(TabItem.shops, '/shops'),
               _buildTabItem(TabItem.order, '/order')
             ]),
-            bottomNavigationBar:
-                BottomNavigation(currentTab: _currentTab, onSelect: onSelect)));
+            bottomNavigationBar: BottomNavigation(
+              currentTab: _currentTab,
+              onSelect: onSelect,
+              currentIndex: _current_index,
+            )));
   }
 
   Widget _buildTabItem(
@@ -82,14 +85,14 @@ class ScreenState extends State<Screen> {
     );
   }
 
-  void onSelect(TabItem tabItem, int index) {
+  void onSelect(TabItem tabItem) {
     if (_currentTab == TabItem.home)
       _navigatorKeys[_currentTab]!
           .currentState!
           .popUntil((route) => route.isFirst);
     setState(() {
       _currentTab = tabItem;
-      _current_index = index;
+      _current_index = tabItem.index;
     });
   }
 }

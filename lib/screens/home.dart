@@ -9,22 +9,12 @@ import 'package:latin_one/navigator/tab_navigator.dart';
 import 'package:latin_one/navigator/bottom_navigator.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key /*, required currentTab*/});
-
-  //TabItem currentTab;
+  const HomePage({super.key});
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  TabItem _currentTab = TabItem.home;
-
-  void _selectTab(TabItem tabItem) {
-    setState(() {
-      _currentTab = tabItem;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -93,22 +83,28 @@ class _HomePageState extends State<HomePage> {
                   final screenstate =
                       context.findAncestorStateOfType<ScreenState>();
                   if (screenstate != null) {
-                    screenstate.onSelect(TabItem.order, 2);
+                    screenstate.onSelect(TabItem.order);
                   }
                 },
                 image: 'assets/images/CoffeeBean.jpg',
                 text: 'Order',
               ),
               HomeItem(
-                onTap: () {},
+                onTap: () {
+                  final screenstate =
+                      context.findAncestorStateOfType<ScreenState>();
+                  if (screenstate != null) {}
+                },
                 image: 'assets/images/Latte.jpg',
                 text: 'Products',
               ),
               HomeItem(
                 onTap: () {
-                  setState(() {
-                    // widget.onChangeIndex(1);
-                  });
+                  final screenstate =
+                      context.findAncestorStateOfType<ScreenState>();
+                  if (screenstate != null) {
+                    screenstate.onSelect(TabItem.shops);
+                  }
                 },
                 image: 'assets/images/Machine.jpg',
                 text: 'Shops',

@@ -125,10 +125,6 @@ class _StoreItemState extends State<StoreItem> {
   Widget build(BuildContext context) {
     return InkWell(
         onTap: () {
-          print("on tap\n");
-          setState(() {
-            widget.selectstore(1);
-          });
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -526,7 +522,7 @@ class ProductItem extends StatelessWidget {
         children: [
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15.0),
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(10),
                 child: Image(

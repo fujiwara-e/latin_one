@@ -29,10 +29,12 @@ class BottomNavigation extends StatefulWidget {
   BottomNavigation({
     Key? key,
     required this.currentTab,
+    required this.currentIndex,
     required this.onSelect,
   }) : super(key: key);
 
   final TabItem currentTab;
+  final int currentIndex;
   final ValueChanged<TabItem> onSelect;
 
   @override
@@ -41,11 +43,9 @@ class BottomNavigation extends StatefulWidget {
 
 class _BottomNavigationState extends State<BottomNavigation> {
   @override
-  int current_index = 0;
-
   Widget build(BuildContext context) {
     return BottomNavigationBar(
-      currentIndex: current_index,
+      currentIndex: widget.currentIndex,
       items: <BottomNavigationBarItem>[
         bottomItem(
           context,
@@ -63,10 +63,6 @@ class _BottomNavigationState extends State<BottomNavigation> {
       type: BottomNavigationBarType.fixed,
       onTap: (index) {
         widget.onSelect(TabItem.values[index]);
-        setState(() {
-          current_index = index;
-        });
-        print(current_index);
       },
     );
   }
