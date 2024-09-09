@@ -13,10 +13,11 @@ class Screen extends StatefulWidget {
   final String title;
 
   @override
-  State<Screen> createState() => _ScreenState();
+  State<Screen> createState() => ScreenState();
 }
 
-class _ScreenState extends State<Screen> {
+class ScreenState extends State<Screen> {
+  int _current_index = 0;
   TabItem _currentTab = TabItem.home;
   Map<TabItem, GlobalKey<NavigatorState>> _navigatorKeys = {
     TabItem.home: GlobalKey<NavigatorState>(),
@@ -55,7 +56,7 @@ class _ScreenState extends State<Screen> {
     return PopScope(
         canPop: canPopValue,
         onPopInvoked: (bool didpop) {
-          onSelect(TabItem.home);
+          onSelect(TabItem.home, 0);
         },
         child: Scaffold(
             body: Stack(children: <Widget>[
@@ -81,13 +82,14 @@ class _ScreenState extends State<Screen> {
     );
   }
 
-  void onSelect(TabItem tabItem) {
+  void onSelect(TabItem tabItem, int index) {
     if (_currentTab == TabItem.home)
       _navigatorKeys[_currentTab]!
           .currentState!
           .popUntil((route) => route.isFirst);
     setState(() {
       _currentTab = tabItem;
+      _current_index = index;
     });
   }
 }

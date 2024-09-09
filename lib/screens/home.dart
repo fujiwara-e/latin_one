@@ -6,6 +6,7 @@ import 'package:latin_one/main.dart';
 import 'package:latin_one/screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:latin_one/navigator/tab_navigator.dart';
+import 'package:latin_one/navigator/bottom_navigator.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key /*, required currentTab*/});
@@ -16,6 +17,14 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  TabItem _currentTab = TabItem.home;
+
+  void _selectTab(TabItem tabItem) {
+    setState(() {
+      _currentTab = tabItem;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -81,14 +90,11 @@ class _HomePageState extends State<HomePage> {
             delegate: SliverChildListDelegate([
               HomeItem(
                 onTap: () {
-                  setState(() {
-                    // _currentTab = TabItem.order;
-                  });
-                  Builder(
-                    builder: (BuildContext context) =>
-                        Screen(title: 'Latin One'),
-                  );
-                  print(selectedIndex);
+                  final screenstate =
+                      context.findAncestorStateOfType<ScreenState>();
+                  if (screenstate != null) {
+                    screenstate.onSelect(TabItem.order, 2);
+                  }
                 },
                 image: 'assets/images/CoffeeBean.jpg',
                 text: 'Order',
