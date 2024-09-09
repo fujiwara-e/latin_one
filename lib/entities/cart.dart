@@ -19,11 +19,12 @@ class CartModel extends ChangeNotifier {
   List<Item> get items => _items;
   int get totalPrice => _totalprice;
 
-  void totalprice() {
+  int totalprice() {
     _totalprice = 0;
     for (int i = 0; i < _items.length; i++) {
       _totalprice = _totalprice + (_items[i].price * _items[i].quantity);
     }
+    return _totalprice;
   }
 
   void add(Item item) {
