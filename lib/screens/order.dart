@@ -71,11 +71,10 @@ class _OrderPageState extends State<OrderPage> {
             );
           }),
           // TODO: cart に追加された商品を表示する
-          Consumer<CartModel>(
-            builder: (context, cart, child) {
+          Consumer2<CartModel, SelectedShopModel>(
+            builder: (context, cart, shop, child) {
               final isShopSelected = context.read<SelectedShopModel>();
-              String text = '商品を選択してください';
-              //String text = cart.items.isEmpty ? '商品を選択してください' : '商品を追加';
+              String text = cart.items.isEmpty ? '商品を選択してください' : '商品を追加';
               return SliverToBoxAdapter(
                 child: OrderItem(
                     text: text,
@@ -163,7 +162,7 @@ class _OrderPageState extends State<OrderPage> {
                       margin: EdgeInsets.only(left: 10),
                       child: Text("総合計",
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 20,
                             color: Colors.black,
                             fontFamily: 'gothic',
                           )),
@@ -171,9 +170,9 @@ class _OrderPageState extends State<OrderPage> {
                     Container(
                       alignment: Alignment.centerRight,
                       margin: EdgeInsets.only(right: 10),
-                      child: Text('￥',
+                      child: Text('￥${total}',
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 20,
                             color: Colors.black,
                             fontFamily: 'gothic',
                           )),
@@ -184,27 +183,102 @@ class _OrderPageState extends State<OrderPage> {
             );
           }),
 
-          SliverToBoxAdapter(
-              child: TextButton(
-            child: Text('購入'),
-            onPressed: () {
-              var cart = context.read<CartModel>();
-              String name;
-              int quantity;
-              int i;
-              String data_tmp = '';
-              for (i = 0; i < cart.items.length; i++) {
-                name = cart.items[i].name;
-                quantity = cart.items[i].quantity;
-                data_tmp = data_tmp + '${name}:${quantity}\n';
-              }
-              final data = ClipboardData(text: data_tmp);
-              Clipboard.setData(data);
+          Consumer2<CartModel, SelectedShopModel>(
+            builder: (context, cart, shop, child) {
+              return SliverToBoxAdapter(
+                child: Opacity(
+                  opacity: cart.items.isNotEmpty ? 1.0 : 0.5,
+                  child: ElevatedButton(
+                    child: const Text('注文する'),
+                    style: ElevatedButton.styleFrom(
+                      fixedSize: Size(
+                          SizeConfig.blockSizeHorizontal * 1, double.infinity),
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.yellow[800],
+                      shape: const StadiumBorder(),
+                    ),
+                    onPressed: cart.items.isNotEmpty
+                        ? () {
+                            String name;
+                            int quantity;
+                            int i;
+                            String data_tmp = '';
+                            for (i = 0; i < cart.items.length; i++) {
+                              name = cart.items[i].name;
+                              quantity = cart.items[i].quantity;
+                              data_tmp = data_tmp + '${name}:${quantity}\n';
+                            }
+                            final data = ClipboardData(text: data_tmp);
+                            Clipboard.setData(data);
+                            showDialog<void>(
+                                context: context,
+                                builder: (_) {
+                                  return AlertDialogSample();
+                                });
+                          }
+                        : null,
+                  ),
+                ),
+              );
             },
-          )),
+          ),
         ],
       ),
     );
+  }
+}
+
+class AlertDialogSample extends StatelessWidget {
+  const AlertDialogSample({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text('注文を確定します'),
+      content: Text('注文確定後のキャンセル，内容変更はできません'),
+      actions: <Widget>[
+        OutlinedButton(
+          child: Text('キャンセル',
+              style:
+                  TextStyle(color: Colors.yellow[800], fontFamily: 'gothic')),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          style: OutlinedButton.styleFrom(
+            side: BorderSide(
+              color: Colors.yellow[800]!,
+            ),
+          ),
+        ),
+        ElevatedButton(
+          child: const Text('OK'),
+          style: ElevatedButton.styleFrom(
+            foregroundColor: Colors.white,
+            backgroundColor: Colors.yellow[800],
+            shape: const StadiumBorder(),
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      ],
+    );
+  }
+}
+
+class OrderCompletionPage extends StatelessWidget {
+  const OrderCompletionPage({
+    Key? key,
+    required this.data,
+  }) : super(key: key);
+
+  final String data;
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        body: Container(
+      child: Text('注文内容がクリップボードにコピーされました．'),
+    ));
   }
 }
 

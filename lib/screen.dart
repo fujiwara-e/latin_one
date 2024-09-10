@@ -18,6 +18,7 @@ class Screen extends StatefulWidget {
 
 class ScreenState extends State<Screen> {
   int _current_index = 0;
+
   TabItem _currentTab = TabItem.home;
   Map<TabItem, GlobalKey<NavigatorState>> _navigatorKeys = {
     TabItem.home: GlobalKey<NavigatorState>(),
