@@ -5,8 +5,7 @@ import 'hello.dart';
 import 'package:latin_one/main.dart';
 import 'package:latin_one/screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:latin_one/navigator/tab_navigator.dart';
-import 'package:latin_one/navigator/bottom_navigator.dart';
+import 'package:latin_one/screens/menu.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -93,7 +92,11 @@ class _HomePageState extends State<HomePage> {
                 onTap: () {
                   final screenstate =
                       context.findAncestorStateOfType<ScreenState>();
-                  if (screenstate != null) {}
+                  if (screenstate != null) {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => const MenuPage(),
+                        fullscreenDialog: true));
+                  }
                 },
                 image: 'assets/images/Latte.jpg',
                 text: 'Products',
@@ -134,48 +137,56 @@ class InboxPage extends StatefulWidget {
 class _InboxPageState extends State<InboxPage> {
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-        length: 2,
-        child: Scaffold(
-          body: NestedScrollView(
-            headerSliverBuilder:
-                (BuildContext context, bool innerBoxIsScrolled) {
-              return <Widget>[
-                SliverAppBar(
-                  pinned: true,
-                  backgroundColor: Colors.white,
-                  expandedHeight: SizeConfig.blockSizeVertical * 8,
-                  flexibleSpace: FlexibleSpaceBar(
-                    title: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          "Inbox",
-                          style: TextStyle(
-                            fontSize: SizeConfig.TitleSize,
-                            color: Colors.black,
-                            fontFamily: 'ozworld',
-                          ),
-                        )),
-                    titlePadding:
-                        EdgeInsets.only(top: 0, right: 0, bottom: 0, left: 20),
-                    collapseMode: CollapseMode.parallax,
-                  ),
-                  bottom: TabBar(
-                    tabs: [
-                      Tab(text: "What's New"),
-                      Tab(text: "Message"),
-                    ],
-                  ),
+    return PopScope(
+        canPop: false,
+        onPopInvoked: (bool didpop) {
+          final screenstate = context.findAncestorStateOfType<ScreenState>();
+          if (screenstate != null) {
+            screenstate.onSelect(TabItem.home);
+          }
+        },
+        child: DefaultTabController(
+            length: 2,
+            child: Scaffold(
+              body: NestedScrollView(
+                headerSliverBuilder:
+                    (BuildContext context, bool innerBoxIsScrolled) {
+                  return <Widget>[
+                    SliverAppBar(
+                      pinned: true,
+                      backgroundColor: Colors.white,
+                      expandedHeight: SizeConfig.blockSizeVertical * 8,
+                      flexibleSpace: FlexibleSpaceBar(
+                        title: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              "Inbox",
+                              style: TextStyle(
+                                fontSize: SizeConfig.TitleSize,
+                                color: Colors.black,
+                                fontFamily: 'ozworld',
+                              ),
+                            )),
+                        titlePadding: EdgeInsets.only(
+                            top: 0, right: 0, bottom: 0, left: 20),
+                        collapseMode: CollapseMode.parallax,
+                      ),
+                      bottom: TabBar(
+                        tabs: [
+                          Tab(text: "What's New"),
+                          Tab(text: "Message"),
+                        ],
+                      ),
+                    ),
+                  ];
+                },
+                body: TabBarView(
+                  children: [
+                    Center(child: Text('Tab 1 Content')),
+                    Center(child: Text('Tab 2 Content')),
+                  ],
                 ),
-              ];
-            },
-            body: TabBarView(
-              children: [
-                Center(child: Text('Tab 1 Content')),
-                Center(child: Text('Tab 2 Content')),
-              ],
-            ),
-          ),
-        ));
+              ),
+            )));
   }
 }

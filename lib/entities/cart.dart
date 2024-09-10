@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:latin_one/entities/catalog.dart';
@@ -19,6 +20,7 @@ class CartModel extends ChangeNotifier {
   int get totalPrice => _totalprice;
 
   void totalprice() {
+    _totalprice = 0;
     for (int i = 0; i < _items.length; i++) {
       _totalprice = _totalprice + (_items[i].price * _items[i].quantity);
     }
@@ -29,8 +31,10 @@ class CartModel extends ChangeNotifier {
         orElse: () => Item(item.id, item.name, item.price, 0, item.description,
             item.imagePath));
     if (existingItem.quantity == 0) {
-      _items.add(Item(
-          item.id, item.name, item.price, 1, item.description, item.imagePath));
+      _items.insert(
+          0,
+          Item(item.id, item.name, item.price, 1, item.description,
+              item.imagePath));
     } else {
       _items[_items.indexOf(existingItem)] = Item(
           item.id,
@@ -40,11 +44,7 @@ class CartModel extends ChangeNotifier {
           item.description,
           item.imagePath);
     }
-
-    for (int i = 0; i < _items.length; i++) {
-      _totalprice = _totalprice + (_items[i].price * _items[i].quantity);
-    }
-
+    totalprice();
     notifyListeners();
   }
 
@@ -65,9 +65,7 @@ class CartModel extends ChangeNotifier {
       _items.remove(existingItem);
     }
 
-    for (int i = 0; i < _items.length; i++) {
-      _totalprice = _totalprice + (_items[i].price * _items[i].quantity);
-    }
+    totalprice();
 
     notifyListeners();
   }

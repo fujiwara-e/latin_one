@@ -567,3 +567,67 @@ class ProductItem extends StatelessWidget {
     );
   }
 }
+
+class MenuItem extends StatelessWidget {
+  final String image;
+  final String text;
+
+  const MenuItem({
+    Key? key,
+    required this.image,
+    required this.text,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+        onTap: () => {},
+        child: Column(
+          children: <Widget>[
+            SizedBox(
+              height: SizeConfig.blockSizeVertical * 9.6,
+              child: Row(children: <Widget>[
+                SizedBox(
+                  height: SizeConfig.blockSizeVertical * 8,
+                  child: Container(
+                    alignment: Alignment.centerLeft,
+                    margin:
+                        EdgeInsets.only(left: 20, top: 0, right: 0, bottom: 0),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(30),
+                      child: Image(
+                        image: AssetImage(image),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                ),
+                Container(
+                  alignment: Alignment.centerLeft,
+                  margin:
+                      EdgeInsets.only(left: 20, top: 0, right: 0, bottom: 0),
+                  height: SizeConfig.blockSizeVertical * 10,
+                  width: SizeConfig.screenWidth * 0.66,
+                  child: Text(text,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.black,
+                        fontFamily: 'gothic',
+                      )),
+                ),
+                Container(
+                  alignment: Alignment.centerLeft,
+                  margin: EdgeInsets.only(left: 0, top: 0, right: 0, bottom: 0),
+                  child: Icon(Icons.arrow_forward_ios),
+                )
+              ]),
+            ),
+            Container(
+              height: 2,
+              width: SizeConfig.screenWidth,
+              color: Colors.black12,
+            ),
+          ],
+        ));
+  }
+}
