@@ -13,10 +13,12 @@ class Screen extends StatefulWidget {
   final String title;
 
   @override
-  State<Screen> createState() => _ScreenState();
+  State<Screen> createState() => ScreenState();
 }
 
-class _ScreenState extends State<Screen> {
+class ScreenState extends State<Screen> {
+  int _current_index = 0;
+
   TabItem _currentTab = TabItem.home;
   Map<TabItem, GlobalKey<NavigatorState>> _navigatorKeys = {
     TabItem.home: GlobalKey<NavigatorState>(),
@@ -63,8 +65,11 @@ class _ScreenState extends State<Screen> {
               _buildTabItem(TabItem.shops, '/shops'),
               _buildTabItem(TabItem.order, '/order')
             ]),
-            bottomNavigationBar:
-                BottomNavigation(currentTab: _currentTab, onSelect: onSelect)));
+            bottomNavigationBar: BottomNavigation(
+              currentTab: _currentTab,
+              onSelect: onSelect,
+              currentIndex: _current_index,
+            )));
   }
 
   Widget _buildTabItem(
@@ -88,6 +93,7 @@ class _ScreenState extends State<Screen> {
           .popUntil((route) => route.isFirst);
     setState(() {
       _currentTab = tabItem;
+      _current_index = tabItem.index;
     });
   }
 }
