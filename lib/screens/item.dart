@@ -5,9 +5,9 @@ import 'package:latin_one/screens/product.dart';
 import 'package:latin_one/screens/shops.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:latin_one/config/size_config.dart';
-import 'package:latin_one/screens/order.dart';
 import 'package:latin_one/entities/shop.dart';
 import 'package:provider/provider.dart';
+import 'package:latin_one/entities/customer.dart';
 
 enum TabItem {
   home,
@@ -28,6 +28,76 @@ class UrlLauncher {
     );
     await launchUrl(getPhoneNumber);
   }
+}
+
+class InfoItem extends StatelessWidget {
+  final String text;
+  final Widget widget;
+  final bool selectedstore;
+
+  const InfoItem({
+    Key? key,
+    required this.text,
+    required this.widget,
+    required this.selectedstore,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Opacity(
+        opacity: selectedstore ? 1.0 : 0.5,
+        child: InkWell(
+            onTap: selectedstore
+                ? () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          settings: RouteSettings(name: '/order/info'),
+                          builder: (context) => widget),
+                    );
+                  }
+                : null,
+            child: Column(
+              children: <Widget>[
+                SizedBox(
+                  width: SizeConfig.screenWidth,
+                  height: SizeConfig.blockSizeVertical * 10,
+                  child: Row(children: <Widget>[
+                    Container(
+                      alignment: Alignment.centerLeft,
+                      margin: const EdgeInsets.only(
+                          left: 20, top: 0, right: 0, bottom: 0),
+                      child: const Icon(Icons.person_2_outlined),
+                    ),
+                    Container(
+                      alignment: Alignment.centerLeft,
+                      margin: const EdgeInsets.only(
+                          left: 20, top: 0, right: 0, bottom: 0),
+                      height: SizeConfig.blockSizeVertical * 10,
+                      width: SizeConfig.screenWidth * 0.73,
+                      child: Text(text,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.black,
+                            fontFamily: 'gothic',
+                          )),
+                    ),
+                    Container(
+                      alignment: Alignment.centerLeft,
+                      margin:
+                          EdgeInsets.only(left: 0, top: 0, right: 0, bottom: 0),
+                      child: Icon(Icons.arrow_forward_ios),
+                    )
+                  ]),
+                ),
+                Container(
+                  height: 2,
+                  width: SizeConfig.screenWidth,
+                  color: Colors.black12,
+                ),
+              ],
+            )));
+  } // widget build
 }
 
 class OrderItem extends StatelessWidget {
@@ -54,7 +124,8 @@ class OrderItem extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          settings: RouteSettings(name: '/order/storepage'),
+                          settings:
+                              const RouteSettings(name: '/order/storepage'),
                           builder: (context) => widget),
                     );
                   }
@@ -67,18 +138,18 @@ class OrderItem extends StatelessWidget {
                   child: Row(children: <Widget>[
                     Container(
                       alignment: Alignment.centerLeft,
-                      margin: EdgeInsets.only(
+                      margin: const EdgeInsets.only(
                           left: 20, top: 0, right: 0, bottom: 0),
                       child: image,
                     ),
                     Container(
                       alignment: Alignment.centerLeft,
-                      margin: EdgeInsets.only(
+                      margin: const EdgeInsets.only(
                           left: 20, top: 0, right: 0, bottom: 0),
                       height: SizeConfig.blockSizeVertical * 10,
                       width: SizeConfig.screenWidth * 0.73,
                       child: Text(text,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 12,
                             color: Colors.black,
                             fontFamily: 'gothic',
@@ -86,9 +157,9 @@ class OrderItem extends StatelessWidget {
                     ),
                     Container(
                       alignment: Alignment.centerLeft,
-                      margin:
-                          EdgeInsets.only(left: 0, top: 0, right: 0, bottom: 0),
-                      child: Icon(Icons.arrow_forward_ios),
+                      margin: const EdgeInsets.only(
+                          left: 0, top: 0, right: 0, bottom: 0),
+                      child: const Icon(Icons.arrow_forward_ios),
                     )
                   ]),
                 ),
@@ -128,7 +199,7 @@ class _StoreItemState extends State<StoreItem> {
           Navigator.push(
             context,
             MaterialPageRoute(
-                settings: RouteSettings(name: '/order/storepage'),
+                settings: const RouteSettings(name: '/order/storepage'),
                 builder: (context) => widget.widget),
           );
         },
@@ -140,18 +211,18 @@ class _StoreItemState extends State<StoreItem> {
               child: Row(children: <Widget>[
                 Container(
                   alignment: Alignment.centerLeft,
-                  margin:
-                      EdgeInsets.only(left: 20, top: 0, right: 0, bottom: 0),
+                  margin: const EdgeInsets.only(
+                      left: 20, top: 0, right: 0, bottom: 0),
                   child: widget.image,
                 ),
                 Container(
                   alignment: Alignment.centerLeft,
-                  margin:
-                      EdgeInsets.only(left: 20, top: 0, right: 0, bottom: 0),
+                  margin: const EdgeInsets.only(
+                      left: 20, top: 0, right: 0, bottom: 0),
                   height: SizeConfig.blockSizeVertical * 10,
                   width: SizeConfig.screenWidth * 0.73,
                   child: Text(widget.text,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 12,
                         color: Colors.black,
                         fontFamily: 'gothic',
@@ -159,8 +230,9 @@ class _StoreItemState extends State<StoreItem> {
                 ),
                 Container(
                   alignment: Alignment.centerLeft,
-                  margin: EdgeInsets.only(left: 0, top: 0, right: 0, bottom: 0),
-                  child: Icon(Icons.arrow_forward_ios),
+                  margin: const EdgeInsets.only(
+                      left: 0, top: 0, right: 0, bottom: 0),
+                  child: const Icon(Icons.arrow_forward_ios),
                 )
               ]),
             ),
@@ -629,5 +701,43 @@ class MenuItem extends StatelessWidget {
             ),
           ],
         ));
+  }
+}
+
+class FormItem extends StatelessWidget {
+  final String text;
+  final TextEditingController controller;
+
+  const FormItem({Key? key, required this.text, required this.controller})
+      : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: controller,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return '値を入力してください';
+        }
+        return null;
+      },
+      decoration: InputDecoration(
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(0),
+          borderSide: BorderSide(color: Colors.black, width: 2.0),
+        ),
+        labelText: text,
+        floatingLabelStyle: const TextStyle(fontSize: 12),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(0),
+          borderSide: BorderSide(
+            color: Colors.black,
+            width: 1.0,
+          ),
+        ),
+      ),
+      onSaved: (value) {
+        print(value);
+      },
+    );
   }
 }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:provider/provider.dart';
 
 class ShopModel {
   static List<String> shopNames = [
@@ -80,6 +79,11 @@ class SelectedShopModel extends ChangeNotifier {
 
   set selectedShop(Shop? newSelectedShop) {
     _selectedShop = newSelectedShop;
+    notifyListeners();
+  }
+
+  void reset() {
+    _isSelected = false;
     notifyListeners();
   }
 

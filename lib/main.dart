@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:latin_one/entities/cart.dart';
 import 'package:latin_one/entities/catalog.dart';
+import 'package:latin_one/entities/customer.dart';
 import 'package:latin_one/screens/shops.dart';
 import './config/size_config.dart';
-import 'screens/home.dart';
-import 'screens/order.dart';
 import 'screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase/firebase_options.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
-import 'screens/product.dart';
 import 'entities/shop.dart';
 
 FirebaseFirestore db = FirebaseFirestore.instance;
@@ -55,6 +53,9 @@ class MyApp extends StatelessWidget {
               selectedShop.shopList = shopList;
               return selectedShop;
             }),
+        ChangeNotifierProvider<CustomerModel>(
+          create: (context) => CustomerModel('', '', '', '', ''),
+        ),
       ],
       child: MaterialApp(
         title: 'Flutter Demo',

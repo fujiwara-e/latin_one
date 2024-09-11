@@ -1,14 +1,20 @@
+import 'dart:ui';
+import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:latin_one/entities/cart.dart';
 import '../config/size_config.dart';
 import '../screens/item.dart';
 import 'package:latin_one/entities/shop.dart';
+import 'package:latin_one/entities/customer.dart';
 import 'package:provider/provider.dart';
 import 'package:latin_one/screens/product.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart';
 
 class OrderPage extends StatefulWidget {
   const OrderPage({super.key});
@@ -148,6 +154,22 @@ class _OrderPageState extends State<OrderPage> {
               );
             }));
           }),
+
+          Consumer3<CartModel, SelectedShopModel, CustomerModel>(
+            builder: (context, cart, shop, customer, child) {
+              final isShopSelected = context.read<SelectedShopModel>();
+              String text = customer.isSeted
+                  ? '${customer.firstName} ${customer.lastName} 様'
+                  : '配達先を指定してください';
+              return SliverToBoxAdapter(
+                child: InfoItem(
+                    text: text,
+                    widget: FormPage(),
+                    selectedstore: isShopSelected.isSelected),
+              );
+            },
+          ),
+
           Consumer<CartModel>(builder: (context, cart, child) {
             final total = cart.totalPrice;
             print(total);
@@ -183,8 +205,8 @@ class _OrderPageState extends State<OrderPage> {
             );
           }),
 
-          Consumer2<CartModel, SelectedShopModel>(
-            builder: (context, cart, shop, child) {
+          Consumer3<CartModel, SelectedShopModel, CustomerModel>(
+            builder: (context, cart, shop, customer, child) {
               return SliverToBoxAdapter(
                 child: Opacity(
                   opacity: cart.items.isNotEmpty ? 1.0 : 0.5,
@@ -197,23 +219,12 @@ class _OrderPageState extends State<OrderPage> {
                       backgroundColor: Colors.yellow[800],
                       shape: const StadiumBorder(),
                     ),
-                    onPressed: cart.items.isNotEmpty
+                    onPressed: cart.items.isNotEmpty && customer.isSeted
                         ? () {
-                            String name;
-                            int quantity;
-                            int i;
-                            String data_tmp = '';
-                            for (i = 0; i < cart.items.length; i++) {
-                              name = cart.items[i].name;
-                              quantity = cart.items[i].quantity;
-                              data_tmp = data_tmp + '${name}:${quantity}\n';
-                            }
-                            final data = ClipboardData(text: data_tmp);
-                            Clipboard.setData(data);
                             showDialog<void>(
                                 context: context,
                                 builder: (_) {
-                                  return AlertDialogSample();
+                                  return Alert();
                                 });
                           }
                         : null,
@@ -228,8 +239,8 @@ class _OrderPageState extends State<OrderPage> {
   }
 }
 
-class AlertDialogSample extends StatelessWidget {
-  const AlertDialogSample({Key? key}) : super(key: key);
+class Alert extends StatelessWidget {
+  const Alert({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -258,7 +269,36 @@ class AlertDialogSample extends StatelessWidget {
             shape: const StadiumBorder(),
           ),
           onPressed: () {
+            var cart = context.read<CartModel>();
+            var shop = context.read<SelectedShopModel>();
+            var customer = context.read<CustomerModel>();
+            String name;
+            int quantity;
+            int i;
+            String data_tmp = '';
+            data_tmp =
+                data_tmp + 'お名前: ${customer.firstName} ${customer.lastName}';
+            data_tmp = data_tmp + '連絡先: ${customer.mail}';
+            data_tmp = data_tmp + '配達先: ${customer.address}';
+            for (i = 0; i < cart.items.length; i++) {
+              name = cart.items[i].name;
+              quantity = cart.items[i].quantity;
+              data_tmp = data_tmp + '${name}: ${quantity}点\n';
+            }
+            data_tmp = data_tmp + '総合計: ¥${cart.totalPrice}';
+            final data = ClipboardData(text: data_tmp);
+            Clipboard.setData(data);
+            cart.reset();
+            shop.reset();
+            customer.reset();
+            print(shop.isSelected);
             Navigator.pop(context);
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                  settings: RouteSettings(name: '/order/info'),
+                  builder: (context) => const OrderCompletionPage(),
+                  fullscreenDialog: true),
+            );
           },
         ),
       ],
@@ -269,16 +309,171 @@ class AlertDialogSample extends StatelessWidget {
 class OrderCompletionPage extends StatelessWidget {
   const OrderCompletionPage({
     Key? key,
-    required this.data,
   }) : super(key: key);
 
-  final String data;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        appBar: PreferredSize(
+            preferredSize: Size.fromHeight(SizeConfig.blockSizeVertical * 10),
+            child: AppBar(
+              automaticallyImplyLeading: true,
+              backgroundColor: Colors.white,
+              title: Align(
+                alignment: Alignment.bottomLeft,
+                child: Text('Order Complete',
+                    style: TextStyle(
+                      fontSize: SizeConfig.TitleSize,
+                      color: Colors.black,
+                      fontFamily: 'ozworld',
+                    )),
+              ),
+            )),
         body: Container(
-      child: Text('注文内容がクリップボードにコピーされました．'),
-    ));
+          height: SizeConfig.screenHeight,
+          width: SizeConfig.screenWidth,
+          child: Align(
+            child: Text(
+              'ご注文ありがとうございました．\n\nご注文内容がクリップボードにコピーされました．',
+              style: TextStyle(fontSize: 20, fontFamily: 'gothic'),
+            ),
+          ),
+        ));
+  }
+}
+
+class FormPage extends StatefulWidget {
+  const FormPage({super.key});
+
+  @override
+  State<FormPage> createState() => _FormPageState();
+}
+
+class _FormPageState extends State<FormPage> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  @override
+  final TextEditingController _firstName_controller = TextEditingController();
+  final TextEditingController _lastName_controller = TextEditingController();
+  final TextEditingController _zipcode_controller = TextEditingController();
+  final TextEditingController _address_controller = TextEditingController();
+  final TextEditingController _mail_controller = TextEditingController();
+
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: PreferredSize(
+            preferredSize: Size.fromHeight(SizeConfig.blockSizeVertical * 10),
+            child: AppBar(
+              automaticallyImplyLeading: true,
+              backgroundColor: Colors.white,
+              title: Align(
+                alignment: Alignment.bottomLeft,
+                child: Text('Information',
+                    style: TextStyle(
+                      fontSize: SizeConfig.TitleSize,
+                      color: Colors.black,
+                      fontFamily: 'ozworld',
+                    )),
+              ),
+            )),
+        body: Column(
+          children: [
+            Padding(
+              padding: EdgeInsets.only(left: 20, right: 20),
+              child: Form(
+                  key: _formKey,
+                  child: Column(children: [
+                    SizedBox(
+                      height: 12,
+                    ),
+                    SizedBox(
+                      height: 40,
+                      child: Row(children: [
+                        Expanded(
+                            child: FormItem(
+                          text: "姓",
+                          controller: _firstName_controller,
+                        )),
+                        SizedBox(width: 10),
+                        Expanded(
+                            child: FormItem(
+                          text: "名",
+                          controller: _lastName_controller,
+                        )),
+                      ]),
+                    ),
+                    SizedBox(
+                      height: 12,
+                    ),
+                    SizedBox(
+                      height: 40,
+                      child: FormItem(
+                        text: "メールアドレス",
+                        controller: _mail_controller,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 12,
+                    ),
+                    SizedBox(
+                      height: 40,
+                      child: Row(
+                        children: [
+                          Expanded(
+                              child: FormItem(
+                            text: "郵便番号",
+                            controller: _zipcode_controller,
+                          )),
+                          IconButton(
+                            icon: Icon(Icons.search),
+                            onPressed: () async {
+                              final zipcode = _zipcode_controller.text;
+                              final address = await zipCodeToAddress(zipcode);
+                              if (address == null) {
+                                return;
+                              }
+                              _address_controller.text = address;
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: 12,
+                    ),
+                    SizedBox(
+                      height: 40,
+                      child: FormItem(
+                        text: "住所",
+                        controller: _address_controller,
+                      ),
+                    ),
+                  ])),
+            ),
+            SizedBox(
+              child: TextButton(
+                style: TextButton.styleFrom(
+                  backgroundColor: Colors.yellow[800],
+                  foregroundColor: Colors.white,
+                ),
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    var customer = context.read<CustomerModel>();
+                    customer.set(
+                        _firstName_controller.text,
+                        _lastName_controller.text,
+                        _zipcode_controller.text,
+                        _mail_controller.text,
+                        _address_controller.text);
+                    Navigator.pop(context);
+                  } else {
+                    print("validate error");
+                  }
+                },
+                child: Text('決定'),
+              ),
+            ),
+          ],
+        ));
   }
 }
 
@@ -394,4 +589,29 @@ class _StorePageState extends State<StorePage> {
           ),
         ));
   }
+}
+
+Future<String?> zipCodeToAddress(String zipCode) async {
+  if (zipCode.length != 7) {
+    return null;
+  }
+  final response = await get(
+    Uri.parse(
+      'https://zipcloud.ibsnet.co.jp/api/search?zipcode=$zipCode',
+    ),
+  );
+  // 正常なステータスコードが返ってきているか
+  if (response.statusCode != 200) {
+    return null;
+  }
+  // ヒットした住所はあるか
+  final result = jsonDecode(response.body);
+  if (result['results'] == null) {
+    return null;
+  }
+  final addressMap =
+      (result['results'] as List).first; // 結果が2つ以上のこともあるが、簡易的に最初のひとつを採用することとする。
+  final address =
+      '${addressMap['address1']} ${addressMap['address2']} ${addressMap['address3']}'; // 住所を連結する。
+  return address;
 }
