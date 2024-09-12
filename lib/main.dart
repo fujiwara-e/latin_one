@@ -35,16 +35,17 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         Provider(create: (context) => CatalogModel()),
-        ChangeNotifierProxyProvider<CatalogModel, CartModel>(
-            create: (context) => CartModel(),
-            update: (context, catalog, cart) {
-              if (cart == null) {
-                throw ArgumentError.notNull('cart');
-              }
-              cart.catalog = catalog;
-              cart.init();
-              return cart;
-            }),
+        ChangeNotifierProxyProvider<CatalogModel, CartModel>(create: (context) {
+          final cart = CartModel();
+          cart.init();
+          return cart;
+        }, update: (context, catalog, cart) {
+          if (cart == null) {
+            throw ArgumentError.notNull('cart');
+          }
+          cart.catalog = catalog;
+          return cart;
+        }),
         Provider(create: (context) => ShopModel()),
         ChangeNotifierProxyProvider<ShopModel, SelectedShopModel>(
             create: (context) => SelectedShopModel(),

@@ -47,100 +47,100 @@ class _ProductPageState extends State<ProductPage> {
         price: item_list[i].price.toString(),
       ));
     }
-
-    item_list = [];
+    var item_list2 = [];
     for (int i = 0;
         i < catalog.catalog['BLEND_COFFEE']!['itemNames']!.length;
         i++) {
       Item item = catalog.getById_BLEND(i);
-      item_list.add(item);
+      item_list2.add(item);
     }
-    for (int i = 0; i < item_list.length; i++) {
+    for (int i = 0; i < item_list2.length; i++) {
       _blend_coffee.add(ProductItem(
         onTap: () {
           Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => ChoicePage(item: item_list[i]),
+                builder: (context) => ChoicePage(item: item_list2[i]),
                 fullscreenDialog: true),
           );
         },
-        image: item_list[i].imagePath,
-        name: item_list[i].name,
-        price: item_list[i].price.toString(),
+        image: item_list2[i].imagePath,
+        name: item_list2[i].name,
+        price: item_list2[i].price.toString(),
       ));
     }
 
-    item_list = [];
+    var item_list3 = [];
     for (int i = 0;
         i < catalog.catalog['FRENCH_ROAST']!['itemNames']!.length;
         i++) {
       Item item = catalog.getById_FRENCH(i);
-      item_list.add(item);
+      item_list3.add(item);
     }
-    for (int i = 0; i < item_list.length; i++) {
+    for (int i = 0; i < item_list3.length; i++) {
       _french_roasts.add(ProductItem(
         onTap: () {
           Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => ChoicePage(item: item_list[i]),
+                builder: (context) => ChoicePage(item: item_list3[i]),
                 fullscreenDialog: true),
           );
         },
-        image: item_list[i].imagePath,
-        name: item_list[i].name,
-        price: item_list[i].price.toString(),
+        image: item_list3[i].imagePath,
+        name: item_list3[i].name,
+        price: item_list3[i].price.toString(),
       ));
     }
 
-    // item_list = [];
-    // for (int i = 0;
-    //     i < catalog.catalog['SPEACIALTY_COFFEE']!['itemNames']!.length;
-    //     i++) {
-    //   Item item = catalog.getById_SPEACIAL(i);
-    //   item_list.add(item);
-    // }
-    // for (int i = 0; i < item_list.length; i++) {
-    //   _special_coffee.add(ProductItem(
-    //     onTap: () {
-    //       Navigator.push(
-    //         context,
-    //         MaterialPageRoute(
-    //             builder: (context) => ChoicePage(item: item_list[i]),
-    //             fullscreenDialog: true),
-    //       );
-    //     },
-    //     image: item_list[i].imagePath,
-    //     name: item_list[i].name,
-    //     price: item_list[i].price.toString(),
-    //   ));
-    // }
+    var item_list4 = [];
+    for (int i = 0;
+        i < catalog.catalog['SPECIALTY_COFFEE']!['itemNames']!.length;
+        i++) {
+      Item item = catalog.getById_SPECIAL(i);
+      item_list4.add(item);
+    }
+    print(item_list4.length);
+    for (int i = 0; i < item_list4.length; i++) {
+      _special_coffee.add(ProductItem(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => ChoicePage(item: item_list4[i]),
+                fullscreenDialog: true),
+          );
+        },
+        image: item_list4[i].imagePath,
+        name: item_list4[i].name,
+        price: item_list4[i].price.toString(),
+      ));
+    }
 
-    // item_list = [];
-    // for (int i = 0;
-    //     i <
-    //         catalog.catalog['SPEACIALTY_COFFEE_MEDIUM_ROAST']!['itemNames']!
-    //             .length;
-    //     i++) {
-    //   Item item = catalog.getById_SPEACIALTY_COFFEE_MEDIUM_ROAST(i);
-    //   item_list.add(item);
-    // }
-    // for (int i = 0; i < item_list.length; i++) {
-    //   _special_coffee_medium.add(ProductItem(
-    //     onTap: () {
-    //       Navigator.push(
-    //         context,
-    //         MaterialPageRoute(
-    //             builder: (context) => ChoicePage(item: item_list[i]),
-    //             fullscreenDialog: true),
-    //       );
-    //     },
-    //     image: item_list[i].imagePath,
-    //     name: item_list[i].name,
-    //     price: item_list[i].price.toString(),
-    //   ));
-    // }
+    var item_list5 = [];
+    for (int i = 0;
+        i <
+            catalog
+                .catalog['SPECIALTY_COFFEE_MEDIUM_ROAST']!['itemNames']!.length;
+        i++) {
+      Item item = catalog.getById_SPECIALTY_COFFEE_MEDIUM_ROAST(i);
+      item_list5.add(item);
+    }
+    for (int i = 0; i < item_list5.length; i++) {
+      _special_coffee_medium.add(ProductItem(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => ChoicePage(item: item_list5[i]),
+                fullscreenDialog: true),
+          );
+        },
+        image: item_list5[i].imagePath,
+        name: item_list5[i].name,
+        price: item_list5[i].price.toString(),
+      ));
+    }
   }
 
   @override
@@ -201,11 +201,11 @@ class _ProductPageState extends State<ProductPage> {
           SliverText(text: "FRENCH ROAST"),
           ProductsItem(products: _french_roasts),
           SliverBorder(),
-          SliverText(text: "SPEACIALTY COFFEE"),
+          SliverText(text: "SPECIALTY COFFEE"),
           ProductsItem(products: _special_coffee),
           SliverBorder(),
-          SliverText(text: "SPEACIALTY COFFEE MEDIUM ROAST"),
-          ProductsItem(products: _special_coffee),
+          SliverText(text: "SPECIALTY COFFEE MEDIUM ROAST"),
+          ProductsItem(products: _special_coffee_medium),
         ])));
   }
 }

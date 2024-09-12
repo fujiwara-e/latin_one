@@ -27,22 +27,22 @@ class CatalogModel {
       catalog['BLEND_COFFEE']!['itemDescriptions']![id],
       catalog['BLEND_COFFEE']!['itemImagePaths']![id]);
 
-  Item getById_SPEACIAL(int id, {int quantity = 0}) => Item(
+  Item getById_SPECIAL(int id, {int quantity = 0}) => Item(
       id,
-      catalog['SPEACIALTY_COFFEE']!['itemNames']![id],
-      catalog['SPEACIALTY_COFFEE']!['itemPrices']![id],
+      catalog['SPECIALTY_COFFEE']!['itemNames']![id],
+      catalog['SPECIALTY_COFFEE']!['itemPrices']![id],
       quantity,
-      catalog['SPEACIALTY_COFFEE']!['itemDescriptions']![id],
-      catalog['SPEACIALTY_COFFEE']!['itemImagePaths']![id]);
+      catalog['SPECIALTY_COFFEE']!['itemDescriptions']![id],
+      catalog['SPECIALTY_COFFEE']!['itemImagePaths']![id]);
 
-  Item getById_SPEACIALTY_COFFEE_MEDIUM_ROAST(int id, {int quantity = 0}) =>
+  Item getById_SPECIALTY_COFFEE_MEDIUM_ROAST(int id, {int quantity = 0}) =>
       Item(
           id,
-          catalog['SPEACIALTY_COFFEE_MEDIUM_ROAST']!['itemNames']![id],
-          catalog['SPEACIALTY_COFFEE_MEDIUM_ROAST']!['itemPrices']![id],
+          catalog['SPECIALTY_COFFEE_MEDIUM_ROAST']!['itemNames']![id],
+          catalog['SPECIALTY_COFFEE_MEDIUM_ROAST']!['itemPrices']![id],
           quantity,
-          catalog['SPEACIALTY_COFFEE_MEDIUM_ROAST']!['itemDescriptions']![id],
-          catalog['SPEACIALTY_COFFEE_MEDIUM_ROAST']!['itemImagePaths']![id]);
+          catalog['SPECIALTY_COFFEE_MEDIUM_ROAST']!['itemDescriptions']![id],
+          catalog['SPECIALTY_COFFEE_MEDIUM_ROAST']!['itemImagePaths']![id]);
 
   Map<String, Map<String, List<dynamic>>> catalog = {
     'ITALLY_ROAST': {

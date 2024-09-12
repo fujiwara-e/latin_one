@@ -136,7 +136,7 @@ class _ProductPageState extends State<MenusPage> {
           SliverText(text: "FRENCH ROAST"),
           ProductsItem(products: _products),
           SliverBorder(),
-          SliverText(text: "SPEACIALTY COFFEE"),
+          SliverText(text: "SPECIALTY COFFEE"),
           ProductsItem(products: _products),
           SliverBorder(),
         ])));
