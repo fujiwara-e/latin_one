@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
-import 'package:provider/provider.dart';
 import 'package:latin_one/entities/catalog.dart';
 
 class CartModel extends ChangeNotifier {
@@ -45,6 +43,12 @@ class CartModel extends ChangeNotifier {
           item.imagePath);
     }
     totalprice();
+    notifyListeners();
+  }
+
+  void reset() {
+    _items.clear();
+    _totalprice = 0;
     notifyListeners();
   }
 
