@@ -252,23 +252,25 @@ class ChoicePage extends StatelessWidget {
           ),
         ],
       ),
-      Positioned(
-        bottom: 10,
-        right: 10,
-        child: TextButton(
-          onPressed: () => {
-            Navigator.popUntil(
-              context,
-              (route) => route.isFirst,
-            )
-          },
-          child: Text('決定する'),
-          style: TextButton.styleFrom(
-            foregroundColor: Colors.white,
-            backgroundColor: Colors.yellow[800],
+      Align(
+        alignment: Alignment.centerRight,
+        child: Container(
+          margin: EdgeInsets.only(left: 0, top: 0, right: 10, bottom: 0),
+          child: TextButton(
+            onPressed: () => {
+              Navigator.popUntil(
+                context,
+                (route) => route.isFirst,
+              )
+            },
+            child: Text('決定する'),
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.white,
+              backgroundColor: Colors.yellow[800],
+            ),
           ),
         ),
-      )
+      ),
     ]));
   }
 }

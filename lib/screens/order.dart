@@ -277,15 +277,20 @@ class Alert extends StatelessWidget {
             int i;
             String data_tmp = '';
             data_tmp =
-                data_tmp + 'お名前: ${customer.firstName} ${customer.lastName}';
-            data_tmp = data_tmp + '連絡先: ${customer.mail}';
-            data_tmp = data_tmp + '配達先: ${customer.address}';
+                data_tmp + 'お名前: ${customer.firstName} ${customer.lastName}\n';
+            data_tmp = data_tmp + '連絡先: ${customer.mail}\n';
+            data_tmp = data_tmp + '配達先: ${customer.address}\n';
+            data_tmp = data_tmp + 'ご注文内容\n';
+            data_tmp = data_tmp +
+                '----------------------------------------------------------------------\n';
             for (i = 0; i < cart.items.length; i++) {
               name = cart.items[i].name;
               quantity = cart.items[i].quantity;
               data_tmp = data_tmp + '${name}: ${quantity}点\n';
             }
-            data_tmp = data_tmp + '総合計: ¥${cart.totalPrice}';
+            data_tmp = data_tmp + '総合計: ¥${cart.totalPrice}\n';
+            data_tmp = data_tmp +
+                '----------------------------------------------------------------------\n';
             final data = ClipboardData(text: data_tmp);
             Clipboard.setData(data);
             cart.reset();
@@ -375,7 +380,8 @@ class _FormPageState extends State<FormPage> {
                     )),
               ),
             )),
-        body: Column(
+        body: SingleChildScrollView(
+            child: Column(
           children: [
             Padding(
               padding: EdgeInsets.only(left: 20, right: 20),
@@ -383,7 +389,7 @@ class _FormPageState extends State<FormPage> {
                   key: _formKey,
                   child: Column(children: [
                     SizedBox(
-                      height: 12,
+                      height: 20,
                     ),
                     SizedBox(
                       height: 40,
@@ -402,7 +408,7 @@ class _FormPageState extends State<FormPage> {
                       ]),
                     ),
                     SizedBox(
-                      height: 12,
+                      height: 20,
                     ),
                     SizedBox(
                       height: 40,
@@ -412,7 +418,7 @@ class _FormPageState extends State<FormPage> {
                       ),
                     ),
                     SizedBox(
-                      height: 12,
+                      height: 20,
                     ),
                     SizedBox(
                       height: 40,
@@ -449,31 +455,35 @@ class _FormPageState extends State<FormPage> {
                     ),
                   ])),
             ),
-            SizedBox(
-              child: TextButton(
-                style: TextButton.styleFrom(
-                  backgroundColor: Colors.yellow[800],
-                  foregroundColor: Colors.white,
+            Align(
+              alignment: Alignment.centerRight,
+              child: Container(
+                margin: EdgeInsets.only(left: 0, top: 0, right: 10, bottom: 0),
+                child: TextButton(
+                  style: TextButton.styleFrom(
+                    backgroundColor: Colors.yellow[800],
+                    foregroundColor: Colors.white,
+                  ),
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      var customer = context.read<CustomerModel>();
+                      customer.set(
+                          _firstName_controller.text,
+                          _lastName_controller.text,
+                          _zipcode_controller.text,
+                          _mail_controller.text,
+                          _address_controller.text);
+                      Navigator.pop(context);
+                    } else {
+                      print("validate error");
+                    }
+                  },
+                  child: Text('決定'),
                 ),
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    var customer = context.read<CustomerModel>();
-                    customer.set(
-                        _firstName_controller.text,
-                        _lastName_controller.text,
-                        _zipcode_controller.text,
-                        _mail_controller.text,
-                        _address_controller.text);
-                    Navigator.pop(context);
-                  } else {
-                    print("validate error");
-                  }
-                },
-                child: Text('決定'),
               ),
             ),
           ],
-        ));
+        )));
   }
 }
 
@@ -600,17 +610,14 @@ Future<String?> zipCodeToAddress(String zipCode) async {
       'https://zipcloud.ibsnet.co.jp/api/search?zipcode=$zipCode',
     ),
   );
-  // 正常なステータスコードが返ってきているか
   if (response.statusCode != 200) {
     return null;
   }
-  // ヒットした住所はあるか
   final result = jsonDecode(response.body);
   if (result['results'] == null) {
     return null;
   }
-  final addressMap =
-      (result['results'] as List).first; // 結果が2つ以上のこともあるが、簡易的に最初のひとつを採用することとする。
+  final addressMap = (result['results'] as List).first;
   final address =
       '${addressMap['address1']} ${addressMap['address2']} ${addressMap['address3']}'; // 住所を連結する。
   return address;

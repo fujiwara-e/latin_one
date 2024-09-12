@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:latin_one/screens/menu.dart';
 import 'package:latin_one/screens/product.dart';
 import 'package:latin_one/screens/shops.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -67,7 +68,7 @@ class InfoItem extends StatelessWidget {
                       alignment: Alignment.centerLeft,
                       margin: const EdgeInsets.only(
                           left: 20, top: 0, right: 0, bottom: 0),
-                      child: const Icon(Icons.person_2_outlined),
+                      child: const Icon(Icons.person_outlined),
                     ),
                     Container(
                       alignment: Alignment.centerLeft,
@@ -413,104 +414,103 @@ class BottomSheetItem extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Container(
-        height: SizeConfig.blockSizeVertical * 30,
-        color: Colors.white,
-        child: Container(
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              border: Border(
-                bottom: BorderSide(
-                  color: Colors.white,
-                  width: 10,
+          height: SizeConfig.blockSizeVertical * 30,
+          color: Colors.white,
+          // child: Container(
+          //     alignment: Alignment.center,
+          //     decoration: BoxDecoration(
+          //       border: Border(
+          //         bottom: BorderSide(
+          //           color: Colors.white,
+          //           width: 10,
+          //         ),
+          //       ),
+          //     ),
+          //     child:
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  IconButton(
+                    onPressed: () => {},
+                    icon: Icon(
+                      Icons.favorite_outline,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () =>
+                        Navigator.of(context, rootNavigator: true).push(
+                      MaterialPageRoute(
+                        builder: (context) => ShopPage(),
+                        fullscreenDialog: true,
+                      ),
+                    ),
+                    icon: Icon(
+                      Icons.info_outline,
+                    ),
+                  ),
+                ],
+              ),
+              Container(
+                margin: EdgeInsets.only(left: 20, top: 0, right: 0, bottom: 0),
+                height: SizeConfig.blockSizeVertical * 30 * 0.2,
+                color: Colors.white,
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    shop.name,
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.black,
+                      fontFamily: 'gothic',
+                    ),
+                  ),
                 ),
               ),
-            ),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    IconButton(
-                      onPressed: () => {},
-                      icon: Icon(
-                        Icons.favorite_outline,
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: () =>
-                          Navigator.of(context, rootNavigator: true).push(
-                        MaterialPageRoute(
-                          builder: (context) => ShopPage(),
-                          fullscreenDialog: true,
-                        ),
-                      ),
-                      icon: Icon(
-                        Icons.info_outline,
-                      ),
-                    ),
-                  ],
-                ),
-                Container(
-                  margin:
-                      EdgeInsets.only(left: 20, top: 0, right: 0, bottom: 0),
-                  height: SizeConfig.blockSizeVertical * 30 * 0.2,
-                  color: Colors.white,
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      shop.name,
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.black,
-                        fontFamily: 'gothic',
-                      ),
+              Container(
+                height: SizeConfig.blockSizeVertical * 30 * 0.2,
+                margin: EdgeInsets.only(left: 20, top: 0, right: 0, bottom: 0),
+                color: Colors.white,
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    shop.address,
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: Colors.black54,
+                      fontFamily: 'ozworld',
                     ),
                   ),
                 ),
-                Container(
-                  height: SizeConfig.blockSizeVertical * 30 * 0.2,
+              ),
+              Align(
+                alignment: Alignment.centerRight,
+                child: Container(
                   margin:
-                      EdgeInsets.only(left: 20, top: 0, right: 0, bottom: 0),
-                  color: Colors.white,
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      shop.address,
-                      style: TextStyle(
-                        fontSize: 15,
-                        color: Colors.black54,
-                        fontFamily: 'ozworld',
-                      ),
+                      EdgeInsets.only(left: 0, top: 0, right: 10, bottom: 0),
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                      backgroundColor: Colors.yellow[800],
+                      foregroundColor: Colors.white,
                     ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => ProductPage()),
+                      );
+                      var currentShop = context.read<SelectedShopModel>();
+                      currentShop.set(shop);
+                      print(currentShop.selectedShop!.name);
+                    },
+                    child: Text('選択する'),
                   ),
                 ),
-                Container(
-                  margin:
-                      EdgeInsets.only(left: 20, top: 0, right: 0, bottom: 0),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: TextButton(
-                      style: TextButton.styleFrom(
-                        backgroundColor: Colors.yellow[800],
-                        foregroundColor: Colors.white,
-                      ),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => ProductPage()),
-                        );
-                        var currentShop = context.read<SelectedShopModel>();
-                        currentShop.set(shop);
-                        print(currentShop.selectedShop!.name);
-                      },
-                      child: Text('選択する'),
-                    ),
-                  ),
-                ),
-              ],
-            )),
-      ),
+              ),
+              // ),
+            ],
+          )),
+      // ),
     );
   }
 }
@@ -653,7 +653,17 @@ class MenuItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-        onTap: () => {},
+        onTap: () => {
+              if (text == "ITALLEY ROAST")
+                {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        settings: const RouteSettings(name: '/order/storepage'),
+                        builder: (context) => MenusPage()),
+                  )
+                }
+            },
         child: Column(
           children: <Widget>[
             SizedBox(
