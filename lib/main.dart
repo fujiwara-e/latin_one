@@ -31,6 +31,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
+
     return MultiProvider(
       providers: [
         Provider(create: (context) => CatalogModel()),
@@ -41,6 +42,7 @@ class MyApp extends StatelessWidget {
                 throw ArgumentError.notNull('cart');
               }
               cart.catalog = catalog;
+              cart.init();
               return cart;
             }),
         Provider(create: (context) => ShopModel()),

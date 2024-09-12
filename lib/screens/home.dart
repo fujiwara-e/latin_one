@@ -58,6 +58,7 @@ class _HomePageState extends State<HomePage> {
                   } else {
                     print('Document does not exist');
                   }
+
                   Navigator.push(
                     context,
                     MaterialPageRoute(
