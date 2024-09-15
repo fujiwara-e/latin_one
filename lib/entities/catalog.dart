@@ -3,46 +3,13 @@ import 'package:flutter/material.dart';
 class CatalogModel {
   static List<String> itemNames = [];
 
-  Item getById_ITALLY(int id, {int quantity = 0}) => Item(
+  Item getById(int id, String category, {int quantity = 0}) => Item(
       id,
-      catalog['ITALLY_ROAST']!['itemNames']![id],
-      catalog['ITALLY_ROAST']!['itemPrices']![id],
+      catalog[category]!['itemNames']![id],
+      catalog[category]!['itemPrices']![id],
       quantity,
-      catalog['ITALLY_ROAST']!['itemDescriptions']![id],
-      catalog['ITALLY_ROAST']!['itemImagePaths']![id]);
-
-  Item getById_FRENCH(int id, {int quantity = 0}) => Item(
-      id,
-      catalog['FRENCH_ROAST']!['itemNames']![id],
-      catalog['FRENCH_ROAST']!['itemPrices']![id],
-      quantity,
-      catalog['FRENCH_ROAST']!['itemDescriptions']![id],
-      catalog['FRENCH_ROAST']!['itemImagePaths']![id]);
-
-  Item getById_BLEND(int id, {int quantity = 0}) => Item(
-      id,
-      catalog['BLEND_COFFEE']!['itemNames']![id],
-      catalog['BLEND_COFFEE']!['itemPrices']![id],
-      quantity,
-      catalog['BLEND_COFFEE']!['itemDescriptions']![id],
-      catalog['BLEND_COFFEE']!['itemImagePaths']![id]);
-
-  Item getById_SPECIAL(int id, {int quantity = 0}) => Item(
-      id,
-      catalog['SPECIALTY_COFFEE']!['itemNames']![id],
-      catalog['SPECIALTY_COFFEE']!['itemPrices']![id],
-      quantity,
-      catalog['SPECIALTY_COFFEE']!['itemDescriptions']![id],
-      catalog['SPECIALTY_COFFEE']!['itemImagePaths']![id]);
-
-  Item getById_SPECIALTY_COFFEE_MEDIUM_ROAST(int id, {int quantity = 0}) =>
-      Item(
-          id,
-          catalog['SPECIALTY_COFFEE_MEDIUM_ROAST']!['itemNames']![id],
-          catalog['SPECIALTY_COFFEE_MEDIUM_ROAST']!['itemPrices']![id],
-          quantity,
-          catalog['SPECIALTY_COFFEE_MEDIUM_ROAST']!['itemDescriptions']![id],
-          catalog['SPECIALTY_COFFEE_MEDIUM_ROAST']!['itemImagePaths']![id]);
+      catalog[category]!['itemDescriptions']![id],
+      catalog[category]!['itemImagePaths']![id]);
 
   Map<String, Map<String, List<dynamic>>> catalog = {
     'ITALLY_ROAST': {
@@ -79,41 +46,12 @@ class CatalogModel {
 
   Map<String, Map<String, List<dynamic>>> get catalogItems => catalog;
 
-  void set_ITALLY(String name, int price, String description, String path) {
-    catalog['ITALLY_ROAST']!['itemNames']!.add(name);
-    catalog['ITALLY_ROAST']!['itemPrices']!.add(price);
-    catalog['ITALLY_ROAST']!['itemDescriptions']!.add(description);
-    catalog['ITALLY_ROAST']!['itemImagePaths']!.add(path);
-  }
-
-  void set_BLEND(String name, int price, String description, String path) {
-    catalog['BLEND_COFFEE']!['itemNames']!.add(name);
-    catalog['BLEND_COFFEE']!['itemPrices']!.add(price);
-    catalog['BLEND_COFFEE']!['itemDescriptions']!.add(description);
-    catalog['BLEND_COFFEE']!['itemImagePaths']!.add(path);
-  }
-
-  void set_FRENCH(String name, int price, String description, String path) {
-    catalog['FRENCH_ROAST']!['itemNames']!.add(name);
-    catalog['FRENCH_ROAST']!['itemPrices']!.add(price);
-    catalog['FRENCH_ROAST']!['itemDescriptions']!.add(description);
-    catalog['FRENCH_ROAST']!['itemImagePaths']!.add(path);
-  }
-
-  void set_SPECIAL(String name, int price, String description, String path) {
-    catalog['SPECIALTY_COFFEE']!['itemNames']!.add(name);
-    catalog['SPECIALTY_COFFEE']!['itemPrices']!.add(price);
-    catalog['SPECIALTY_COFFEE']!['itemDescriptions']!.add(description);
-    catalog['SPECIALTY_COFFEE']!['itemImagePaths']!.add(path);
-  }
-
-  void set_SPECIAL_MEDIUM(
-      String name, int price, String description, String path) {
-    catalog['SPECIALTY_COFFEE_MEDIUM_ROAST']!['itemNames']!.add(name);
-    catalog['SPECIALTY_COFFEE_MEDIUM_ROAST']!['itemPrices']!.add(price);
-    catalog['SPECIALTY_COFFEE_MEDIUM_ROAST']!['itemDescriptions']!
-        .add(description);
-    catalog['SPECIALTY_COFFEE_MEDIUM_ROAST']!['itemImagePaths']!.add(path);
+  void setItem(String category, String name, int price, String description,
+      String path) {
+    catalog[category]!['itemNames']!.add(name);
+    catalog[category]!['itemPrices']!.add(price);
+    catalog[category]!['itemDescriptions']!.add(description);
+    catalog[category]!['itemImagePaths']!.add(path);
   }
 }
 

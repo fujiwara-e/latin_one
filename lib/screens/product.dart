@@ -24,123 +24,38 @@ class _ProductPageState extends State<ProductPage> {
   void initState() {
     super.initState();
     var catalog = context.read<CatalogModel>();
-    var item_list = [];
-    for (int i = 0;
-        i < catalog.catalog['ITALLY_ROAST']!['itemNames']!.length;
-        i++) {
-      Item item = catalog.getById_ITALLY(i);
-      print(catalog.catalog['ITALLY_ROAST']!['itemNames']![i]);
-      item_list.add(item);
-    }
-    for (int i = 0; i < item_list.length; i++) {
-      _itally_roasts.add(ProductItem(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => ChoicePage(item: item_list[i]),
-                fullscreenDialog: true),
-          );
-        },
-        image: item_list[i].imagePath,
-        name: item_list[i].name,
-        price: item_list[i].price.toString(),
-      ));
-    }
-    var item_list2 = [];
-    for (int i = 0;
-        i < catalog.catalog['BLEND_COFFEE']!['itemNames']!.length;
-        i++) {
-      Item item = catalog.getById_BLEND(i);
-      item_list2.add(item);
-    }
-    for (int i = 0; i < item_list2.length; i++) {
-      _blend_coffee.add(ProductItem(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => ChoicePage(item: item_list2[i]),
-                fullscreenDialog: true),
-          );
-        },
-        image: item_list2[i].imagePath,
-        name: item_list2[i].name,
-        price: item_list2[i].price.toString(),
-      ));
+
+    void populateItems(String category, List<ProductItem> targetlist) {
+      List<Item> itemlist = [];
+      for (int i = 0;
+          i < catalog.catalog[category]!['itemNames']!.length;
+          i++) {
+        Item item = catalog.getById(i, category);
+        itemlist.add(item);
+      }
+
+      for (var item in itemlist) {
+        targetlist.add(ProductItem(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => ChoicePage(item: item),
+                  fullscreenDialog: true),
+            );
+          },
+          image: item.imagePath,
+          name: item.name,
+          price: item.price.toString(),
+        ));
+      }
     }
 
-    var item_list3 = [];
-    for (int i = 0;
-        i < catalog.catalog['FRENCH_ROAST']!['itemNames']!.length;
-        i++) {
-      Item item = catalog.getById_FRENCH(i);
-      item_list3.add(item);
-    }
-    for (int i = 0; i < item_list3.length; i++) {
-      _french_roasts.add(ProductItem(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => ChoicePage(item: item_list3[i]),
-                fullscreenDialog: true),
-          );
-        },
-        image: item_list3[i].imagePath,
-        name: item_list3[i].name,
-        price: item_list3[i].price.toString(),
-      ));
-    }
-
-    var item_list4 = [];
-    for (int i = 0;
-        i < catalog.catalog['SPECIALTY_COFFEE']!['itemNames']!.length;
-        i++) {
-      Item item = catalog.getById_SPECIAL(i);
-      item_list4.add(item);
-    }
-    print(item_list4.length);
-    for (int i = 0; i < item_list4.length; i++) {
-      _special_coffee.add(ProductItem(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => ChoicePage(item: item_list4[i]),
-                fullscreenDialog: true),
-          );
-        },
-        image: item_list4[i].imagePath,
-        name: item_list4[i].name,
-        price: item_list4[i].price.toString(),
-      ));
-    }
-
-    var item_list5 = [];
-    for (int i = 0;
-        i <
-            catalog
-                .catalog['SPECIALTY_COFFEE_MEDIUM_ROAST']!['itemNames']!.length;
-        i++) {
-      Item item = catalog.getById_SPECIALTY_COFFEE_MEDIUM_ROAST(i);
-      item_list5.add(item);
-    }
-    for (int i = 0; i < item_list5.length; i++) {
-      _special_coffee_medium.add(ProductItem(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => ChoicePage(item: item_list5[i]),
-                fullscreenDialog: true),
-          );
-        },
-        image: item_list5[i].imagePath,
-        name: item_list5[i].name,
-        price: item_list5[i].price.toString(),
-      ));
-    }
+    populateItems('ITALLY_ROAST', _itally_roasts);
+    populateItems('FRENCH_ROAST', _french_roasts);
+    populateItems('SPECIALTY_COFFEE', _special_coffee);
+    populateItems('SPECIALTY_COFFEE_MEDIUM_ROAST', _special_coffee_medium);
+    populateItems('BLEND_COFFEE', _blend_coffee);
   }
 
   @override

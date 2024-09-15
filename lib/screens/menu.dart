@@ -60,7 +60,7 @@ class _ProductPageState extends State<MenusPage> {
     CatalogModel catalog = CatalogModel();
     final ItemList = [];
     for (int i = 0; i < CatalogModel.itemNames.length; i++) {
-      Item item = catalog.getById_ITALLY(i);
+      Item item = catalog.getById(i, 'ITALLEY_ROAST');
       ItemList.add(item);
     }
 

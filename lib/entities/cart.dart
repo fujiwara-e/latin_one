@@ -20,64 +20,27 @@ class CartModel extends ChangeNotifier {
 
   void init() {
     final FirebaseFirestore db = FirebaseFirestore.instance;
-    var docRef = db.collection("Products").doc("ITALLY_ROAST");
-    docRef.get().then((DocumentSnapshot doc) {
-      Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?;
-      for (int i = 0; i < data!.length; i++) {
-        _catalog.set_ITALLY(
-            doc.get(i.toString())['name'],
-            doc.get(i.toString())['price'],
-            doc.get(i.toString())['description'],
-            doc.get(i.toString())['imagepath']);
-      }
-    });
-    docRef = db.collection("Products").doc("BLEND_COFFEE");
-    docRef.get().then((DocumentSnapshot doc) {
-      Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?;
-      for (int i = 0; i < data!.length; i++) {
-        _catalog.set_BLEND(
-            doc.get(i.toString())['name'],
-            doc.get(i.toString())['price'],
-            doc.get(i.toString())['description'],
-            doc.get(i.toString())['imagepath']);
-      }
-    });
 
-    docRef = db.collection("Products").doc("FRENCH_ROAST");
-    docRef.get().then((DocumentSnapshot doc) {
-      Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?;
-      for (int i = 0; i < data!.length; i++) {
-        _catalog.set_FRENCH(
-            doc.get(i.toString())['name'],
-            doc.get(i.toString())['price'],
-            doc.get(i.toString())['description'],
-            doc.get(i.toString())['imagepath']);
-      }
-    });
+    void setitem(String category) {
+      var docRef = db.collection("Products").doc(category);
+      docRef.get().then((DocumentSnapshot doc) {
+        Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?;
+        for (int i = 0; i < data!.length; i++) {
+          _catalog.setItem(
+              category,
+              doc.get(i.toString())['name'],
+              doc.get(i.toString())['price'],
+              doc.get(i.toString())['description'],
+              doc.get(i.toString())['imagepath']);
+        }
+      });
+    }
 
-    docRef = db.collection("Products").doc("SPECIALTY_COFFEE");
-    docRef.get().then((DocumentSnapshot doc) {
-      Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?;
-      for (int i = 0; i < data!.length; i++) {
-        _catalog.set_SPECIAL(
-            doc.get(i.toString())['name'],
-            doc.get(i.toString())['price'],
-            doc.get(i.toString())['description'],
-            doc.get(i.toString())['imagepath']);
-      }
-    });
-
-    docRef = db.collection("Products").doc("SPECIALTY_COFFEE_MEDIUM_ROAST");
-    docRef.get().then((DocumentSnapshot doc) {
-      Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?;
-      for (int i = 0; i < data!.length; i++) {
-        _catalog.set_SPECIAL_MEDIUM(
-            doc.get(i.toString())['name'],
-            doc.get(i.toString())['price'],
-            doc.get(i.toString())['description'],
-            doc.get(i.toString())['imagepath']);
-      }
-    });
+    setitem('ITALLY_ROAST');
+    setitem('FRENCH_ROAST');
+    setitem('BLEND_COFFEE');
+    setitem('SPECIALTY_COFFEE');
+    setitem('SPECIALTY_COFFEE_MEDIUM_ROAST');
   }
 
   void totalprice() {
