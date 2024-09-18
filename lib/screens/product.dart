@@ -14,23 +14,33 @@ class ProductPage extends StatefulWidget {
 }
 
 class _ProductPageState extends State<ProductPage> {
-  @override
   List<ProductItem> _itally_roasts = [];
   List<ProductItem> _french_roasts = [];
   List<ProductItem> _special_coffee = [];
   List<ProductItem> _special_coffee_medium = [];
   List<ProductItem> _blend_coffee = [];
+  List<List<ProductItem>> _categories = [];
 
+  @override
   void initState() {
     super.initState();
     var catalog = context.read<CatalogModel>();
 
-    void populateItems(String category, List<ProductItem> targetlist) {
+    _categories = [
+      _blend_coffee,
+      _french_roasts,
+      _itally_roasts,
+      _special_coffee,
+      _special_coffee_medium,
+    ];
+
+    void product_from_category(
+        String category, List<ProductItem> targetlist, int categorynum) {
       List<Item> itemlist = [];
       for (int i = 0;
           i < catalog.catalog[category]!['itemNames']!.length;
           i++) {
-        Item item = catalog.getById(i, category);
+        Item item = catalog.getById(i, category, categorynum);
         itemlist.add(item);
       }
 
@@ -51,11 +61,18 @@ class _ProductPageState extends State<ProductPage> {
       }
     }
 
-    populateItems('ITALLY_ROAST', _itally_roasts);
-    populateItems('FRENCH_ROAST', _french_roasts);
-    populateItems('SPECIALTY_COFFEE', _special_coffee);
-    populateItems('SPECIALTY_COFFEE_MEDIUM_ROAST', _special_coffee_medium);
-    populateItems('BLEND_COFFEE', _blend_coffee);
+    void productitem_from_category() {
+      List<String> categoryNames = catalog.categoryNames;
+      categoryNames.sort;
+      int categoryIndex = 0;
+      categoryNames.forEach((category) {
+        product_from_category(
+            category, _categories[categoryIndex], categoryIndex);
+        categoryIndex++;
+      });
+    }
+
+    productitem_from_category();
   }
 
   @override
@@ -107,21 +124,22 @@ class _ProductPageState extends State<ProductPage> {
                       ))),
             ),
           ),
-          SliverText(text: "BLEND COFFEE"),
-          ProductsItem(products: _blend_coffee),
-          SliverBorder(),
-          SliverText(text: "ITALLEY ROAST"),
-          ProductsItem(products: _itally_roasts),
-          SliverBorder(),
-          SliverText(text: "FRENCH ROAST"),
-          ProductsItem(products: _french_roasts),
-          SliverBorder(),
-          SliverText(text: "SPECIALTY COFFEE"),
-          ProductsItem(products: _special_coffee),
-          SliverBorder(),
-          SliverText(text: "SPECIALTY COFFEE MEDIUM ROAST"),
-          ProductsItem(products: _special_coffee_medium),
+          ...buildProductSlivers(),
         ])));
+  }
+
+  List<Widget> buildProductSlivers() {
+    List<Widget> slivers = [];
+    var catalog = context.read<CatalogModel>();
+    List<String> categoryNames = catalog.categoryNames;
+    for (int i = 0; i < categoryNames.length; i++) {
+      slivers.add(SliverText(text: categoryNames[i]));
+      slivers.add(ProductsItem(products: _categories[i]));
+      if (i < categoryNames.length - 1) {
+        slivers.add(SliverBorder());
+      }
+    }
+    return slivers;
   }
 }
 

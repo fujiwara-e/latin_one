@@ -48,14 +48,17 @@ class MyApp extends StatelessWidget {
         }),
         Provider(create: (context) => ShopModel()),
         ChangeNotifierProxyProvider<ShopModel, SelectedShopModel>(
-            create: (context) => SelectedShopModel(),
-            update: (context, shopList, selectedShop) {
-              if (selectedShop == null) {
-                throw ArgumentError.notNull('selectedShop');
-              }
-              selectedShop.shopList = shopList;
-              return selectedShop;
-            }),
+            create: (context) {
+          final shop = SelectedShopModel();
+          shop.init();
+          return shop;
+        }, update: (context, shopList, selectedShop) {
+          if (selectedShop == null) {
+            throw ArgumentError.notNull('selectedShop');
+          }
+          selectedShop.shopList = shopList;
+          return selectedShop;
+        }),
         ChangeNotifierProvider<CustomerModel>(
           create: (context) => CustomerModel('', '', '', '', ''),
         ),

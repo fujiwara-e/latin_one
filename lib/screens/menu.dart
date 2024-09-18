@@ -1,12 +1,14 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:latin_one/entities/cart.dart';
 import 'package:latin_one/entities/catalog.dart';
 import 'package:latin_one/config/size_config.dart';
 import 'package:latin_one/screens/item.dart';
+import 'package:provider/provider.dart';
 
-class MenuPage extends StatelessWidget {
-  const MenuPage({Key? key}) : super(key: key);
+class CategoryPage extends StatelessWidget {
+  const CategoryPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -35,8 +37,14 @@ class MenuPage extends StatelessWidget {
         SliverFixedExtentList(
           itemExtent: SizeConfig.blockSizeVertical * 10,
           delegate: SliverChildListDelegate([
-            MenuItem(image: "assets/images/store.png", text: "ITALLEY ROAST"),
-            MenuItem(image: "assets/images/store.png", text: "FRENCH ROAST"),
+            MenuItem(
+                image: "assets/images/store.png",
+                text: "BLEND COFFEE",
+                index: 0),
+            MenuItem(
+                image: "assets/images/store.png",
+                text: "FRENCH ROAST",
+                index: 1),
           ]),
         ),
       ],
@@ -45,40 +53,78 @@ class MenuPage extends StatelessWidget {
 }
 
 class MenusPage extends StatefulWidget {
-  const MenusPage({super.key});
+  final int index;
+  final String text;
+  const MenusPage({
+    Key? key,
+    required this.index,
+    required this.text,
+  }) : super(key: key);
 
   @override
-  State<MenusPage> createState() => _ProductPageState();
+  State<MenusPage> createState() => _MenusPageState();
 }
 
-class _ProductPageState extends State<MenusPage> {
-  List<ProductItem> _products = [];
+class _MenusPageState extends State<MenusPage> {
+  List<ProductItem> _itally_roasts = [];
+  List<ProductItem> _french_roasts = [];
+  List<ProductItem> _special_coffee = [];
+  List<ProductItem> _special_coffee_medium = [];
+  List<ProductItem> _blend_coffee = [];
+  List<List<ProductItem>> _categories = [];
 
   @override
   void initState() {
     super.initState();
-    CatalogModel catalog = CatalogModel();
-    final ItemList = [];
-    for (int i = 0; i < CatalogModel.itemNames.length; i++) {
-      Item item = catalog.getById(i, 'ITALLEY_ROAST');
-      ItemList.add(item);
+    var catalog = context.read<CatalogModel>();
+
+    _categories = [
+      _blend_coffee,
+      _french_roasts,
+      _itally_roasts,
+      _special_coffee,
+      _special_coffee_medium,
+    ];
+
+    void product_from_category(
+        String category, List<ProductItem> targetlist, int categorynum) {
+      List<Item> itemlist = [];
+      for (int i = 0;
+          i < catalog.catalog[category]!['itemNames']!.length;
+          i++) {
+        Item item = catalog.getById(i, category, categorynum);
+        itemlist.add(item);
+      }
+
+      for (var item in itemlist) {
+        targetlist.add(ProductItem(
+          onTap: () {
+            // Navigator.push(
+            //   context,
+            //   MaterialPageRoute(
+            //       builder: (context) => ChoicePage(item: item),
+            //       fullscreenDialog: true),
+            // );
+          },
+          image: item.imagePath,
+          name: item.name,
+          price: item.price.toString(),
+        ));
+      }
     }
 
-    for (int i = 0; i < ItemList.length; i++) {
-      _products.add(ProductItem(
-        onTap: () {
-          // Navigator.push(
-          //   context,
-          //   MaterialPageRoute(
-          //       builder: (context) => ChoicePage(item: ItemList[i]),
-          //       fullscreenDialog: true),
-          // );
-        },
-        image: ItemList[i].imagePath,
-        name: ItemList[i].name,
-        price: ItemList[i].price.toString(),
-      ));
+    void productitem_from_category() {
+      List<String> categoryNames = catalog.categoryNames;
+      categoryNames.sort;
+      int categoryIndex = 0;
+      categoryNames.forEach((category) {
+        product_from_category(
+            category, _categories[categoryIndex], categoryIndex);
+        categoryIndex++;
+      });
     }
+
+    productitem_from_category();
   }
 
   @override
@@ -130,15 +176,15 @@ class _ProductPageState extends State<MenusPage> {
                       ))),
             ),
           ),
-          SliverText(text: "ITALLEY ROAST"),
-          ProductsItem(products: _products),
+          SliverText(text: widget.text),
+          ProductsItem(products: _categories[widget.index]),
           SliverBorder(),
-          SliverText(text: "FRENCH ROAST"),
-          ProductsItem(products: _products),
-          SliverBorder(),
-          SliverText(text: "SPECIALTY COFFEE"),
-          ProductsItem(products: _products),
-          SliverBorder(),
+          // SliverText(text: "FRENCH ROAST"),
+          // ProductsItem(products: _french_roasts),
+          // SliverBorder(),
+          // SliverText(text: "SPECIALTY COFFEE"),
+          // ProductsItem(products: _special_coffee),
+          // SliverBorder(),
         ])));
   }
 }

@@ -1,15 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:latin_one/entities/cart.dart';
+import 'package:provider/provider.dart';
 
 class CatalogModel {
   static List<String> itemNames = [];
+  List<String> categoryNames = [];
 
-  Item getById(int id, String category, {int quantity = 0}) => Item(
-      id,
-      catalog[category]!['itemNames']![id],
-      catalog[category]!['itemPrices']![id],
-      quantity,
-      catalog[category]!['itemDescriptions']![id],
-      catalog[category]!['itemImagePaths']![id]);
+  int calculateid(int id, int categorynum) {
+    int firstid = 0;
+    int productid = 0;
+
+    for (int i = 0; i < categorynum; i++) {
+      firstid += catalog[categoryNames[i]]!['itemNames']!.length;
+    }
+
+    productid = firstid + id;
+    return productid;
+  }
+
+  Item getById(int id, String category, int categorynum, {int quantity = 0}) =>
+      Item(
+          calculateid(id, categorynum),
+          catalog[category]!['itemNames']![id],
+          catalog[category]!['itemPrices']![id],
+          quantity,
+          catalog[category]!['itemDescriptions']![id],
+          catalog[category]!['itemImagePaths']![id]);
 
   Map<String, Map<String, List<dynamic>>> catalog = {
     'ITALLY_ROAST': {
@@ -53,6 +69,10 @@ class CatalogModel {
     catalog[category]!['itemDescriptions']!.add(description);
     catalog[category]!['itemImagePaths']!.add(path);
   }
+
+  void setCategoryNames(List<String> categorynames) {
+    categoryNames = categorynames;
+  }
 }
 
 @immutable
@@ -69,6 +89,10 @@ class Item {
 
   @override
   int get hashCode => id;
+
+  String toString() {
+    return 'Item(id: $id, name: $name, quantity: $quantity)';
+  }
 
   @override
   bool operator ==(Object other) => other is Item && other.id == id;

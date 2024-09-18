@@ -15,6 +15,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class OrderPage extends StatefulWidget {
   const OrderPage({super.key});
@@ -363,7 +364,10 @@ class _FormPageState extends State<FormPage> {
   final TextEditingController _address_controller = TextEditingController();
   final TextEditingController _mail_controller = TextEditingController();
 
+  List<String> _previousInputs = [];
+
   Widget build(BuildContext context) {
+    _loadPreviousInputs();
     return Scaffold(
         appBar: PreferredSize(
             preferredSize: Size.fromHeight(SizeConfig.blockSizeVertical * 10),
@@ -387,73 +391,100 @@ class _FormPageState extends State<FormPage> {
               padding: EdgeInsets.only(left: 20, right: 20),
               child: Form(
                   key: _formKey,
-                  child: Column(children: [
-                    SizedBox(
-                      height: 20,
-                    ),
-                    SizedBox(
-                      height: 40,
-                      child: Row(children: [
-                        Expanded(
-                            child: FormItem(
-                          text: "姓",
-                          controller: _firstName_controller,
-                        )),
-                        SizedBox(width: 10),
-                        Expanded(
-                            child: FormItem(
-                          text: "名",
-                          controller: _lastName_controller,
-                        )),
-                      ]),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    SizedBox(
-                      height: 40,
-                      child: FormItem(
-                        text: "メールアドレス",
-                        controller: _mail_controller,
-                      ),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    SizedBox(
-                      height: 40,
-                      child: Row(
-                        children: [
-                          Expanded(
-                              child: FormItem(
-                            text: "郵便番号",
-                            controller: _zipcode_controller,
-                          )),
-                          IconButton(
-                            icon: Icon(Icons.search),
-                            onPressed: () async {
-                              final zipcode = _zipcode_controller.text;
-                              final address = await zipCodeToAddress(zipcode);
-                              if (address == null) {
-                                return;
-                              }
-                              _address_controller.text = address;
-                            },
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // SizedBox(
+                        //   height: 20,
+                        // ),
+                        SizedBox(
+                          height: SizeConfig.FormSize,
+                          child: Row(children: [
+                            Expanded(
+                                child: FormItem(
+                              text: "姓",
+                              controller: _firstName_controller,
+                            )),
+                            SizedBox(width: 10),
+                            Expanded(
+                                child: FormItem(
+                              text: "名",
+                              controller: _lastName_controller,
+                            )),
+                          ]),
+                        ),
+                        // SizedBox(
+                        //   height: 20,
+                        // ),
+                        SizedBox(
+                          height: SizeConfig.FormSize,
+                          child: FormItem(
+                            text: "メールアドレス",
+                            controller: _mail_controller,
                           ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      height: 12,
-                    ),
-                    SizedBox(
-                      height: 40,
-                      child: FormItem(
-                        text: "住所",
-                        controller: _address_controller,
-                      ),
-                    ),
-                  ])),
+                        ),
+                        // SizedBox(
+                        //   height: 20,
+                        // ),
+                        SizedBox(
+                          height: SizeConfig.FormSize,
+                          child: Row(
+                            children: [
+                              Expanded(
+                                  child: FormItem(
+                                text: "郵便番号",
+                                controller: _zipcode_controller,
+                              )),
+                              IconButton(
+                                icon: Icon(Icons.search),
+                                onPressed: () async {
+                                  final zipcode = _zipcode_controller.text;
+                                  final address =
+                                      await zipCodeToAddress(zipcode);
+                                  if (address == null) {
+                                    return;
+                                  }
+                                  _address_controller.text = address;
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                        // SizedBox(
+                        //   height: 12,
+                        // ),
+                        SizedBox(
+                          height: SizeConfig.FormSize,
+                          child: FormItem(
+                            text: "住所",
+                            controller: _address_controller,
+                          ),
+                        ),
+                      ])),
+            ),
+            Align(
+              alignment: Alignment.centerRight,
+              child: Container(
+                margin: EdgeInsets.only(left: 0, top: 0, right: 10, bottom: 0),
+                child: TextButton(
+                  style: TextButton.styleFrom(
+                    backgroundColor: Colors.yellow[800],
+                    foregroundColor: Colors.white,
+                  ),
+                  onPressed: () {
+                    if (_previousInputs != []) {
+                      setState(() {
+                        _firstName_controller.text = _previousInputs[0];
+                        _lastName_controller.text = _previousInputs[1];
+                        _zipcode_controller.text = _previousInputs[2];
+                        _mail_controller.text = _previousInputs[3];
+                        _address_controller.text = _previousInputs[4];
+                      });
+                    }
+                  },
+                  child: Text('前回の内容を入力する'),
+                ),
+              ),
             ),
             Align(
               alignment: Alignment.centerRight,
@@ -467,12 +498,17 @@ class _FormPageState extends State<FormPage> {
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
                       var customer = context.read<CustomerModel>();
-                      customer.set(
-                          _firstName_controller.text,
-                          _lastName_controller.text,
-                          _zipcode_controller.text,
-                          _mail_controller.text,
-                          _address_controller.text);
+                      List<String> inputs = [];
+                      inputs = [
+                        _firstName_controller.text,
+                        _lastName_controller.text,
+                        _zipcode_controller.text,
+                        _mail_controller.text,
+                        _address_controller.text
+                      ];
+                      customer.set(inputs[0], inputs[1], inputs[2], inputs[3],
+                          inputs[4]);
+                      _savePreviousInputs(inputs);
                       Navigator.pop(context);
                     } else {
                       print("validate error");
@@ -484,6 +520,18 @@ class _FormPageState extends State<FormPage> {
             ),
           ],
         )));
+  }
+
+  Future<void> _loadPreviousInputs() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _previousInputs = prefs.getStringList('previousInputs') ?? [];
+    });
+  }
+
+  Future<void> _savePreviousInputs(List<String> inputs) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setStringList('previousInputs', inputs);
   }
 }
 
@@ -497,7 +545,8 @@ class StorePage extends StatefulWidget {
 class _StorePageState extends State<StorePage> {
   @override
   Widget build(BuildContext context) {
-    ShopModel shopList = ShopModel();
+    var shop = context.read<SelectedShopModel>();
+    var shopList = shop.shopList;
     return DefaultTabController(
         length: 3,
         child: Scaffold(

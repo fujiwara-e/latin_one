@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class CartModel extends ChangeNotifier {
   late CatalogModel _catalog;
   final List<Item> _items = [];
+  List<String> _categorynames = [];
   int _totalprice = 0;
 
   CatalogModel get catalog => _catalog;
@@ -16,31 +17,41 @@ class CartModel extends ChangeNotifier {
   }
 
   List<Item> get items => _items;
+  List<String> get categorynames => _categorynames;
+
   int get totalPrice => _totalprice;
 
   void init() {
     final FirebaseFirestore db = FirebaseFirestore.instance;
 
-    void setitem(String category) {
-      var docRef = db.collection("Products").doc(category);
-      docRef.get().then((DocumentSnapshot doc) {
-        Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?;
-        for (int i = 0; i < data!.length; i++) {
-          _catalog.setItem(
-              category,
-              doc.get(i.toString())['name'],
-              doc.get(i.toString())['price'],
-              doc.get(i.toString())['description'],
-              doc.get(i.toString())['imagepath']);
-        }
+    Future<List<String>> documentnames_from_firebase() async {
+      CollectionReference collectionRef = db.collection('Products');
+      QuerySnapshot querySnapshot = await collectionRef.get();
+      List<String> documentNames =
+          querySnapshot.docs.map((doc) => doc.id).toList();
+      return documentNames;
+    }
+
+    void category_from_firebase() async {
+      _categorynames = await documentnames_from_firebase();
+      catalog.setCategoryNames(_categorynames);
+      _categorynames.forEach((category) {
+        var docRef = db.collection("Products").doc(category);
+        docRef.get().then((DocumentSnapshot doc) {
+          Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?;
+          for (int i = 0; i < data!.length; i++) {
+            _catalog.setItem(
+                category,
+                doc.get(i.toString())['name'],
+                doc.get(i.toString())['price'],
+                doc.get(i.toString())['description'],
+                doc.get(i.toString())['imagepath']);
+          }
+        });
       });
     }
 
-    setitem('ITALLY_ROAST');
-    setitem('FRENCH_ROAST');
-    setitem('BLEND_COFFEE');
-    setitem('SPECIALTY_COFFEE');
-    setitem('SPECIALTY_COFFEE_MEDIUM_ROAST');
+    category_from_firebase();
   }
 
   void totalprice() {
@@ -64,7 +75,7 @@ class CartModel extends ChangeNotifier {
           item.id,
           item.name,
           item.price,
-          existingItem.quantity + 1,
+          _items[_items.indexOf(existingItem)].quantity + 1,
           item.description,
           item.imagePath);
     }

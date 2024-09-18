@@ -95,7 +95,7 @@ class _HomePageState extends State<HomePage> {
                       context.findAncestorStateOfType<ScreenState>();
                   if (screenstate != null) {
                     Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => const MenuPage(),
+                        builder: (context) => const CategoryPage(),
                         fullscreenDialog: true));
                   }
                 },
