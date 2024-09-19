@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -8,7 +10,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:latin_one/config/size_config.dart';
 import 'package:latin_one/entities/shop.dart';
 import 'package:provider/provider.dart';
-import 'package:latin_one/entities/customer.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 enum TabItem {
   home,
@@ -442,7 +444,7 @@ class BottomSheetItem extends StatelessWidget {
                     onPressed: () =>
                         Navigator.of(context, rootNavigator: true).push(
                       MaterialPageRoute(
-                        builder: (context) => ShopPage(),
+                        builder: (context) => ShopPage(shop: shop),
                         fullscreenDialog: true,
                       ),
                     ),
@@ -524,8 +526,8 @@ class ProductsItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return SliverGrid.count(
         crossAxisCount: 3,
-        mainAxisSpacing: 12.0, // アイテムとアイテムの縦の隙間の幅
-        crossAxisSpacing: 1.0, // アイテムとアイテムの横の隙間の幅
+        mainAxisSpacing: 2.0, // アイテムとアイテムの縦の隙間の幅
+        crossAxisSpacing: 2, // アイテムとアイテムの横の隙間の幅
         childAspectRatio: 0.8,
         children: products);
   }
@@ -592,9 +594,11 @@ class ProductItem extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Expanded(
+          Container(
+            height: 65,
+            width: 90,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              padding: const EdgeInsets.symmetric(horizontal: 5.0),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(10),
                 child: Image(
@@ -606,13 +610,13 @@ class ProductItem extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(
-                horizontal: 15.0), // Same padding as the image
+                horizontal: 13.0), // Same padding as the image
             child: Align(
               alignment: Alignment.centerLeft,
               child: Text(
                 name,
                 style: TextStyle(
-                  fontSize: 15,
+                  fontSize: 12,
                   color: Colors.black54,
                   fontFamily: 'gothic',
                 ),
@@ -621,13 +625,13 @@ class ProductItem extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(
-                horizontal: 15.0), // Same padding as the image
+                horizontal: 13.0), // Same padding as the image
             child: Align(
               alignment: Alignment.centerLeft,
               child: Text(
                 price,
                 style: TextStyle(
-                  fontSize: 15,
+                  fontSize: 14,
                   color: Colors.black54,
                   fontFamily: 'gothic',
                 ),
@@ -643,26 +647,25 @@ class ProductItem extends StatelessWidget {
 class MenuItem extends StatelessWidget {
   final String image;
   final String text;
+  final int index;
 
   const MenuItem({
     Key? key,
     required this.image,
     required this.text,
+    required this.index,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
         onTap: () => {
-              if (text == "ITALLEY ROAST")
-                {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        settings: const RouteSettings(name: '/order/storepage'),
-                        builder: (context) => MenusPage()),
-                  )
-                }
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    settings: const RouteSettings(name: '/order/storepage'),
+                    builder: (context) => MenusPage(index: index, text: text)),
+              )
             },
         child: Column(
           children: <Widget>[
@@ -745,6 +748,8 @@ class FormItem extends StatelessWidget {
           ),
         ),
       ),
+      maxLines: null,
+      minLines: 1,
       onSaved: (value) {
         print(value);
       },

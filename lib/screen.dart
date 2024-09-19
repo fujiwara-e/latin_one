@@ -3,6 +3,9 @@ import 'package:latin_one/screens/home.dart';
 import 'package:latin_one/screens/item.dart';
 import 'package:latin_one/navigator/bottom_navigator.dart';
 import 'package:latin_one/navigator/tab_navigator.dart';
+import 'package:latin_one/entities/catalog.dart';
+import 'package:provider/provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 int selectedIndex = 0;
 bool canPopValue = true;

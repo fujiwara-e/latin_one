@@ -8,6 +8,7 @@ class SizeConfig {
   static double blockSizeHorizontal = 0.0;
   static double blockSizeVertical = 0.0;
   static double TitleSize = 23;
+  static double FormSize = 80;
 
   void init(BuildContext context) {
     _mediaQueryData = MediaQuery.of(context);

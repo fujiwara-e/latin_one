@@ -28,7 +28,6 @@ class TabNavigator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final routerBuilder = _routerBuilder(context);
-
     return Navigator(
       key: navigationKey,
       initialRoute: '/',
