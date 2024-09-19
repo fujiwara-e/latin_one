@@ -10,18 +10,25 @@ class ShopModel {
   List<String> shopPhoneNumbers = [];
   List<String> shopPaymentMethods = [];
   List<String> shopReguralHolidays = [];
-  List<String> shopLatitude = [];
-  List<String> shopLongitude = [];
+  List<double> shopLatitude = [];
+  List<double> shopLongitude = [];
 
-  Shop getById(int id) => Shop(
-      id,
-      shopNames[id],
-      shopAddresses[id],
-      shopOpeningHours[id],
-      shopClosingHours[id],
-      shopPhoneNumbers[id],
-      shopPaymentMethods[id],
-      shopReguralHolidays[id]);
+  Shop getById(int id) {
+    if (id < 0 || id >= shopNames.length) {
+      throw RangeError('Invalid index: $id');
+    }
+    return Shop(
+        id,
+        shopNames[id],
+        shopAddresses[id],
+        shopOpeningHours[id],
+        shopClosingHours[id],
+        shopPhoneNumbers[id],
+        shopPaymentMethods[id],
+        shopReguralHolidays[id],
+        shopLatitude[id],
+        shopLongitude[id]);
+  }
 
   void setItem(
       String shop,
@@ -31,8 +38,8 @@ class ShopModel {
       String phone,
       String payment,
       String holiday,
-      String latitude,
-      String longitude) {
+      double latitude,
+      double longitude) {
     shopNames.add(shop);
     shopAddresses.add(address);
     shopOpeningHours.add(opening);
@@ -55,12 +62,26 @@ class Shop {
   final String phoneNumber;
   final String paymentMethods;
   final String reguralHoliday;
+  final double latitude;
+  final double longitude;
 
-  Shop(this.id, this.name, this.address, this.openingHours, this.closingHours,
-      this.phoneNumber, this.paymentMethods, this.reguralHoliday);
+  Shop(
+      this.id,
+      this.name,
+      this.address,
+      this.openingHours,
+      this.closingHours,
+      this.phoneNumber,
+      this.paymentMethods,
+      this.reguralHoliday,
+      this.latitude,
+      this.longitude);
 
   @override
   int get hashCode => id;
+  String toString() {
+    return 'Shop(id: $id, name: $name, $address,1: $openingHours,2: $closingHours,$phoneNumber,$paymentMethods,$reguralHoliday,$latitude, $longitude)';
+  }
 
   @override
   bool operator ==(Object other) => other is Shop && other.id == id;
@@ -81,8 +102,8 @@ class SelectedShopModel extends ChangeNotifier {
     Future<List<String>> shopsnames_from_firebase() async {
       CollectionReference collectionRef = db.collection('shops');
       QuerySnapshot querySnapshot = await collectionRef.get();
-      List<String> shopNames = querySnapshot.docs.map((doc) => doc.id).toList();
-      return shopNames;
+      List<String> shopnames = querySnapshot.docs.map((doc) => doc.id).toList();
+      return shopnames;
     }
 
     void shops_from_firebase() async {
