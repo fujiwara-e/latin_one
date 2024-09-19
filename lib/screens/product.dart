@@ -14,33 +14,65 @@ class ProductPage extends StatefulWidget {
 }
 
 class _ProductPageState extends State<ProductPage> {
-  List<ProductItem> _products = [];
+  List<ProductItem> _itally_roasts = [];
+  List<ProductItem> _french_roasts = [];
+  List<ProductItem> _special_coffee = [];
+  List<ProductItem> _special_coffee_medium = [];
+  List<ProductItem> _blend_coffee = [];
+  List<List<ProductItem>> _categories = [];
 
   @override
   void initState() {
     super.initState();
-    CatalogModel catalog = CatalogModel();
-    final ItemList = [];
-    for (int i = 0; i < CatalogModel.itemNames.length; i++) {
-      Item item = catalog.getById(i);
-      ItemList.add(item);
+    var catalog = context.read<CatalogModel>();
+
+    _categories = [
+      _blend_coffee,
+      _french_roasts,
+      _itally_roasts,
+      _special_coffee,
+      _special_coffee_medium,
+    ];
+
+    void product_from_category(
+        String category, List<ProductItem> targetlist, int categorynum) {
+      List<Item> itemlist = [];
+      for (int i = 0;
+          i < catalog.catalog[category]!['itemNames']!.length;
+          i++) {
+        Item item = catalog.getById(i, category, categorynum);
+        itemlist.add(item);
+      }
+
+      for (var item in itemlist) {
+        targetlist.add(ProductItem(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => ChoicePage(item: item),
+                  fullscreenDialog: true),
+            );
+          },
+          image: item.imagePath,
+          name: item.name,
+          price: item.price.toString(),
+        ));
+      }
     }
 
-    for (int i = 0; i < ItemList.length; i++) {
-      _products.add(ProductItem(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => ChoicePage(item: ItemList[i]),
-                fullscreenDialog: true),
-          );
-        },
-        image: ItemList[i].imagePath,
-        name: ItemList[i].name,
-        price: ItemList[i].price.toString(),
-      ));
+    void productitem_from_category() {
+      List<String> categoryNames = catalog.categoryNames;
+      categoryNames.sort;
+      int categoryIndex = 0;
+      categoryNames.forEach((category) {
+        product_from_category(
+            category, _categories[categoryIndex], categoryIndex);
+        categoryIndex++;
+      });
     }
+
+    productitem_from_category();
   }
 
   @override
@@ -92,16 +124,22 @@ class _ProductPageState extends State<ProductPage> {
                       ))),
             ),
           ),
-          SliverText(text: "ITALLEY ROAST"),
-          ProductsItem(products: _products),
-          SliverBorder(),
-          SliverText(text: "FRENCH ROAST"),
-          ProductsItem(products: _products),
-          SliverBorder(),
-          SliverText(text: "SPEACIALTY COFFEE"),
-          ProductsItem(products: _products),
-          SliverBorder(),
+          ...buildProductSlivers(),
         ])));
+  }
+
+  List<Widget> buildProductSlivers() {
+    List<Widget> slivers = [];
+    var catalog = context.read<CatalogModel>();
+    List<String> categoryNames = catalog.categoryNames;
+    for (int i = 0; i < categoryNames.length; i++) {
+      slivers.add(SliverText(text: categoryNames[i]));
+      slivers.add(ProductsItem(products: _categories[i]));
+      if (i < categoryNames.length - 1) {
+        slivers.add(SliverBorder());
+      }
+    }
+    return slivers;
   }
 }
 
@@ -252,23 +290,25 @@ class ChoicePage extends StatelessWidget {
           ),
         ],
       ),
-      Positioned(
-        bottom: 10,
-        right: 10,
-        child: TextButton(
-          onPressed: () => {
-            Navigator.popUntil(
-              context,
-              (route) => route.isFirst,
-            )
-          },
-          child: Text('決定する'),
-          style: TextButton.styleFrom(
-            foregroundColor: Colors.white,
-            backgroundColor: Colors.yellow[800],
+      Align(
+        alignment: Alignment.centerRight,
+        child: Container(
+          margin: EdgeInsets.only(left: 0, top: 0, right: 10, bottom: 0),
+          child: TextButton(
+            onPressed: () => {
+              Navigator.popUntil(
+                context,
+                (route) => route.isFirst,
+              )
+            },
+            child: Text('決定する'),
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.white,
+              backgroundColor: Colors.yellow[800],
+            ),
           ),
         ),
-      )
+      ),
     ]));
   }
 }
