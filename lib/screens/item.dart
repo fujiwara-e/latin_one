@@ -404,14 +404,25 @@ class HomeItem extends StatelessWidget {
 
 class BottomSheetItem extends StatelessWidget {
   final VoidCallback onTap;
+  final List<int> favoritelist;
   final Shop shop;
   const BottomSheetItem({
     Key? key,
     required this.onTap,
+    required this.favoritelist,
     required this.shop,
   }) : super(key: key);
 
   @override
+  Future<void> _savePreviousInputs(List<String> favoriteshops) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setStringList('favoriteshops', favoriteshops);
+  }
+
+  bool isContained() {
+    return favoritelist.any((favorite) => favorite == shop.id);
+  }
+
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
@@ -435,7 +446,17 @@ class BottomSheetItem extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   IconButton(
-                    onPressed: () => {},
+                    onPressed: !isContained()
+                        ? () {
+                            setState() {
+                              favoritelist.add(shop.id);
+                              List<String> stringList = favoritelist
+                                  .map((int number) => number.toString())
+                                  .toList();
+                              _savePreviousInputs(stringList);
+                            }
+                          }
+                        : null,
                     icon: Icon(
                       Icons.favorite_outline,
                     ),

@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +15,8 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart' as geoCoding;
 
 class OrderPage extends StatefulWidget {
   const OrderPage({super.key});
@@ -563,9 +564,22 @@ class StorePage extends StatefulWidget {
 
 class _StorePageState extends State<StorePage> {
   @override
+  List<String> favoriteshops = [];
+
+  Future<void> _loadFavoriteShops() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      favoriteshops = prefs.getStringList('favoriteshops') ?? [];
+    });
+  }
+
   Widget build(BuildContext context) {
     var shop = context.read<SelectedShopModel>();
     var shopList = shop.shopList;
+    _loadFavoriteShops();
+    List<int> intfavoriteList =
+        favoriteshops.map((str) => int.parse(str)).toList();
+    _determinePosition();
     return DefaultTabController(
         length: 3,
         child: Scaffold(
@@ -632,6 +646,7 @@ class _StorePageState extends State<StorePage> {
                                     builder: (context) {
                                       return BottomSheetItem(
                                           onTap: () {},
+                                          favoritelist: intfavoriteList,
                                           shop: shopList.getById(0));
                                     });
                               },
@@ -689,4 +704,43 @@ Future<String?> zipCodeToAddress(String zipCode) async {
   final address =
       '${addressMap['address1']} ${addressMap['address2']} ${addressMap['address3']}'; // 住所を連結する。
   return address;
+}
+
+Future<void> _determinePosition() async {
+  bool serviceEnabled;
+  LocationPermission permission;
+
+  // 位置情報サービスが有効かどうかをテストします。
+  serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  if (!serviceEnabled) {
+    // 位置情報サービスが有効でない場合、続行できません。
+    // 位置情報にアクセスし、ユーザーに対して
+    // 位置情報サービスを有効にするようアプリに要請する。
+    return Future.error('Location services are disabled.');
+  }
+
+  permission = await Geolocator.checkPermission();
+  if (permission == LocationPermission.denied) {
+    // ユーザーに位置情報を許可してもらうよう促す
+    permission = await Geolocator.requestPermission();
+    if (permission == LocationPermission.denied) {
+      // 拒否された場合エラーを返す
+      return Future.error('Location permissions are denied');
+    }
+  }
+
+  // 永久に拒否されている場合のエラーを返す
+  if (permission == LocationPermission.deniedForever) {
+    return Future.error(
+        'Location permissions are permanently denied, we cannot request permissions.');
+  }
+
+  // ここまでたどり着くと、位置情報に対しての権限が許可されているということなので
+  // デバイスの位置情報を返す。
+  final position = await Geolocator.getCurrentPosition();
+  final placemarks = await geoCoding.placemarkFromCoordinates(
+      position.latitude, position.longitude);
+  final placemark = placemarks[0];
+
+  print(placemark.country);
 }

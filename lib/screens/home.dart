@@ -138,56 +138,48 @@ class InboxPage extends StatefulWidget {
 class _InboxPageState extends State<InboxPage> {
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-        canPop: false,
-        onPopInvoked: (bool didpop) {
-          final screenstate = context.findAncestorStateOfType<ScreenState>();
-          if (screenstate != null) {
-            screenstate.onSelect(TabItem.home);
-          }
-        },
-        child: DefaultTabController(
-            length: 2,
-            child: Scaffold(
-              body: NestedScrollView(
-                headerSliverBuilder:
-                    (BuildContext context, bool innerBoxIsScrolled) {
-                  return <Widget>[
-                    SliverAppBar(
-                      pinned: true,
-                      backgroundColor: Colors.white,
-                      expandedHeight: SizeConfig.blockSizeVertical * 8,
-                      flexibleSpace: FlexibleSpaceBar(
-                        title: Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              "Inbox",
-                              style: TextStyle(
-                                fontSize: SizeConfig.TitleSize,
-                                color: Colors.black,
-                                fontFamily: 'ozworld',
-                              ),
-                            )),
-                        titlePadding: EdgeInsets.only(
-                            top: 0, right: 0, bottom: 0, left: 20),
-                        collapseMode: CollapseMode.parallax,
-                      ),
-                      bottom: TabBar(
-                        tabs: [
-                          Tab(text: "What's New"),
-                          Tab(text: "Message"),
-                        ],
-                      ),
-                    ),
-                  ];
-                },
-                body: TabBarView(
-                  children: [
-                    Center(child: Text('Tab 1 Content')),
-                    Center(child: Text('Tab 2 Content')),
-                  ],
+    return DefaultTabController(
+        length: 2,
+        child: Scaffold(
+          body: NestedScrollView(
+            headerSliverBuilder:
+                (BuildContext context, bool innerBoxIsScrolled) {
+              return <Widget>[
+                SliverAppBar(
+                  pinned: true,
+                  backgroundColor: Colors.white,
+                  expandedHeight: SizeConfig.blockSizeVertical * 8,
+                  flexibleSpace: FlexibleSpaceBar(
+                    title: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "Inbox",
+                          style: TextStyle(
+                            fontSize: SizeConfig.TitleSize,
+                            color: Colors.black,
+                            fontFamily: 'ozworld',
+                          ),
+                        )),
+                    titlePadding:
+                        EdgeInsets.only(top: 0, right: 0, bottom: 0, left: 20),
+                    collapseMode: CollapseMode.parallax,
+                  ),
+                  bottom: TabBar(
+                    tabs: [
+                      Tab(text: "What's New"),
+                      Tab(text: "Message"),
+                    ],
+                  ),
                 ),
-              ),
-            )));
+              ];
+            },
+            body: TabBarView(
+              children: [
+                Center(child: Text('Tab 1 Content')),
+                Center(child: Text('Tab 2 Content')),
+              ],
+            ),
+          ),
+        ));
   }
 }
