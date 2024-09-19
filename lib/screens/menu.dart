@@ -12,43 +12,63 @@ class CategoryPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: CustomScrollView(
-      slivers: <Widget>[
-        SliverAppBar(
-          backgroundColor: Colors.white,
-          expandedHeight: SizeConfig.blockSizeVertical * 8,
-          flexibleSpace: FlexibleSpaceBar(
-            title: Align(
-                alignment: Alignment.bottomLeft,
-                child: Text(
-                  "Products",
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Colors.black,
-                    fontFamily: 'ozworld',
-                  ),
-                )),
-            titlePadding:
-                EdgeInsets.only(top: 0, right: 0, bottom: 0, left: 20),
-            collapseMode: CollapseMode.parallax,
-          ),
-        ),
-        SliverFixedExtentList(
-          itemExtent: SizeConfig.blockSizeVertical * 10,
-          delegate: SliverChildListDelegate([
-            MenuItem(
-                image: "assets/images/store.png",
-                text: "BLEND COFFEE",
-                index: 0),
-            MenuItem(
-                image: "assets/images/store.png",
-                text: "FRENCH ROAST",
-                index: 1),
-          ]),
-        ),
-      ],
-    ));
+    return PopScope(
+        canPop: false,
+        onPopInvoked: (bool didpop) {
+          if (didpop) {
+            return;
+          }
+          Navigator.pop(context);
+        },
+        child: Scaffold(
+            body: CustomScrollView(
+          slivers: <Widget>[
+            SliverAppBar(
+              backgroundColor: Colors.white,
+              expandedHeight: SizeConfig.blockSizeVertical * 8,
+              flexibleSpace: FlexibleSpaceBar(
+                title: Align(
+                    alignment: Alignment.bottomLeft,
+                    child: Text(
+                      "Products",
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.black,
+                        fontFamily: 'ozworld',
+                      ),
+                    )),
+                titlePadding:
+                    EdgeInsets.only(top: 0, right: 0, bottom: 0, left: 20),
+                collapseMode: CollapseMode.parallax,
+              ),
+            ),
+            SliverFixedExtentList(
+              itemExtent: SizeConfig.blockSizeVertical * 10,
+              delegate: SliverChildListDelegate([
+                MenuItem(
+                    image: "assets/images/store.png",
+                    text: "BLEND COFFEE",
+                    index: 0),
+                MenuItem(
+                    image: "assets/images/store.png",
+                    text: "FRENCH ROAST",
+                    index: 1),
+                MenuItem(
+                    image: "assets/images/store.png",
+                    text: "ITALY ROAST",
+                    index: 2),
+                MenuItem(
+                    image: "assets/images/store.png",
+                    text: "SPECIALTY COFFEE",
+                    index: 3),
+                MenuItem(
+                    image: "assets/images/store.png",
+                    text: "SPECIALTY COFFEE MEDIUM",
+                    index: 4),
+              ]),
+            ),
+          ],
+        )));
   }
 }
 
@@ -99,12 +119,12 @@ class _MenusPageState extends State<MenusPage> {
       for (var item in itemlist) {
         targetlist.add(ProductItem(
           onTap: () {
-            // Navigator.push(
-            //   context,
-            //   MaterialPageRoute(
-            //       builder: (context) => ChoicePage(item: item),
-            //       fullscreenDialog: true),
-            // );
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => MenuPage(item: item),
+                  fullscreenDialog: true),
+            );
           },
           image: item.imagePath,
           name: item.name,
@@ -135,10 +155,7 @@ class _MenusPageState extends State<MenusPage> {
           if (didpop) {
             return;
           }
-          Navigator.popUntil(
-            context,
-            (route) => route.isFirst,
-          );
+          Navigator.pop(context);
         },
         child: Scaffold(
             body: CustomScrollView(slivers: <Widget>[
@@ -178,13 +195,120 @@ class _MenusPageState extends State<MenusPage> {
           ),
           SliverText(text: widget.text),
           ProductsItem(products: _categories[widget.index]),
-          SliverBorder(),
-          // SliverText(text: "FRENCH ROAST"),
-          // ProductsItem(products: _french_roasts),
-          // SliverBorder(),
-          // SliverText(text: "SPECIALTY COFFEE"),
-          // ProductsItem(products: _special_coffee),
-          // SliverBorder(),
         ])));
+  }
+}
+
+class MenuPage extends StatelessWidget {
+  final Item item;
+  const MenuPage({
+    Key? key,
+    required this.item,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        body: Stack(children: [
+      CustomScrollView(
+        slivers: <Widget>[
+          SliverAppBar(
+            backgroundColor: Colors.white,
+            expandedHeight: SizeConfig.blockSizeVertical * 8,
+            flexibleSpace: FlexibleSpaceBar(
+              title: Align(
+                  alignment: Alignment.bottomLeft,
+                  child: Text(
+                    "商品選択",
+                    style: TextStyle(
+                      fontSize: SizeConfig.TitleSize,
+                      color: Colors.black,
+                      fontFamily: 'gothic',
+                    ),
+                  )),
+              titlePadding:
+                  EdgeInsets.only(top: 0, right: 0, bottom: 0, left: 20),
+              collapseMode: CollapseMode.parallax,
+            ),
+          ),
+          SliverList(
+            // itemExtent: SizeConfig.blockSizeVertical * 10 + 8,
+            delegate: SliverChildListDelegate(
+              [
+                Image.asset(item.imagePath),
+                SizedBox(
+                  height: 30,
+                ),
+                Container(
+                  color: Colors.yellow[800],
+                  child: Padding(
+                    padding: EdgeInsets.only(left: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          item.name,
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.white,
+                            fontFamily: 'gothic',
+                          ),
+                        ),
+                        Text(item.price.toString(),
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.white,
+                              fontFamily: 'ozworld',
+                            )),
+                        Text("価格は税込み価格です",
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.black54,
+                              fontFamily: 'gothic',
+                            )),
+                      ],
+                    ),
+                  ),
+                ),
+                Container(
+                  height: 2,
+                  width: SizeConfig.screenWidth,
+                  color: Colors.black12,
+                ),
+                Padding(
+                  padding: EdgeInsets.only(left: 20),
+                  child: Column(
+                    children: [
+                      Container(
+                        height: SizeConfig.blockSizeVertical * 2,
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "商品説明",
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: Colors.black54,
+                            fontFamily: 'gothic',
+                          ),
+                        ),
+                      ),
+                      Container(
+                        height: SizeConfig.blockSizeVertical * 6,
+                        alignment: Alignment.centerLeft,
+                        child: Text(item.description,
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.black,
+                              fontFamily: 'gothic',
+                            )),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ]));
   }
 }

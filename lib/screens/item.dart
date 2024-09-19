@@ -444,7 +444,7 @@ class BottomSheetItem extends StatelessWidget {
                     onPressed: () =>
                         Navigator.of(context, rootNavigator: true).push(
                       MaterialPageRoute(
-                        builder: (context) => ShopPage(),
+                        builder: (context) => ShopPage(shop: shop),
                         fullscreenDialog: true,
                       ),
                     ),

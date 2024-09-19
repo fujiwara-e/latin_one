@@ -249,9 +249,26 @@ class ChoicePage extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(item.name),
-                          Text(item.price.toString()),
-                          Text("価格は税込み価格です"),
+                          Text(item.name,
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.black,
+                                fontFamily: 'gothic',
+                              )),
+                          Text(item.price.toString(),
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.black,
+                                fontFamily: 'ozworld',
+                              )),
+                          Text(
+                            "価格は税込み価格です",
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.black54,
+                              fontFamily: 'gothic',
+                            ),
+                          ),
                         ],
                       ),
                     ),

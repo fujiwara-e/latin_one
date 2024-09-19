@@ -18,7 +18,6 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  WidgetsFlutterBinding.ensureInitialized();
   runApp(
     const MyApp(),
   );
@@ -33,55 +32,51 @@ class MyApp extends StatelessWidget {
     SizeConfig().init(context);
 
     return MultiProvider(
-      providers: [
-        Provider(create: (context) => CatalogModel()),
-        ChangeNotifierProxyProvider<CatalogModel, CartModel>(create: (context) {
-          final cart = CartModel();
-          cart.init();
-          return cart;
-        }, update: (context, catalog, cart) {
-          if (cart == null) {
-            throw ArgumentError.notNull('cart');
-          }
-          cart.catalog = catalog;
-          return cart;
-        }),
-        Provider(create: (context) => ShopModel()),
-        ChangeNotifierProxyProvider<ShopModel, SelectedShopModel>(
-            create: (context) {
-          final shop = SelectedShopModel();
-          shop.init();
-          return shop;
-        }, update: (context, shopList, selectedShop) {
-          if (selectedShop == null) {
-            throw ArgumentError.notNull('selectedShop');
-          }
-          selectedShop.shopList = shopList;
-          return selectedShop;
-        }),
-        ChangeNotifierProvider<CustomerModel>(
-          create: (context) => CustomerModel('', '', '', '', ''),
-        ),
-      ],
-      child: MaterialApp(
-        title: 'Flutter Demo',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
-          useMaterial3: true,
-          pageTransitionsTheme: const PageTransitionsTheme(
-              builders: <TargetPlatform, PageTransitionsBuilder>{
-                TargetPlatform.android: CupertinoPageTransitionsBuilder(),
-                TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-                TargetPlatform.linux: FadeUpwardsPageTransitionsBuilder(),
-                TargetPlatform.macOS: CupertinoPageTransitionsBuilder(),
-                TargetPlatform.windows: FadeUpwardsPageTransitionsBuilder(),
-              }),
-        ),
-        home: Screen(title: 'Latin One'),
-        routes: {
-          "/shops/shop": (BuildContext context) => ShopPage(),
-        },
-      ),
-    );
+        providers: [
+          Provider(create: (context) => CatalogModel()),
+          ChangeNotifierProxyProvider<CatalogModel, CartModel>(
+              create: (context) {
+            final cart = CartModel();
+            cart.init();
+            return cart;
+          }, update: (context, catalog, cart) {
+            if (cart == null) {
+              throw ArgumentError.notNull('cart');
+            }
+            cart.catalog = catalog;
+            return cart;
+          }),
+          Provider(create: (context) => ShopModel()),
+          ChangeNotifierProxyProvider<ShopModel, SelectedShopModel>(
+              create: (context) {
+            final shop = SelectedShopModel();
+            shop.init();
+            return shop;
+          }, update: (context, shopList, selectedShop) {
+            if (selectedShop == null) {
+              throw ArgumentError.notNull('selectedShop');
+            }
+            selectedShop.shopList = shopList;
+            return selectedShop;
+          }),
+          ChangeNotifierProvider<CustomerModel>(
+            create: (context) => CustomerModel('', '', '', '', ''),
+          ),
+        ],
+        child: MaterialApp(
+            title: 'Flutter Demo',
+            theme: ThemeData(
+              colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
+              useMaterial3: true,
+              pageTransitionsTheme: const PageTransitionsTheme(
+                  builders: <TargetPlatform, PageTransitionsBuilder>{
+                    TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+                    TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+                    TargetPlatform.linux: FadeUpwardsPageTransitionsBuilder(),
+                    TargetPlatform.macOS: CupertinoPageTransitionsBuilder(),
+                    TargetPlatform.windows: FadeUpwardsPageTransitionsBuilder(),
+                  }),
+            ),
+            home: Screen(title: 'Latin One')));
   }
 }

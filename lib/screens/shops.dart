@@ -5,9 +5,12 @@ import 'package:url_launcher/url_launcher.dart';
 import '../config/size_config.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:latin_one/entities/shop.dart';
+import 'package:provider/provider.dart';
 
 class ShopPage extends StatefulWidget {
-  const ShopPage({super.key});
+  final Shop shop;
+  const ShopPage({super.key, required this.shop});
 
   @override
   State<ShopPage> createState() => _ShopPageState();
@@ -26,7 +29,7 @@ class _ShopPageState extends State<ShopPage> {
               title: Align(
                   alignment: Alignment.bottomLeft,
                   child: Text(
-                    "JAVANICAN",
+                    widget.shop.name,
                     style: TextStyle(
                       fontSize: SizeConfig.TitleSize,
                       color: Colors.black,
@@ -41,10 +44,15 @@ class _ShopPageState extends State<ShopPage> {
           SliverFixedExtentList(
             itemExtent: SizeConfig.blockSizeVertical * 10 + 2,
             delegate: SliverChildListDelegate([
-              AddressItem(text: "高知県 高知市 布師田3061 ラテンコーヒー"),
-              ShopItem(column_name: '営業時間', text: "9:00-18:00"),
-              ShopItem(column_name: '定休日', text: "不定休"),
-              ShopItem(column_name: 'モバイル決済', text: "現金のみ！！"),
+              AddressItem(text: widget.shop.address),
+              ShopItem(
+                  column_name: '営業時間',
+                  text:
+                      "${widget.shop.openingHours}-${widget.shop.closingHours}"),
+              ShopItem(
+                  column_name: '定休日', text: "${widget.shop.reguralHoliday}"),
+              ShopItem(
+                  column_name: 'モバイル決済', text: "${widget.shop.paymentMethods}"),
             ]),
           ),
         ],
@@ -63,6 +71,8 @@ class ShopsPage extends StatefulWidget {
 class _ShopsPageState extends State<ShopsPage> {
   @override
   Widget build(BuildContext context) {
+    var shop = context.read<SelectedShopModel>();
+    var shopList = shop.shopList;
     return Scaffold(
         appBar: PreferredSize(
             preferredSize: Size.fromHeight(SizeConfig.blockSizeVertical * 10),
@@ -104,7 +114,8 @@ class _ShopsPageState extends State<ShopsPage> {
                       onPressed: () =>
                           Navigator.of(context, rootNavigator: true)
                               .push(MaterialPageRoute(
-                        builder: (context) => ShopPage(),
+                        builder: (context) =>
+                            ShopPage(shop: shopList.getById(0)),
                         fullscreenDialog: true,
                       )),
                       icon: Icon(
