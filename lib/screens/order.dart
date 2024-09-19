@@ -277,27 +277,25 @@ class Alert extends StatelessWidget {
             int quantity;
             int i;
             String data_tmp = '';
+            data_tmp = 'お名前: ${customer.firstName} ${customer.lastName}\n';
+            data_tmp = '${data_tmp}連絡先: ${customer.mail}\n';
+            data_tmp = '${data_tmp}配達先: ${customer.address}\n';
+            data_tmp = '${data_tmp}ご注文内容\n';
             data_tmp =
-                data_tmp + 'お名前: ${customer.firstName} ${customer.lastName}\n';
-            data_tmp = data_tmp + '連絡先: ${customer.mail}\n';
-            data_tmp = data_tmp + '配達先: ${customer.address}\n';
-            data_tmp = data_tmp + 'ご注文内容\n';
-            data_tmp = data_tmp +
-                '----------------------------------------------------------------------\n';
+                '${data_tmp}----------------------------------------------------------------------\n';
             for (i = 0; i < cart.items.length; i++) {
               name = cart.items[i].name;
               quantity = cart.items[i].quantity;
-              data_tmp = data_tmp + '${name}: ${quantity}点\n';
+              data_tmp = '${data_tmp}${name}: ${quantity}点\n';
             }
-            data_tmp = data_tmp + '総合計: ¥${cart.totalPrice}\n';
-            data_tmp = data_tmp +
-                '----------------------------------------------------------------------\n';
+            data_tmp =
+                '${data_tmp}----------------------------------------------------------------------\n';
             final data = ClipboardData(text: data_tmp);
             Clipboard.setData(data);
             cart.reset();
             shop.reset();
             customer.reset();
-            print(shop.isSelected);
+            launch_mail("コーヒー注文", data_tmp, "hosokawa2023@s.okayama-u.ac.jp");
             Navigator.pop(context);
             Navigator.of(context).push(
               MaterialPageRoute(
@@ -309,6 +307,27 @@ class Alert extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  void launch_mail(String mailTitle, String mailBody, String mailAddress) {
+    final Uri mailUri = Uri(
+      scheme: 'mailto',
+      path: mailAddress,
+      queryParameters: {
+        'subject': mailTitle,
+        'body': mailBody,
+      },
+    );
+    final encodedUri = mailUri.toString().replaceAll('+', '%20');
+    _launchUrl(Uri.parse(encodedUri));
+  }
+
+  Future<void> _launchUrl(Uri url) async {
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
+    } else {
+      throw ArgumentError('Could not launch $url');
+    }
   }
 }
 
@@ -340,7 +359,7 @@ class OrderCompletionPage extends StatelessWidget {
           width: SizeConfig.screenWidth,
           child: Align(
             child: Text(
-              'ご注文ありがとうございました．\n\nご注文内容がクリップボードにコピーされました．',
+              'ご注文ありがとうございました．\n\nご注文内容がメールにコピーされました．',
               style: TextStyle(fontSize: 20, fontFamily: 'gothic'),
             ),
           ),
@@ -502,8 +521,8 @@ class _FormPageState extends State<FormPage> {
                       inputs = [
                         _firstName_controller.text,
                         _lastName_controller.text,
-                        _zipcode_controller.text,
                         _mail_controller.text,
+                        _zipcode_controller.text,
                         _address_controller.text
                       ];
                       customer.set(inputs[0], inputs[1], inputs[2], inputs[3],
