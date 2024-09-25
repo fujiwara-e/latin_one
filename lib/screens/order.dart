@@ -7,6 +7,7 @@ import '../config/size_config.dart';
 import '../screens/item.dart';
 import 'package:latin_one/entities/shop.dart';
 import 'package:latin_one/entities/customer.dart';
+import 'package:latin_one/screens/shops.dart';
 import 'package:provider/provider.dart';
 import 'package:latin_one/screens/product.dart';
 import 'package:latlong2/latlong.dart';
@@ -16,7 +17,6 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:geocoding/geocoding.dart' as geoCoding;
 
 class OrderPage extends StatefulWidget {
   const OrderPage({super.key});
@@ -573,13 +573,23 @@ class _StorePageState extends State<StorePage> {
     });
   }
 
+  Future<void> _savePreviousInputs(List<String> favoriteshops) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setStringList('favoriteshops', favoriteshops);
+  }
+
   Widget build(BuildContext context) {
     var shop = context.read<SelectedShopModel>();
     var shopList = shop.shopList;
+    final position;
     _loadFavoriteShops();
+
     List<int> intfavoriteList =
         favoriteshops.map((str) => int.parse(str)).toList();
-    _determinePosition();
+
+    position = _determinePosition();
+    //print(position.latitude);
+    //print(position.longitude);
     return DefaultTabController(
         length: 3,
         child: Scaffold(
@@ -676,7 +686,136 @@ class _StorePageState extends State<StorePage> {
                   ],
                 )),
                 Center(child: Text('近くの店舗 Content')),
-                Center(child: Text('お気に入り Content')),
+                Center(
+                  child: ListView(
+                    padding: EdgeInsets.zero,
+                    children: intfavoriteList.map((id) {
+                      var shopList = context.read<SelectedShopModel>();
+                      var shop = shopList.shopList.getById(id);
+                      bool isContained() {
+                        return intfavoriteList
+                            .any((favorite) => favorite == shop.id);
+                      }
+
+                      return Column(children: <Widget>[
+                        Row(children: <Widget>[
+                          Padding(
+                              padding: const EdgeInsets.only(left: 10),
+                              child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    Container(
+                                      color: Colors.white,
+                                      child: Text(shop.name,
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            color: Colors.black,
+                                            fontFamily: 'gothic',
+                                          )),
+                                    ),
+                                    Container(
+                                      color: Colors.white,
+                                      child: Text(shop.address,
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            color: Colors.black,
+                                            fontFamily: 'gothic',
+                                          )),
+                                    ),
+                                    Align(
+                                      alignment: Alignment.centerRight,
+                                      child: Container(
+                                        margin: EdgeInsets.only(
+                                            left: 0,
+                                            top: 0,
+                                            right: 10,
+                                            bottom: 0),
+                                        child: TextButton(
+                                          style: TextButton.styleFrom(
+                                            backgroundColor: Colors.yellow[800],
+                                            foregroundColor: Colors.white,
+                                          ),
+                                          onPressed: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      ProductPage()),
+                                            );
+                                            var currentShop = context
+                                                .read<SelectedShopModel>();
+                                            currentShop.set(shop);
+                                          },
+                                          child: Text('選択する'),
+                                        ),
+                                      ),
+                                    ),
+                                  ])),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  if (!isContained()) {
+                                    setState(() {
+                                      var tmpfavoriteList = intfavoriteList;
+                                      tmpfavoriteList.add(shop.id);
+                                      List<String> stringList = tmpfavoriteList
+                                          .map(
+                                              (int number) => number.toString())
+                                          .toList();
+                                      _savePreviousInputs(stringList);
+                                    });
+                                  } else {
+                                    setState(() {
+                                      var tmpfavoriteList = intfavoriteList;
+                                      tmpfavoriteList.remove(shop.id);
+                                      List<String> stringList = tmpfavoriteList
+                                          .map(
+                                              (int number) => number.toString())
+                                          .toList();
+                                      _savePreviousInputs(stringList);
+                                      print("ontap");
+                                      print(position.latitude);
+                                      print(position.longitude);
+                                    });
+                                  }
+                                },
+                                icon: isContained()
+                                    ? Icon(
+                                        Icons.favorite,
+                                      )
+                                    : Icon(
+                                        Icons.favorite_outline,
+                                      ),
+                                color: isContained()
+                                    ? Colors.yellow[800]
+                                    : Colors.grey,
+                              ),
+                              IconButton(
+                                onPressed: () =>
+                                    Navigator.of(context, rootNavigator: true)
+                                        .push(
+                                  MaterialPageRoute(
+                                    builder: (context) => ShopPage(shop: shop),
+                                    fullscreenDialog: true,
+                                  ),
+                                ),
+                                icon: Icon(
+                                  Icons.info_outline,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ]),
+                        Container(
+                          height: 2,
+                          color: Colors.black12,
+                        )
+                      ]);
+                    }).toList(),
+                  ),
+                ),
               ],
             ),
           ),
@@ -706,7 +845,7 @@ Future<String?> zipCodeToAddress(String zipCode) async {
   return address;
 }
 
-Future<void> _determinePosition() async {
+Future<Position> _determinePosition() async {
   bool serviceEnabled;
   LocationPermission permission;
 
@@ -735,12 +874,7 @@ Future<void> _determinePosition() async {
         'Location permissions are permanently denied, we cannot request permissions.');
   }
 
+  return await Geolocator.getCurrentPosition();
   // ここまでたどり着くと、位置情報に対しての権限が許可されているということなので
   // デバイスの位置情報を返す。
-  final position = await Geolocator.getCurrentPosition();
-  final placemarks = await geoCoding.placemarkFromCoordinates(
-      position.latitude, position.longitude);
-  final placemark = placemarks[0];
-
-  print(placemark.country);
 }

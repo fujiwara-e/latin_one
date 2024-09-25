@@ -113,13 +113,6 @@ class _HomePageState extends State<HomePage> {
                 image: 'assets/images/Machine.jpg',
                 text: 'Shops',
               ),
-              HomeItem(
-                onTap: () {
-                  print("クリックされたぞ!!!!!");
-                },
-                image: 'assets/images/Latte.jpg',
-                text: '',
-              ),
             ]),
           ),
         ],

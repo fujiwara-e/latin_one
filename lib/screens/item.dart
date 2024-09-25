@@ -402,7 +402,7 @@ class HomeItem extends StatelessWidget {
   }
 }
 
-class BottomSheetItem extends StatelessWidget {
+class BottomSheetItem extends StatefulWidget {
   final VoidCallback onTap;
   final List<int> favoritelist;
   final Shop shop;
@@ -414,18 +414,23 @@ class BottomSheetItem extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<BottomSheetItem> createState() => _BottomSheetItemState();
+}
+
+class _BottomSheetItemState extends State<BottomSheetItem> {
+  @override
   Future<void> _savePreviousInputs(List<String> favoriteshops) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setStringList('favoriteshops', favoriteshops);
   }
 
   bool isContained() {
-    return favoritelist.any((favorite) => favorite == shop.id);
+    return widget.favoritelist.any((favorite) => favorite == widget.shop.id);
   }
 
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: onTap,
+      onTap: widget.onTap,
       child: Container(
           height: SizeConfig.blockSizeVertical * 30,
           color: Colors.white,
@@ -446,26 +451,39 @@ class BottomSheetItem extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   IconButton(
-                    onPressed: !isContained()
-                        ? () {
-                            setState() {
-                              favoritelist.add(shop.id);
-                              List<String> stringList = favoritelist
-                                  .map((int number) => number.toString())
-                                  .toList();
-                              _savePreviousInputs(stringList);
-                            }
-                          }
-                        : null,
-                    icon: Icon(
-                      Icons.favorite_outline,
-                    ),
+                    onPressed: () {
+                      if (!isContained()) {
+                        setState(() {
+                          widget.favoritelist.add(widget.shop.id);
+                          List<String> stringList = widget.favoritelist
+                              .map((int number) => number.toString())
+                              .toList();
+                          _savePreviousInputs(stringList);
+                        });
+                      } else {
+                        setState(() {
+                          widget.favoritelist.remove(widget.shop.id);
+                          List<String> stringList = widget.favoritelist
+                              .map((int number) => number.toString())
+                              .toList();
+                          _savePreviousInputs(stringList);
+                        });
+                      }
+                    },
+                    icon: isContained()
+                        ? Icon(
+                            Icons.favorite,
+                          )
+                        : Icon(
+                            Icons.favorite_outline,
+                          ),
+                    color: isContained() ? Colors.yellow[800] : Colors.grey,
                   ),
                   IconButton(
                     onPressed: () =>
                         Navigator.of(context, rootNavigator: true).push(
                       MaterialPageRoute(
-                        builder: (context) => ShopPage(shop: shop),
+                        builder: (context) => ShopPage(shop: widget.shop),
                         fullscreenDialog: true,
                       ),
                     ),
@@ -482,7 +500,7 @@ class BottomSheetItem extends StatelessWidget {
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    shop.name,
+                    widget.shop.name,
                     style: TextStyle(
                       fontSize: 18,
                       color: Colors.black,
@@ -498,7 +516,7 @@ class BottomSheetItem extends StatelessWidget {
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    shop.address,
+                    widget.shop.address,
                     style: TextStyle(
                       fontSize: 15,
                       color: Colors.black54,
@@ -523,7 +541,7 @@ class BottomSheetItem extends StatelessWidget {
                         MaterialPageRoute(builder: (context) => ProductPage()),
                       );
                       var currentShop = context.read<SelectedShopModel>();
-                      currentShop.set(shop);
+                      currentShop.set(widget.shop);
                       print(currentShop.selectedShop!.name);
                     },
                     child: Text('選択する'),
