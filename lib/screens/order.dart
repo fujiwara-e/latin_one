@@ -563,7 +563,14 @@ class StorePage extends StatefulWidget {
 }
 
 class _StorePageState extends State<StorePage> {
+  late Future<Position> _futurePosition;
+
   @override
+  void initState() {
+    super.initState();
+    _futurePosition = _determinePosition();
+  }
+
   List<String> favoriteshops = [];
 
   Future<void> _loadFavoriteShops() async {
@@ -581,245 +588,260 @@ class _StorePageState extends State<StorePage> {
   Widget build(BuildContext context) {
     var shop = context.read<SelectedShopModel>();
     var shopList = shop.shopList;
-    final position;
     _loadFavoriteShops();
 
     List<int> intfavoriteList =
         favoriteshops.map((str) => int.parse(str)).toList();
 
-    position = _determinePosition();
-    //print(position.latitude);
-    //print(position.longitude);
-    return DefaultTabController(
-        length: 3,
-        child: Scaffold(
-          body: NestedScrollView(
-            headerSliverBuilder:
-                (BuildContext context, bool innerBoxIsScrolled) {
-              return <Widget>[
-                SliverAppBar(
-                  backgroundColor: Colors.white,
-                  expandedHeight: SizeConfig.blockSizeVertical * 8,
-                  flexibleSpace: FlexibleSpaceBar(
-                    title: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          "Store Select",
-                          style: TextStyle(
-                            fontSize: SizeConfig.TitleSize,
-                            color: Colors.black,
-                            fontFamily: 'ozworld',
-                          ),
-                        )),
-                    titlePadding:
-                        EdgeInsets.only(top: 0, right: 0, bottom: 0, left: 20),
-                    collapseMode: CollapseMode.parallax,
-                  ),
-                  bottom: TabBar(
-                    tabs: [
-                      Tab(text: 'MAP'),
-                      Tab(text: '近くの店舗'),
-                      Tab(text: 'お気に入り'),
-                    ],
-                  ),
-                ),
-              ];
-            },
-            body: TabBarView(
-              children: [
-                Center(
-                    child: FlutterMap(
-                  options: MapOptions(
-                    center: LatLng(33.57454362494296, 133.578431168963),
-                    zoom: 15.0,
-                    minZoom: 10,
-                    maxZoom: 18,
-                    interactiveFlags: InteractiveFlag.all &
-                        ~InteractiveFlag.rotate, // 回転を無効にする
-                  ),
-                  children: [
-                    TileLayer(
-                      urlTemplate:
-                          'https://api.maptiler.com/maps/jp-mierune-streets/{z}/{x}/{y}.png?key=2YhYCGe6F0g5cNXrFsOp',
-                    ),
-                    MarkerLayer(
-                      markers: [
-                        Marker(
-                          width: 40,
-                          height: 40,
-                          point: LatLng(33.57454362494296, 133.578431168963),
-                          builder: (ctx) => Container(
-                            child: IconButton(
-                              onPressed: () {
-                                showModalBottomSheet(
-                                    context: context,
-                                    builder: (context) {
-                                      return BottomSheetItem(
-                                          onTap: () {},
-                                          favoritelist: intfavoriteList,
-                                          shop: shopList.getById(0));
-                                    });
-                              },
-                              icon: Icon(
-                                Icons.circle,
-                                color: Colors.yellow[800],
-                                size: 20.0,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    RichAttributionWidget(
-                      attributions: [
-                        TextSourceAttribution('MapTiler',
-                            onTap: () => launchUrl(Uri.parse(
-                                "https://www.maptiler.com/copyright/"))),
-                        TextSourceAttribution('OpenStreetMap contributors',
-                            onTap: () => launchUrl(Uri.parse(
-                                "https://www.openstreetmap.org/copyright"))),
-                        TextSourceAttribution('MIERUNE',
-                            onTap: () =>
-                                launchUrl(Uri.parse("https://maptiler.jp/"))),
-                      ],
-                    )
-                  ],
-                )),
-                Center(child: Text('近くの店舗 Content')),
-                Center(
-                  child: ListView(
-                    padding: EdgeInsets.zero,
-                    children: intfavoriteList.map((id) {
-                      var shopList = context.read<SelectedShopModel>();
-                      var shop = shopList.shopList.getById(id);
-                      bool isContained() {
-                        return intfavoriteList
-                            .any((favorite) => favorite == shop.id);
-                      }
+    return FutureBuilder<Position>(
+      future: _futurePosition,
+      builder: (BuildContext content, AsyncSnapshot<Position> snapshot) {
+        if (snapshot.hasData) {
+          Position position = snapshot.data!;
+          print(position.latitude);
+          print(position.longitude);
+          caluculateDistance(position.latitude, position.longitude,
+              33.57454362494296, 133.578431168963);
+        }
 
-                      return Column(children: <Widget>[
-                        Row(children: <Widget>[
-                          Padding(
-                              padding: const EdgeInsets.only(left: 10),
-                              child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    Container(
-                                      color: Colors.white,
-                                      child: Text(shop.name,
-                                          style: TextStyle(
-                                            fontSize: 15,
-                                            color: Colors.black,
-                                            fontFamily: 'gothic',
-                                          )),
-                                    ),
-                                    Container(
-                                      color: Colors.white,
-                                      child: Text(shop.address,
-                                          style: TextStyle(
-                                            fontSize: 15,
-                                            color: Colors.black,
-                                            fontFamily: 'gothic',
-                                          )),
-                                    ),
-                                    Align(
-                                      alignment: Alignment.centerRight,
-                                      child: Container(
-                                        margin: EdgeInsets.only(
-                                            left: 0,
-                                            top: 0,
-                                            right: 10,
-                                            bottom: 0),
-                                        child: TextButton(
-                                          style: TextButton.styleFrom(
-                                            backgroundColor: Colors.yellow[800],
-                                            foregroundColor: Colors.white,
-                                          ),
-                                          onPressed: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      ProductPage()),
-                                            );
-                                            var currentShop = context
-                                                .read<SelectedShopModel>();
-                                            currentShop.set(shop);
-                                          },
-                                          child: Text('選択する'),
-                                        ),
-                                      ),
-                                    ),
-                                  ])),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              IconButton(
-                                onPressed: () {
-                                  if (!isContained()) {
-                                    setState(() {
-                                      var tmpfavoriteList = intfavoriteList;
-                                      tmpfavoriteList.add(shop.id);
-                                      List<String> stringList = tmpfavoriteList
-                                          .map(
-                                              (int number) => number.toString())
-                                          .toList();
-                                      _savePreviousInputs(stringList);
-                                    });
-                                  } else {
-                                    setState(() {
-                                      var tmpfavoriteList = intfavoriteList;
-                                      tmpfavoriteList.remove(shop.id);
-                                      List<String> stringList = tmpfavoriteList
-                                          .map(
-                                              (int number) => number.toString())
-                                          .toList();
-                                      _savePreviousInputs(stringList);
-                                      print("ontap");
-                                      print(position.latitude);
-                                      print(position.longitude);
-                                    });
-                                  }
-                                },
-                                icon: isContained()
-                                    ? Icon(
-                                        Icons.favorite,
-                                      )
-                                    : Icon(
-                                        Icons.favorite_outline,
-                                      ),
-                                color: isContained()
-                                    ? Colors.yellow[800]
-                                    : Colors.grey,
+        //print(position.latitude);
+        //print(position.longitude);
+        return DefaultTabController(
+            length: 3,
+            child: Scaffold(
+              body: NestedScrollView(
+                headerSliverBuilder:
+                    (BuildContext context, bool innerBoxIsScrolled) {
+                  return <Widget>[
+                    SliverAppBar(
+                      backgroundColor: Colors.white,
+                      expandedHeight: SizeConfig.blockSizeVertical * 8,
+                      flexibleSpace: FlexibleSpaceBar(
+                        title: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              "Store Select",
+                              style: TextStyle(
+                                fontSize: SizeConfig.TitleSize,
+                                color: Colors.black,
+                                fontFamily: 'ozworld',
                               ),
-                              IconButton(
-                                onPressed: () =>
-                                    Navigator.of(context, rootNavigator: true)
-                                        .push(
-                                  MaterialPageRoute(
-                                    builder: (context) => ShopPage(shop: shop),
-                                    fullscreenDialog: true,
+                            )),
+                        titlePadding: EdgeInsets.only(
+                            top: 0, right: 0, bottom: 0, left: 20),
+                        collapseMode: CollapseMode.parallax,
+                      ),
+                      bottom: TabBar(
+                        tabs: [
+                          Tab(text: 'MAP'),
+                          Tab(text: '近くの店舗'),
+                          Tab(text: 'お気に入り'),
+                        ],
+                      ),
+                    ),
+                  ];
+                },
+                body: TabBarView(
+                  children: [
+                    Center(
+                        child: FlutterMap(
+                      options: MapOptions(
+                        center: LatLng(33.57454362494296, 133.578431168963),
+                        zoom: 15.0,
+                        minZoom: 10,
+                        maxZoom: 18,
+                        interactiveFlags: InteractiveFlag.all &
+                            ~InteractiveFlag.rotate, // 回転を無効にする
+                      ),
+                      children: [
+                        TileLayer(
+                          urlTemplate:
+                              'https://api.maptiler.com/maps/jp-mierune-streets/{z}/{x}/{y}.png?key=2YhYCGe6F0g5cNXrFsOp',
+                        ),
+                        MarkerLayer(
+                          markers: [
+                            Marker(
+                              width: 40,
+                              height: 40,
+                              point:
+                                  LatLng(33.57454362494296, 133.578431168963),
+                              builder: (ctx) => Container(
+                                child: IconButton(
+                                  onPressed: () {
+                                    showModalBottomSheet(
+                                        context: context,
+                                        builder: (context) {
+                                          return BottomSheetItem(
+                                              onTap: () {},
+                                              favoritelist: intfavoriteList,
+                                              shop: shopList.getById(0));
+                                        });
+                                  },
+                                  icon: Icon(
+                                    Icons.circle,
+                                    color: Colors.yellow[800],
+                                    size: 20.0,
                                   ),
                                 ),
-                                icon: Icon(
-                                  Icons.info_outline,
-                                ),
                               ),
-                            ],
-                          ),
-                        ]),
-                        Container(
-                          height: 2,
-                          color: Colors.black12,
+                            ),
+                          ],
+                        ),
+                        RichAttributionWidget(
+                          attributions: [
+                            TextSourceAttribution('MapTiler',
+                                onTap: () => launchUrl(Uri.parse(
+                                    "https://www.maptiler.com/copyright/"))),
+                            TextSourceAttribution('OpenStreetMap contributors',
+                                onTap: () => launchUrl(Uri.parse(
+                                    "https://www.openstreetmap.org/copyright"))),
+                            TextSourceAttribution('MIERUNE',
+                                onTap: () => launchUrl(
+                                    Uri.parse("https://maptiler.jp/"))),
+                          ],
                         )
-                      ]);
-                    }).toList(),
-                  ),
+                      ],
+                    )),
+                    Center(child: Text('近くの店舗 Content')),
+                    Center(
+                      child: ListView(
+                        padding: EdgeInsets.zero,
+                        children: intfavoriteList.map((id) {
+                          var shopList = context.read<SelectedShopModel>();
+                          var shop = shopList.shopList.getById(id);
+                          bool isContained() {
+                            return intfavoriteList
+                                .any((favorite) => favorite == shop.id);
+                          }
+
+                          return Column(children: <Widget>[
+                            Row(children: <Widget>[
+                              Padding(
+                                  padding: const EdgeInsets.only(left: 10),
+                                  child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        Container(
+                                          color: Colors.white,
+                                          child: Text(shop.name,
+                                              style: TextStyle(
+                                                fontSize: 15,
+                                                color: Colors.black,
+                                                fontFamily: 'gothic',
+                                              )),
+                                        ),
+                                        Container(
+                                          color: Colors.white,
+                                          child: Text(shop.address,
+                                              style: TextStyle(
+                                                fontSize: 15,
+                                                color: Colors.black,
+                                                fontFamily: 'gothic',
+                                              )),
+                                        ),
+                                        Align(
+                                          alignment: Alignment.centerRight,
+                                          child: Container(
+                                            margin: EdgeInsets.only(
+                                                left: 0,
+                                                top: 0,
+                                                right: 10,
+                                                bottom: 0),
+                                            child: TextButton(
+                                              style: TextButton.styleFrom(
+                                                backgroundColor:
+                                                    Colors.yellow[800],
+                                                foregroundColor: Colors.white,
+                                              ),
+                                              onPressed: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          ProductPage()),
+                                                );
+                                                var currentShop = context
+                                                    .read<SelectedShopModel>();
+                                                currentShop.set(shop);
+                                              },
+                                              child: Text('選択する'),
+                                            ),
+                                          ),
+                                        ),
+                                      ])),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  IconButton(
+                                    onPressed: () {
+                                      if (!isContained()) {
+                                        setState(() {
+                                          var tmpfavoriteList = intfavoriteList;
+                                          tmpfavoriteList.add(shop.id);
+                                          List<String> stringList =
+                                              tmpfavoriteList
+                                                  .map((int number) =>
+                                                      number.toString())
+                                                  .toList();
+                                          _savePreviousInputs(stringList);
+                                        });
+                                      } else {
+                                        setState(() {
+                                          var tmpfavoriteList = intfavoriteList;
+                                          tmpfavoriteList.remove(shop.id);
+                                          List<String> stringList =
+                                              tmpfavoriteList
+                                                  .map((int number) =>
+                                                      number.toString())
+                                                  .toList();
+                                          _savePreviousInputs(stringList);
+                                          print("ontap");
+                                        });
+                                      }
+                                    },
+                                    icon: isContained()
+                                        ? Icon(
+                                            Icons.favorite,
+                                          )
+                                        : Icon(
+                                            Icons.favorite_outline,
+                                          ),
+                                    color: isContained()
+                                        ? Colors.yellow[800]
+                                        : Colors.grey,
+                                  ),
+                                  IconButton(
+                                    onPressed: () => Navigator.of(context,
+                                            rootNavigator: true)
+                                        .push(
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            ShopPage(shop: shop),
+                                        fullscreenDialog: true,
+                                      ),
+                                    ),
+                                    icon: Icon(
+                                      Icons.info_outline,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ]),
+                            Container(
+                              height: 2,
+                              color: Colors.black12,
+                            )
+                          ]);
+                        }).toList(),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
-        ));
+              ),
+            ));
+      },
+    );
   }
 }
 
@@ -877,4 +899,9 @@ Future<Position> _determinePosition() async {
   return await Geolocator.getCurrentPosition();
   // ここまでたどり着くと、位置情報に対しての権限が許可されているということなので
   // デバイスの位置情報を返す。
+}
+
+void caluculateDistance(double lat1, double lon1, double lat2, double lon2) {
+  double distance = Geolocator.distanceBetween(lat1, lon1, lat2, lon2);
+  print(distance / 1000);
 }
