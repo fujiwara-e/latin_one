@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:latin_one/screens/menu.dart';
+import 'package:latin_one/screens/order.dart';
 import 'package:latin_one/screens/product.dart';
 import 'package:latin_one/screens/shops.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -11,6 +12,7 @@ import 'package:latin_one/config/size_config.dart';
 import 'package:latin_one/entities/shop.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:geolocator/geolocator.dart';
 
 enum TabItem {
   home,
@@ -21,6 +23,154 @@ enum TabItem {
 enum SubTabItem {
   home,
   inbox,
+}
+
+class StoreTabItem extends StatefulWidget {
+  const StoreTabItem(
+      {Key? key,
+      required this.shop,
+      required this.favoritelist,
+      required this.position})
+      : super(key: key);
+
+  final Shop shop;
+  final List<int> favoritelist;
+  final Position? position;
+
+  @override
+  State<StoreTabItem> createState() => _StoreTabItemState();
+}
+
+class _StoreTabItemState extends State<StoreTabItem> {
+  double distance = 0;
+  bool isContained() {
+    return widget.favoritelist.any((favorite) => favorite == widget.shop.id);
+  }
+
+  Future<void> _savePreviousInputs(List<String> inputs) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setStringList('previousInputs', inputs);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    distance = caluculateDistance(
+        widget.position!.latitude,
+        widget.position!.longitude,
+        widget.shop.latitude,
+        widget.shop.longitude);
+
+    return Padding(
+        padding: const EdgeInsets.only(left: 10),
+        child: Column(
+          children: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Container(
+                  color: Colors.white,
+                  child: Text(widget.shop.name,
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: Colors.black,
+                        fontFamily: 'gothic',
+                      )),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        if (!isContained()) {
+                          setState(() {
+                            var tmpfavoriteList = widget.favoritelist;
+                            tmpfavoriteList.add(widget.shop.id);
+                            List<String> stringList = tmpfavoriteList
+                                .map((int number) => number.toString())
+                                .toList();
+                            _savePreviousInputs(stringList);
+                          });
+                        } else {
+                          setState(() {
+                            var tmpfavoriteList = widget.favoritelist;
+                            tmpfavoriteList.remove(widget.shop.id);
+                            List<String> stringList = tmpfavoriteList
+                                .map((int number) => number.toString())
+                                .toList();
+                            _savePreviousInputs(stringList);
+                            print("ontap");
+                          });
+                        }
+                      },
+                      icon: isContained()
+                          ? Icon(
+                              Icons.favorite,
+                            )
+                          : Icon(
+                              Icons.favorite_outline,
+                            ),
+                      color: isContained() ? Colors.yellow[800] : Colors.grey,
+                    ),
+                    IconButton(
+                      onPressed: () =>
+                          Navigator.of(context, rootNavigator: true).push(
+                        MaterialPageRoute(
+                          builder: (context) => ShopPage(shop: widget.shop),
+                          fullscreenDialog: true,
+                        ),
+                      ),
+                      icon: Icon(
+                        Icons.info_outline,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            Container(
+                alignment: Alignment.centerLeft,
+                child: Text(widget.shop.address,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.black54,
+                      fontFamily: 'gothic',
+                    ))),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Container(
+                    margin:
+                        EdgeInsets.only(left: 0, top: 0, right: 10, bottom: 0),
+                    child: TextButton(
+                      style: TextButton.styleFrom(
+                        backgroundColor: Colors.yellow[800],
+                        foregroundColor: Colors.white,
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ProductPage()),
+                        );
+                        var currentShop = context.read<SelectedShopModel>();
+                        currentShop.set(widget.shop);
+                      },
+                      child: Text('選択する'),
+                    ),
+                  ),
+                ),
+                Text(distance.toString() + "km"),
+              ],
+            ),
+            Container(
+              height: 2,
+              color: Colors.black12,
+            )
+          ],
+        ));
+  }
 }
 
 class UrlLauncher {

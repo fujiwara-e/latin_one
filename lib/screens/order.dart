@@ -569,6 +569,7 @@ class _StorePageState extends State<StorePage> {
   void initState() {
     super.initState();
     _futurePosition = _determinePosition();
+    _loadFavoriteShops();
   }
 
   List<String> favoriteshops = [];
@@ -588,7 +589,7 @@ class _StorePageState extends State<StorePage> {
   Widget build(BuildContext context) {
     var shop = context.read<SelectedShopModel>();
     var shopList = shop.shopList;
-    _loadFavoriteShops();
+    Position? position;
 
     List<int> intfavoriteList =
         favoriteshops.map((str) => int.parse(str)).toList();
@@ -597,15 +598,8 @@ class _StorePageState extends State<StorePage> {
       future: _futurePosition,
       builder: (BuildContext content, AsyncSnapshot<Position> snapshot) {
         if (snapshot.hasData) {
-          Position position = snapshot.data!;
-          print(position.latitude);
-          print(position.longitude);
-          caluculateDistance(position.latitude, position.longitude,
-              33.57454362494296, 133.578431168963);
+          position = snapshot.data!;
         }
-
-        //print(position.latitude);
-        //print(position.longitude);
         return DefaultTabController(
             length: 3,
             child: Scaffold(
@@ -714,125 +708,10 @@ class _StorePageState extends State<StorePage> {
                                 .any((favorite) => favorite == shop.id);
                           }
 
-                          return Column(children: <Widget>[
-                            Row(children: <Widget>[
-                              Padding(
-                                  padding: const EdgeInsets.only(left: 10),
-                                  child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: <Widget>[
-                                        Container(
-                                          color: Colors.white,
-                                          child: Text(shop.name,
-                                              style: TextStyle(
-                                                fontSize: 15,
-                                                color: Colors.black,
-                                                fontFamily: 'gothic',
-                                              )),
-                                        ),
-                                        Container(
-                                          color: Colors.white,
-                                          child: Text(shop.address,
-                                              style: TextStyle(
-                                                fontSize: 15,
-                                                color: Colors.black,
-                                                fontFamily: 'gothic',
-                                              )),
-                                        ),
-                                        Align(
-                                          alignment: Alignment.centerRight,
-                                          child: Container(
-                                            margin: EdgeInsets.only(
-                                                left: 0,
-                                                top: 0,
-                                                right: 10,
-                                                bottom: 0),
-                                            child: TextButton(
-                                              style: TextButton.styleFrom(
-                                                backgroundColor:
-                                                    Colors.yellow[800],
-                                                foregroundColor: Colors.white,
-                                              ),
-                                              onPressed: () {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          ProductPage()),
-                                                );
-                                                var currentShop = context
-                                                    .read<SelectedShopModel>();
-                                                currentShop.set(shop);
-                                              },
-                                              child: Text('選択する'),
-                                            ),
-                                          ),
-                                        ),
-                                      ])),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  IconButton(
-                                    onPressed: () {
-                                      if (!isContained()) {
-                                        setState(() {
-                                          var tmpfavoriteList = intfavoriteList;
-                                          tmpfavoriteList.add(shop.id);
-                                          List<String> stringList =
-                                              tmpfavoriteList
-                                                  .map((int number) =>
-                                                      number.toString())
-                                                  .toList();
-                                          _savePreviousInputs(stringList);
-                                        });
-                                      } else {
-                                        setState(() {
-                                          var tmpfavoriteList = intfavoriteList;
-                                          tmpfavoriteList.remove(shop.id);
-                                          List<String> stringList =
-                                              tmpfavoriteList
-                                                  .map((int number) =>
-                                                      number.toString())
-                                                  .toList();
-                                          _savePreviousInputs(stringList);
-                                          print("ontap");
-                                        });
-                                      }
-                                    },
-                                    icon: isContained()
-                                        ? Icon(
-                                            Icons.favorite,
-                                          )
-                                        : Icon(
-                                            Icons.favorite_outline,
-                                          ),
-                                    color: isContained()
-                                        ? Colors.yellow[800]
-                                        : Colors.grey,
-                                  ),
-                                  IconButton(
-                                    onPressed: () => Navigator.of(context,
-                                            rootNavigator: true)
-                                        .push(
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            ShopPage(shop: shop),
-                                        fullscreenDialog: true,
-                                      ),
-                                    ),
-                                    icon: Icon(
-                                      Icons.info_outline,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ]),
-                            Container(
-                              height: 2,
-                              color: Colors.black12,
-                            )
-                          ]);
+                          return StoreTabItem(
+                              shop: shop,
+                              favoritelist: intfavoriteList,
+                              position: position);
                         }).toList(),
                       ),
                     ),
@@ -901,7 +780,12 @@ Future<Position> _determinePosition() async {
   // デバイスの位置情報を返す。
 }
 
-void caluculateDistance(double lat1, double lon1, double lat2, double lon2) {
+double caluculateDistance(
+  double lat1,
+  double lon1,
+  double lat2,
+  double lon2,
+) {
   double distance = Geolocator.distanceBetween(lat1, lon1, lat2, lon2);
-  print(distance / 1000);
+  return (double.parse((distance / 1000).toStringAsFixed(1))); //km
 }
