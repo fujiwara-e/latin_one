@@ -12,6 +12,7 @@ class ShopModel {
   List<String> shopReguralHolidays = [];
   List<double> shopLatitude = [];
   List<double> shopLongitude = [];
+  List<String> shopMail = [];
 
   Shop getById(int id) {
     if (id < 0 || id >= shopNames.length) {
@@ -27,7 +28,8 @@ class ShopModel {
         shopPaymentMethods[id],
         shopReguralHolidays[id],
         shopLatitude[id],
-        shopLongitude[id]);
+        shopLongitude[id],
+        shopMail[id]);
   }
 
   void setItem(
@@ -39,7 +41,8 @@ class ShopModel {
       String payment,
       String holiday,
       double latitude,
-      double longitude) {
+      double longitude,
+      String mail) {
     shopNames.add(shop);
     shopAddresses.add(address);
     shopOpeningHours.add(opening);
@@ -49,6 +52,7 @@ class ShopModel {
     shopReguralHolidays.add(holiday);
     shopLatitude.add(latitude);
     shopLongitude.add(longitude);
+    shopMail.add(mail);
   }
 }
 
@@ -62,6 +66,7 @@ class Shop {
   final String phoneNumber;
   final String paymentMethods;
   final String reguralHoliday;
+  final String mail;
   final double latitude;
   final double longitude;
 
@@ -75,7 +80,8 @@ class Shop {
       this.paymentMethods,
       this.reguralHoliday,
       this.latitude,
-      this.longitude);
+      this.longitude,
+      this.mail);
 
   @override
   int get hashCode => id;
@@ -122,7 +128,8 @@ class SelectedShopModel extends ChangeNotifier {
                 doc.get('payment'),
                 doc.get('holiday'),
                 doc.get('latitude'),
-                doc.get('longitude'));
+                doc.get('longitude'),
+                doc.get('mail_address'));
           }
         });
       });

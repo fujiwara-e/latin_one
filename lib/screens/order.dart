@@ -296,7 +296,7 @@ class Alert extends StatelessWidget {
             cart.reset();
             shop.reset();
             customer.reset();
-            launch_mail("コーヒー注文", data_tmp, "hosokawa2023@s.okayama-u.ac.jp");
+            launch_mail("コーヒー注文", data_tmp, shop.selectedShop!.mail);
             Navigator.pop(context);
             Navigator.of(context).push(
               MaterialPageRoute(
@@ -496,8 +496,8 @@ class _FormPageState extends State<FormPage> {
                       setState(() {
                         _firstName_controller.text = _previousInputs[0];
                         _lastName_controller.text = _previousInputs[1];
-                        _zipcode_controller.text = _previousInputs[2];
-                        _mail_controller.text = _previousInputs[3];
+                        _mail_controller.text = _previousInputs[2];
+                        _zipcode_controller.text = _previousInputs[3];
                         _address_controller.text = _previousInputs[4];
                       });
                     }
@@ -562,14 +562,26 @@ class StorePage extends StatefulWidget {
   State<StorePage> createState() => _StorePageState();
 }
 
-class _StorePageState extends State<StorePage> {
+class _StorePageState extends State<StorePage>
+    with SingleTickerProviderStateMixin {
   late Future<Position> _futurePosition;
+  late TabController _tabController;
+  late List<int> intfavoriteList;
 
   @override
   void initState() {
     super.initState();
     _futurePosition = _determinePosition();
     _loadFavoriteShops();
+    _tabController = TabController(length: 3, vsync: this);
+    _tabController.addListener(() {
+      if (_tabController.indexIsChanging) {
+        _loadFavoriteShops();
+        setState(() {
+          intfavoriteList = favoriteshops.map((str) => int.parse(str)).toList();
+        });
+      }
+    });
   }
 
   List<String> favoriteshops = [];
@@ -591,8 +603,7 @@ class _StorePageState extends State<StorePage> {
     var shopList = shop.shopList;
     Position? position;
 
-    List<int> intfavoriteList =
-        favoriteshops.map((str) => int.parse(str)).toList();
+    intfavoriteList = favoriteshops.map((str) => int.parse(str)).toList();
 
     return FutureBuilder<Position>(
       future: _futurePosition,
@@ -626,6 +637,7 @@ class _StorePageState extends State<StorePage> {
                         collapseMode: CollapseMode.parallax,
                       ),
                       bottom: TabBar(
+                        controller: _tabController,
                         tabs: [
                           Tab(text: 'MAP'),
                           Tab(text: '近くの店舗'),
@@ -636,6 +648,7 @@ class _StorePageState extends State<StorePage> {
                   ];
                 },
                 body: TabBarView(
+                  controller: _tabController,
                   children: [
                     Center(
                         child: FlutterMap(
@@ -703,11 +716,6 @@ class _StorePageState extends State<StorePage> {
                         children: intfavoriteList.map((id) {
                           var shopList = context.read<SelectedShopModel>();
                           var shop = shopList.shopList.getById(id);
-                          bool isContained() {
-                            return intfavoriteList
-                                .any((favorite) => favorite == shop.id);
-                          }
-
                           return StoreTabItem(
                               shop: shop,
                               favoritelist: intfavoriteList,

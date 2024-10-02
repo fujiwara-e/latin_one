@@ -43,13 +43,14 @@ class StoreTabItem extends StatefulWidget {
 
 class _StoreTabItemState extends State<StoreTabItem> {
   double distance = 0;
+  List<String> favoriteshops = []; //debug
   bool isContained() {
     return widget.favoritelist.any((favorite) => favorite == widget.shop.id);
   }
 
-  Future<void> _savePreviousInputs(List<String> inputs) async {
+  Future<void> _saveFavoriteShops(List<String> shops) async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setStringList('previousInputs', inputs);
+    prefs.setStringList('favoriteshops', shops);
   }
 
   @override
@@ -88,7 +89,7 @@ class _StoreTabItemState extends State<StoreTabItem> {
                             List<String> stringList = tmpfavoriteList
                                 .map((int number) => number.toString())
                                 .toList();
-                            _savePreviousInputs(stringList);
+                            _saveFavoriteShops(stringList);
                           });
                         } else {
                           setState(() {
@@ -97,8 +98,7 @@ class _StoreTabItemState extends State<StoreTabItem> {
                             List<String> stringList = tmpfavoriteList
                                 .map((int number) => number.toString())
                                 .toList();
-                            _savePreviousInputs(stringList);
-                            print("ontap");
+                            _saveFavoriteShops(stringList);
                           });
                         }
                       },
@@ -569,7 +569,7 @@ class BottomSheetItem extends StatefulWidget {
 
 class _BottomSheetItemState extends State<BottomSheetItem> {
   @override
-  Future<void> _savePreviousInputs(List<String> favoriteshops) async {
+  Future<void> _saveFavoriteShops(List<String> favoriteshops) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setStringList('favoriteshops', favoriteshops);
   }
@@ -608,7 +608,7 @@ class _BottomSheetItemState extends State<BottomSheetItem> {
                           List<String> stringList = widget.favoritelist
                               .map((int number) => number.toString())
                               .toList();
-                          _savePreviousInputs(stringList);
+                          _saveFavoriteShops(stringList);
                         });
                       } else {
                         setState(() {
@@ -616,7 +616,7 @@ class _BottomSheetItemState extends State<BottomSheetItem> {
                           List<String> stringList = widget.favoritelist
                               .map((int number) => number.toString())
                               .toList();
-                          _savePreviousInputs(stringList);
+                          _saveFavoriteShops(stringList);
                         });
                       }
                     },
