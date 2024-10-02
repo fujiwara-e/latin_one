@@ -174,7 +174,6 @@ class _OrderPageState extends State<OrderPage> {
 
           Consumer<CartModel>(builder: (context, cart, child) {
             final total = cart.totalPrice;
-            print(total);
             return SliverToBoxAdapter(
               child: Container(
                 height: SizeConfig.blockSizeVertical * 10,
@@ -567,6 +566,7 @@ class _StorePageState extends State<StorePage>
   late Future<Position> _futurePosition;
   late TabController _tabController;
   late List<int> intfavoriteList;
+  List<int> nearbyshopList = [];
 
   @override
   void initState() {
@@ -599,11 +599,68 @@ class _StorePageState extends State<StorePage>
   }
 
   Widget build(BuildContext context) {
-    var shop = context.read<SelectedShopModel>();
-    var shopList = shop.shopList;
+    var shopmodel = context.read<SelectedShopModel>();
+    List<Shop> shopList = [];
+    for (int i = 0; i < shopmodel.shopList.shopNames.length; i++) {
+      shopList.add(shopmodel.shopList.getById(i));
+    }
+
     Position? position;
 
     intfavoriteList = favoriteshops.map((str) => int.parse(str)).toList();
+
+    void nearbyListgen() {
+      nearbyshopList = [];
+      for (int i = 0; i < shopList.length; i++) {
+        if (caluculateDistance(position!.latitude, position!.longitude,
+                shopList[i].latitude, shopList[i].longitude) <
+            10.0) {
+          nearbyshopList.add(i);
+        }
+      }
+    }
+
+    List<StoreTabItem> genNearbyShopList() {
+      nearbyListgen();
+      return nearbyshopList.map((id) {
+        var shopList = context.read<SelectedShopModel>();
+        var shop = shopList.shopList.getById(id);
+        return StoreTabItem(
+            shop: shop, favoritelist: intfavoriteList, position: position);
+      }).toList();
+    }
+
+    List<Marker> createMarkers(
+        BuildContext context, List<Shop> shopList, List<int> intfavoriteList) {
+      return shopList.map((shop) {
+        return Marker(
+          width: 40,
+          height: 40,
+          point: LatLng(shop.latitude, shop.longitude),
+          builder: (ctx) => Container(
+            child: IconButton(
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  builder: (context) {
+                    return BottomSheetItem(
+                      onTap: () {},
+                      favoritelist: intfavoriteList,
+                      shop: shop,
+                    );
+                  },
+                );
+              },
+              icon: Icon(
+                Icons.circle,
+                color: Colors.yellow[800],
+                size: 20.0,
+              ),
+            ),
+          ),
+        );
+      }).toList();
+    }
 
     return FutureBuilder<Position>(
       future: _futurePosition,
@@ -653,7 +710,7 @@ class _StorePageState extends State<StorePage>
                     Center(
                         child: FlutterMap(
                       options: MapOptions(
-                        center: LatLng(33.57454362494296, 133.578431168963),
+                        center: LatLng(34.6656739, 133.9130976),
                         zoom: 15.0,
                         minZoom: 10,
                         maxZoom: 18,
@@ -666,34 +723,8 @@ class _StorePageState extends State<StorePage>
                               'https://api.maptiler.com/maps/jp-mierune-streets/{z}/{x}/{y}.png?key=2YhYCGe6F0g5cNXrFsOp',
                         ),
                         MarkerLayer(
-                          markers: [
-                            Marker(
-                              width: 40,
-                              height: 40,
-                              point:
-                                  LatLng(33.57454362494296, 133.578431168963),
-                              builder: (ctx) => Container(
-                                child: IconButton(
-                                  onPressed: () {
-                                    showModalBottomSheet(
-                                        context: context,
-                                        builder: (context) {
-                                          return BottomSheetItem(
-                                              onTap: () {},
-                                              favoritelist: intfavoriteList,
-                                              shop: shopList.getById(0));
-                                        });
-                                  },
-                                  icon: Icon(
-                                    Icons.circle,
-                                    color: Colors.yellow[800],
-                                    size: 20.0,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                            markers: createMarkers(
+                                context, shopList, intfavoriteList)),
                         RichAttributionWidget(
                           attributions: [
                             TextSourceAttribution('MapTiler',
@@ -709,7 +740,10 @@ class _StorePageState extends State<StorePage>
                         )
                       ],
                     )),
-                    Center(child: Text('近くの店舗 Content')),
+                    Center(
+                        child: ListView(
+                            padding: EdgeInsets.zero,
+                            children: genNearbyShopList())),
                     Center(
                       child: ListView(
                         padding: EdgeInsets.zero,

@@ -44,7 +44,7 @@ class _ShopPageState extends State<ShopPage> {
           SliverFixedExtentList(
             itemExtent: SizeConfig.blockSizeVertical * 10 + 2,
             delegate: SliverChildListDelegate([
-              AddressItem(text: widget.shop.address),
+              AddressItem(shop: widget.shop),
               ShopItem(
                   column_name: '営業時間',
                   text:

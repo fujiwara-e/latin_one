@@ -400,11 +400,11 @@ class _StoreItemState extends State<StoreItem> {
 }
 
 class AddressItem extends StatelessWidget {
-  final String text;
+  final Shop shop;
 
   const AddressItem({
     Key? key,
-    required this.text,
+    required this.shop,
   }) : super(key: key);
 
   @override
@@ -419,7 +419,7 @@ class AddressItem extends StatelessWidget {
             margin: EdgeInsets.only(left: 20, top: 0, right: 0, bottom: 0),
             height: SizeConfig.blockSizeVertical * 10,
             width: SizeConfig.screenWidth * 0.67,
-            child: Text(text,
+            child: Text(shop.address,
                 style: TextStyle(
                   fontSize: 10,
                   color: Colors.black,
@@ -428,16 +428,14 @@ class AddressItem extends StatelessWidget {
           ),
           IconButton(
               onPressed: () {
-                print(SizeConfig.blockSizeVertical);
                 final urlLauncher = UrlLauncher();
-                urlLauncher.makePhoneCall('088-846-0408');
+                urlLauncher.makePhoneCall(shop.phoneNumber);
               },
               icon: Icon(Icons.phone)),
           IconButton(
               onPressed: () async {
                 print(SizeConfig.blockSizeVertical);
-                final url =
-                    Uri.parse("https://maps.app.goo.gl/zTAPviyi3NyRxvwt5");
+                final url = Uri.parse(shop.mapurl);
                 await launchUrl(url);
               },
               icon: Icon(Icons.map_outlined))
