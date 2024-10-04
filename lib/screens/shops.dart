@@ -7,6 +7,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:latin_one/entities/shop.dart';
 import 'package:provider/provider.dart';
+import 'package:latin_one/network/connectivity.dart';
 
 class ShopPage extends StatefulWidget {
   final Shop shop;
@@ -44,7 +45,7 @@ class _ShopPageState extends State<ShopPage> {
           SliverFixedExtentList(
             itemExtent: SizeConfig.blockSizeVertical * 10 + 2,
             delegate: SliverChildListDelegate([
-              AddressItem(text: widget.shop.address),
+              AddressItem(shop: widget.shop),
               ShopItem(
                   column_name: '営業時間',
                   text:
@@ -70,9 +71,37 @@ class ShopsPage extends StatefulWidget {
 
 class _ShopsPageState extends State<ShopsPage> {
   @override
+  List<Marker> createMarkersinShops(BuildContext context, List<Shop> shopList) {
+    return shopList.map((shop) {
+      return Marker(
+        width: 40,
+        height: 40,
+        point: LatLng(shop.latitude, shop.longitude),
+        builder: (ctx) => Container(
+          child: IconButton(
+            onPressed: () => Navigator.of(context, rootNavigator: true)
+                .push(MaterialPageRoute(
+              builder: (context) => ShopPage(shop: shop),
+              fullscreenDialog: true,
+            )),
+            icon: Icon(
+              Icons.circle,
+              color: Colors.yellow[800],
+              size: 20.0,
+            ),
+          ),
+        ),
+      );
+    }).toList();
+  }
+
   Widget build(BuildContext context) {
-    var shop = context.read<SelectedShopModel>();
-    var shopList = shop.shopList;
+    var shopmodel = context.read<SelectedShopModel>();
+    List<Shop> shopList = [];
+    for (int i = 0; i < shopmodel.shopList.shopNames.length; i++) {
+      shopList.add(shopmodel.shopList.getById(i));
+    }
+
     return Scaffold(
         appBar: PreferredSize(
             preferredSize: Size.fromHeight(SizeConfig.blockSizeVertical * 10),
@@ -103,31 +132,7 @@ class _ShopsPageState extends State<ShopsPage> {
               urlTemplate:
                   'https://api.maptiler.com/maps/jp-mierune-streets/{z}/{x}/{y}.png?key=2YhYCGe6F0g5cNXrFsOp',
             ),
-            MarkerLayer(
-              markers: [
-                Marker(
-                  width: 40,
-                  height: 40,
-                  point: LatLng(33.57454362494296, 133.578431168963),
-                  builder: (ctx) => Container(
-                    child: IconButton(
-                      onPressed: () =>
-                          Navigator.of(context, rootNavigator: true)
-                              .push(MaterialPageRoute(
-                        builder: (context) =>
-                            ShopPage(shop: shopList.getById(0)),
-                        fullscreenDialog: true,
-                      )),
-                      icon: Icon(
-                        Icons.circle,
-                        color: Colors.yellow[800],
-                        size: 20.0,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+            MarkerLayer(markers: createMarkersinShops(context, shopList)),
             RichAttributionWidget(
               attributions: [
                 TextSourceAttribution('MapTiler',

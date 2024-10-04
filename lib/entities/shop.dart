@@ -12,6 +12,8 @@ class ShopModel {
   List<String> shopReguralHolidays = [];
   List<double> shopLatitude = [];
   List<double> shopLongitude = [];
+  List<String> shopMail = [];
+  List<String> shopMapUrl = [];
 
   Shop getById(int id) {
     if (id < 0 || id >= shopNames.length) {
@@ -27,7 +29,9 @@ class ShopModel {
         shopPaymentMethods[id],
         shopReguralHolidays[id],
         shopLatitude[id],
-        shopLongitude[id]);
+        shopLongitude[id],
+        shopMail[id],
+        shopMapUrl[id]);
   }
 
   void setItem(
@@ -39,7 +43,9 @@ class ShopModel {
       String payment,
       String holiday,
       double latitude,
-      double longitude) {
+      double longitude,
+      String mail,
+      String mapurl) {
     shopNames.add(shop);
     shopAddresses.add(address);
     shopOpeningHours.add(opening);
@@ -49,6 +55,8 @@ class ShopModel {
     shopReguralHolidays.add(holiday);
     shopLatitude.add(latitude);
     shopLongitude.add(longitude);
+    shopMail.add(mail);
+    shopMapUrl.add(mapurl);
   }
 }
 
@@ -62,8 +70,10 @@ class Shop {
   final String phoneNumber;
   final String paymentMethods;
   final String reguralHoliday;
+  final String mail;
   final double latitude;
   final double longitude;
+  final String mapurl;
 
   Shop(
       this.id,
@@ -75,7 +85,9 @@ class Shop {
       this.paymentMethods,
       this.reguralHoliday,
       this.latitude,
-      this.longitude);
+      this.longitude,
+      this.mail,
+      this.mapurl);
 
   @override
   int get hashCode => id;
@@ -111,19 +123,18 @@ class SelectedShopModel extends ChangeNotifier {
       shopNames.forEach((shop) {
         var docRef = db.collection("shops").doc(shop);
         docRef.get().then((DocumentSnapshot doc) {
-          Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?;
-          for (int i = 0; i < data!.length; i++) {
-            _shopList.setItem(
-                shop,
-                doc.get('address'),
-                doc.get('opening_hours'),
-                doc.get('closing_hours'),
-                doc.get('phone_number'),
-                doc.get('payment'),
-                doc.get('holiday'),
-                doc.get('latitude'),
-                doc.get('longitude'));
-          }
+          _shopList.setItem(
+              shop,
+              doc.get('address'),
+              doc.get('opening_hours'),
+              doc.get('closing_hours'),
+              doc.get('phone_number'),
+              doc.get('payment'),
+              doc.get('holiday'),
+              doc.get('latitude'),
+              doc.get('longitude'),
+              doc.get('mail_address'),
+              doc.get('map_url'));
         });
       });
     }
