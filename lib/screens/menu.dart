@@ -232,7 +232,6 @@ class MenuPage extends StatelessWidget {
             ),
           ),
           SliverList(
-            // itemExtent: SizeConfig.blockSizeVertical * 10 + 8,
             delegate: SliverChildListDelegate(
               [
                 Image.asset(item.imagePath),

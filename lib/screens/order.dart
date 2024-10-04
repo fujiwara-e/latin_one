@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +7,7 @@ import '../config/size_config.dart';
 import '../screens/item.dart';
 import 'package:latin_one/entities/shop.dart';
 import 'package:latin_one/entities/customer.dart';
+import 'package:latin_one/screens/shops.dart';
 import 'package:provider/provider.dart';
 import 'package:latin_one/screens/product.dart';
 import 'package:latlong2/latlong.dart';
@@ -16,6 +16,8 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:latin_one/network/connectivity.dart';
 
 class OrderPage extends StatefulWidget {
   const OrderPage({super.key});
@@ -173,7 +175,6 @@ class _OrderPageState extends State<OrderPage> {
 
           Consumer<CartModel>(builder: (context, cart, child) {
             final total = cart.totalPrice;
-            print(total);
             return SliverToBoxAdapter(
               child: Container(
                 height: SizeConfig.blockSizeVertical * 10,
@@ -277,27 +278,25 @@ class Alert extends StatelessWidget {
             int quantity;
             int i;
             String data_tmp = '';
+            data_tmp = 'お名前: ${customer.firstName} ${customer.lastName}\n';
+            data_tmp = '${data_tmp}連絡先: ${customer.mail}\n';
+            data_tmp = '${data_tmp}配達先: ${customer.address}\n';
+            data_tmp = '${data_tmp}ご注文内容\n';
             data_tmp =
-                data_tmp + 'お名前: ${customer.firstName} ${customer.lastName}\n';
-            data_tmp = data_tmp + '連絡先: ${customer.mail}\n';
-            data_tmp = data_tmp + '配達先: ${customer.address}\n';
-            data_tmp = data_tmp + 'ご注文内容\n';
-            data_tmp = data_tmp +
-                '----------------------------------------------------------------------\n';
+                '${data_tmp}----------------------------------------------------------------------\n';
             for (i = 0; i < cart.items.length; i++) {
               name = cart.items[i].name;
               quantity = cart.items[i].quantity;
-              data_tmp = data_tmp + '${name}: ${quantity}点\n';
+              data_tmp = '${data_tmp}${name}: ${quantity}点\n';
             }
-            data_tmp = data_tmp + '総合計: ¥${cart.totalPrice}\n';
-            data_tmp = data_tmp +
-                '----------------------------------------------------------------------\n';
+            data_tmp =
+                '${data_tmp}----------------------------------------------------------------------\n';
             final data = ClipboardData(text: data_tmp);
             Clipboard.setData(data);
             cart.reset();
             shop.reset();
             customer.reset();
-            print(shop.isSelected);
+            launch_mail("コーヒー注文", data_tmp, shop.selectedShop!.mail);
             Navigator.pop(context);
             Navigator.of(context).push(
               MaterialPageRoute(
@@ -309,6 +308,27 @@ class Alert extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  void launch_mail(String mailTitle, String mailBody, String mailAddress) {
+    final Uri mailUri = Uri(
+      scheme: 'mailto',
+      path: mailAddress,
+      queryParameters: {
+        'subject': mailTitle,
+        'body': mailBody,
+      },
+    );
+    final encodedUri = mailUri.toString().replaceAll('+', '%20');
+    _launchUrl(Uri.parse(encodedUri));
+  }
+
+  Future<void> _launchUrl(Uri url) async {
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
+    } else {
+      throw ArgumentError('Could not launch $url');
+    }
   }
 }
 
@@ -340,7 +360,7 @@ class OrderCompletionPage extends StatelessWidget {
           width: SizeConfig.screenWidth,
           child: Align(
             child: Text(
-              'ご注文ありがとうございました．\n\nご注文内容がクリップボードにコピーされました．',
+              'ご注文ありがとうございました。\n\nご注文内容がメールにコピーされました。',
               style: TextStyle(fontSize: 20, fontFamily: 'gothic'),
             ),
           ),
@@ -394,9 +414,6 @@ class _FormPageState extends State<FormPage> {
                   child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        // SizedBox(
-                        //   height: 20,
-                        // ),
                         SizedBox(
                           height: SizeConfig.FormSize,
                           child: Row(children: [
@@ -413,9 +430,6 @@ class _FormPageState extends State<FormPage> {
                             )),
                           ]),
                         ),
-                        // SizedBox(
-                        //   height: 20,
-                        // ),
                         SizedBox(
                           height: SizeConfig.FormSize,
                           child: FormItem(
@@ -423,9 +437,6 @@ class _FormPageState extends State<FormPage> {
                             controller: _mail_controller,
                           ),
                         ),
-                        // SizedBox(
-                        //   height: 20,
-                        // ),
                         SizedBox(
                           height: SizeConfig.FormSize,
                           child: Row(
@@ -450,9 +461,6 @@ class _FormPageState extends State<FormPage> {
                             ],
                           ),
                         ),
-                        // SizedBox(
-                        //   height: 12,
-                        // ),
                         SizedBox(
                           height: SizeConfig.FormSize,
                           child: FormItem(
@@ -476,8 +484,8 @@ class _FormPageState extends State<FormPage> {
                       setState(() {
                         _firstName_controller.text = _previousInputs[0];
                         _lastName_controller.text = _previousInputs[1];
-                        _zipcode_controller.text = _previousInputs[2];
-                        _mail_controller.text = _previousInputs[3];
+                        _mail_controller.text = _previousInputs[2];
+                        _zipcode_controller.text = _previousInputs[3];
                         _address_controller.text = _previousInputs[4];
                       });
                     }
@@ -502,8 +510,8 @@ class _FormPageState extends State<FormPage> {
                       inputs = [
                         _firstName_controller.text,
                         _lastName_controller.text,
-                        _zipcode_controller.text,
                         _mail_controller.text,
+                        _zipcode_controller.text,
                         _address_controller.text
                       ];
                       customer.set(inputs[0], inputs[1], inputs[2], inputs[3],
@@ -542,111 +550,211 @@ class StorePage extends StatefulWidget {
   State<StorePage> createState() => _StorePageState();
 }
 
-class _StorePageState extends State<StorePage> {
+class _StorePageState extends State<StorePage>
+    with SingleTickerProviderStateMixin {
+  late Future<Position> _futurePosition;
+  late TabController _tabController;
+  late List<int> intfavoriteList;
+  List<int> nearbyshopList = [];
+
   @override
+  void initState() {
+    super.initState();
+    _futurePosition = _determinePosition();
+    _loadFavoriteShops();
+    _tabController = TabController(length: 3, vsync: this);
+    _tabController.addListener(() {
+      if (_tabController.indexIsChanging) {
+        _loadFavoriteShops();
+        setState(() {
+          intfavoriteList = favoriteshops.map((str) => int.parse(str)).toList();
+        });
+      }
+    });
+  }
+
+  List<String> favoriteshops = [];
+
+  Future<void> _loadFavoriteShops() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      favoriteshops = prefs.getStringList('favoriteshops') ?? [];
+    });
+  }
+
+  Future<void> _savePreviousInputs(List<String> favoriteshops) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setStringList('favoriteshops', favoriteshops);
+  }
+
   Widget build(BuildContext context) {
-    var shop = context.read<SelectedShopModel>();
-    var shopList = shop.shopList;
-    return DefaultTabController(
-        length: 3,
-        child: Scaffold(
-          body: NestedScrollView(
-            headerSliverBuilder:
-                (BuildContext context, bool innerBoxIsScrolled) {
-              return <Widget>[
-                SliverAppBar(
-                  backgroundColor: Colors.white,
-                  expandedHeight: SizeConfig.blockSizeVertical * 8,
-                  flexibleSpace: FlexibleSpaceBar(
-                    title: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          "Store Select",
-                          style: TextStyle(
-                            fontSize: SizeConfig.TitleSize,
-                            color: Colors.black,
-                            fontFamily: 'ozworld',
-                          ),
-                        )),
-                    titlePadding:
-                        EdgeInsets.only(top: 0, right: 0, bottom: 0, left: 20),
-                    collapseMode: CollapseMode.parallax,
-                  ),
-                  bottom: TabBar(
-                    tabs: [
-                      Tab(text: 'MAP'),
-                      Tab(text: '近くの店舗'),
-                      Tab(text: 'お気に入り'),
-                    ],
-                  ),
-                ),
-              ];
-            },
-            body: TabBarView(
-              children: [
-                Center(
-                    child: FlutterMap(
-                  options: MapOptions(
-                    center: LatLng(33.57454362494296, 133.578431168963),
-                    zoom: 15.0,
-                    minZoom: 10,
-                    maxZoom: 18,
-                    interactiveFlags: InteractiveFlag.all &
-                        ~InteractiveFlag.rotate, // 回転を無効にする
-                  ),
-                  children: [
-                    TileLayer(
-                      urlTemplate:
-                          'https://api.maptiler.com/maps/jp-mierune-streets/{z}/{x}/{y}.png?key=2YhYCGe6F0g5cNXrFsOp',
-                    ),
-                    MarkerLayer(
-                      markers: [
-                        Marker(
-                          width: 40,
-                          height: 40,
-                          point: LatLng(33.57454362494296, 133.578431168963),
-                          builder: (ctx) => Container(
-                            child: IconButton(
-                              onPressed: () {
-                                showModalBottomSheet(
-                                    context: context,
-                                    builder: (context) {
-                                      return BottomSheetItem(
-                                          onTap: () {},
-                                          shop: shopList.getById(0));
-                                    });
-                              },
-                              icon: Icon(
-                                Icons.circle,
-                                color: Colors.yellow[800],
-                                size: 20.0,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    RichAttributionWidget(
-                      attributions: [
-                        TextSourceAttribution('MapTiler',
-                            onTap: () => launchUrl(Uri.parse(
-                                "https://www.maptiler.com/copyright/"))),
-                        TextSourceAttribution('OpenStreetMap contributors',
-                            onTap: () => launchUrl(Uri.parse(
-                                "https://www.openstreetmap.org/copyright"))),
-                        TextSourceAttribution('MIERUNE',
-                            onTap: () =>
-                                launchUrl(Uri.parse("https://maptiler.jp/"))),
-                      ],
-                    )
-                  ],
-                )),
-                Center(child: Text('近くの店舗 Content')),
-                Center(child: Text('お気に入り Content')),
-              ],
+    var shopmodel = context.read<SelectedShopModel>();
+    List<Shop> shopList = [];
+    for (int i = 0; i < shopmodel.shopList.shopNames.length; i++) {
+      shopList.add(shopmodel.shopList.getById(i));
+    }
+
+    Position? position;
+
+    intfavoriteList = favoriteshops.map((str) => int.parse(str)).toList();
+
+    void nearbyListgen() {
+      nearbyshopList = [];
+      for (int i = 0; i < shopList.length; i++) {
+        if (caluculateDistance(position!.latitude, position!.longitude,
+                shopList[i].latitude, shopList[i].longitude) <
+            10.0) {
+          nearbyshopList.add(i);
+        }
+      }
+    }
+
+    List<StoreTabItem> genNearbyShopList() {
+      nearbyListgen();
+      return nearbyshopList.map((id) {
+        var shopList = context.read<SelectedShopModel>();
+        var shop = shopList.shopList.getById(id);
+        return StoreTabItem(
+            shop: shop, favoritelist: intfavoriteList, position: position);
+      }).toList();
+    }
+
+    List<Marker> createMarkers(
+        BuildContext context, List<Shop> shopList, List<int> intfavoriteList) {
+      return shopList.map((shop) {
+        return Marker(
+          width: 40,
+          height: 40,
+          point: LatLng(shop.latitude, shop.longitude),
+          builder: (ctx) => Container(
+            child: IconButton(
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  builder: (context) {
+                    return BottomSheetItem(
+                      onTap: () {},
+                      favoritelist: intfavoriteList,
+                      shop: shop,
+                    );
+                  },
+                );
+              },
+              icon: Icon(
+                Icons.circle,
+                color: Colors.yellow[800],
+                size: 20.0,
+              ),
             ),
           ),
-        ));
+        );
+      }).toList();
+    }
+
+    return FutureBuilder<Position>(
+      future: _futurePosition,
+      builder: (BuildContext content, AsyncSnapshot<Position> snapshot) {
+        if (snapshot.hasData) {
+          position = snapshot.data!;
+        }
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        }
+        return DefaultTabController(
+            length: 3,
+            child: Scaffold(
+              body: NestedScrollView(
+                headerSliverBuilder:
+                    (BuildContext context, bool innerBoxIsScrolled) {
+                  return <Widget>[
+                    SliverAppBar(
+                      backgroundColor: Colors.white,
+                      expandedHeight: SizeConfig.blockSizeVertical * 8,
+                      flexibleSpace: FlexibleSpaceBar(
+                        title: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              "Store Select",
+                              style: TextStyle(
+                                fontSize: SizeConfig.TitleSize,
+                                color: Colors.black,
+                                fontFamily: 'ozworld',
+                              ),
+                            )),
+                        titlePadding: EdgeInsets.only(
+                            top: 0, right: 0, bottom: 0, left: 20),
+                        collapseMode: CollapseMode.parallax,
+                      ),
+                      bottom: TabBar(
+                        controller: _tabController,
+                        tabs: [
+                          Tab(text: 'MAP'),
+                          Tab(text: '近くの店舗'),
+                          Tab(text: 'お気に入り'),
+                        ],
+                      ),
+                    ),
+                  ];
+                },
+                body: TabBarView(
+                  controller: _tabController,
+                  children: [
+                    Center(
+                        child: FlutterMap(
+                      options: MapOptions(
+                        center: LatLng(34.6656739, 133.9130976),
+                        zoom: 15.0,
+                        minZoom: 10,
+                        maxZoom: 18,
+                        interactiveFlags: InteractiveFlag.all &
+                            ~InteractiveFlag.rotate, // 回転を無効にする
+                      ),
+                      children: [
+                        TileLayer(
+                          urlTemplate:
+                              'https://api.maptiler.com/maps/jp-mierune-streets/{z}/{x}/{y}.png?key=2YhYCGe6F0g5cNXrFsOp',
+                        ),
+                        MarkerLayer(
+                            markers: createMarkers(
+                                context, shopList, intfavoriteList)),
+                        RichAttributionWidget(
+                          attributions: [
+                            TextSourceAttribution('MapTiler',
+                                onTap: () => launchUrl(Uri.parse(
+                                    "https://www.maptiler.com/copyright/"))),
+                            TextSourceAttribution('OpenStreetMap contributors',
+                                onTap: () => launchUrl(Uri.parse(
+                                    "https://www.openstreetmap.org/copyright"))),
+                            TextSourceAttribution('MIERUNE',
+                                onTap: () => launchUrl(
+                                    Uri.parse("https://maptiler.jp/"))),
+                          ],
+                        )
+                      ],
+                    )),
+                    Center(
+                        child: ListView(
+                            padding: EdgeInsets.zero,
+                            children: genNearbyShopList())),
+                    Center(
+                      child: ListView(
+                        padding: EdgeInsets.zero,
+                        children: intfavoriteList.map((id) {
+                          var shopList = context.read<SelectedShopModel>();
+                          var shop = shopList.shopList.getById(id);
+                          return StoreTabItem(
+                              shop: shop,
+                              favoritelist: intfavoriteList,
+                              position: position);
+                        }).toList(),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ));
+      },
+    );
   }
 }
 
@@ -670,4 +778,39 @@ Future<String?> zipCodeToAddress(String zipCode) async {
   final address =
       '${addressMap['address1']} ${addressMap['address2']} ${addressMap['address3']}'; // 住所を連結する。
   return address;
+}
+
+Future<Position> _determinePosition() async {
+  bool serviceEnabled;
+  LocationPermission permission;
+
+  serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  if (!serviceEnabled) {
+    return Future.error('Location services are disabled.');
+  }
+
+  permission = await Geolocator.checkPermission();
+  if (permission == LocationPermission.denied) {
+    permission = await Geolocator.requestPermission();
+    if (permission == LocationPermission.denied) {
+      return Future.error('Location permissions are denied');
+    }
+  }
+
+  if (permission == LocationPermission.deniedForever) {
+    return Future.error(
+        'Location permissions are permanently denied, we cannot request permissions.');
+  }
+
+  return await Geolocator.getCurrentPosition();
+}
+
+double caluculateDistance(
+  double lat1,
+  double lon1,
+  double lat2,
+  double lon2,
+) {
+  double distance = Geolocator.distanceBetween(lat1, lon1, lat2, lon2);
+  return (double.parse((distance / 1000).toStringAsFixed(1))); //km
 }

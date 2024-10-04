@@ -6,6 +6,7 @@ import 'package:latin_one/main.dart';
 import 'package:latin_one/screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:latin_one/screens/menu.dart';
+import 'package:latin_one/network/connectivity.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -36,10 +37,7 @@ class _HomePageState extends State<HomePage> {
           SliverAppBar(
             backgroundColor: Colors.white,
             expandedHeight: SizeConfig.blockSizeVertical * 0.96,
-            // forceElevated: true,
-            // elevation:20,
             pinned: true,
-            // expandedHeight: 100.0,
             flexibleSpace: FlexibleSpaceBar(),
             leadingWidth: 120,
             leading: TextButton.icon(
@@ -70,8 +68,6 @@ class _HomePageState extends State<HomePage> {
                 setState(() {
                   canPopValue = false;
                 });
-                print(canPopValue);
-                print("クリックされたぞ");
               },
             ),
           ),
@@ -113,13 +109,6 @@ class _HomePageState extends State<HomePage> {
                 image: 'assets/images/Machine.jpg',
                 text: 'Shops',
               ),
-              HomeItem(
-                onTap: () {
-                  print("クリックされたぞ!!!!!");
-                },
-                image: 'assets/images/Latte.jpg',
-                text: '',
-              ),
             ]),
           ),
         ],
@@ -138,56 +127,48 @@ class InboxPage extends StatefulWidget {
 class _InboxPageState extends State<InboxPage> {
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-        canPop: false,
-        onPopInvoked: (bool didpop) {
-          final screenstate = context.findAncestorStateOfType<ScreenState>();
-          if (screenstate != null) {
-            screenstate.onSelect(TabItem.home);
-          }
-        },
-        child: DefaultTabController(
-            length: 2,
-            child: Scaffold(
-              body: NestedScrollView(
-                headerSliverBuilder:
-                    (BuildContext context, bool innerBoxIsScrolled) {
-                  return <Widget>[
-                    SliverAppBar(
-                      pinned: true,
-                      backgroundColor: Colors.white,
-                      expandedHeight: SizeConfig.blockSizeVertical * 8,
-                      flexibleSpace: FlexibleSpaceBar(
-                        title: Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              "Inbox",
-                              style: TextStyle(
-                                fontSize: SizeConfig.TitleSize,
-                                color: Colors.black,
-                                fontFamily: 'ozworld',
-                              ),
-                            )),
-                        titlePadding: EdgeInsets.only(
-                            top: 0, right: 0, bottom: 0, left: 20),
-                        collapseMode: CollapseMode.parallax,
-                      ),
-                      bottom: TabBar(
-                        tabs: [
-                          Tab(text: "What's New"),
-                          Tab(text: "Message"),
-                        ],
-                      ),
-                    ),
-                  ];
-                },
-                body: TabBarView(
-                  children: [
-                    Center(child: Text('Tab 1 Content')),
-                    Center(child: Text('Tab 2 Content')),
-                  ],
+    return DefaultTabController(
+        length: 2,
+        child: Scaffold(
+          body: NestedScrollView(
+            headerSliverBuilder:
+                (BuildContext context, bool innerBoxIsScrolled) {
+              return <Widget>[
+                SliverAppBar(
+                  pinned: true,
+                  backgroundColor: Colors.white,
+                  expandedHeight: SizeConfig.blockSizeVertical * 8,
+                  flexibleSpace: FlexibleSpaceBar(
+                    title: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "Inbox",
+                          style: TextStyle(
+                            fontSize: SizeConfig.TitleSize,
+                            color: Colors.black,
+                            fontFamily: 'ozworld',
+                          ),
+                        )),
+                    titlePadding:
+                        EdgeInsets.only(top: 0, right: 0, bottom: 0, left: 20),
+                    collapseMode: CollapseMode.parallax,
+                  ),
+                  bottom: TabBar(
+                    tabs: [
+                      Tab(text: "What's New"),
+                      Tab(text: "Message"),
+                    ],
+                  ),
                 ),
-              ),
-            )));
+              ];
+            },
+            body: TabBarView(
+              children: [
+                Center(child: Text('Tab 1 Content')),
+                Center(child: Text('Tab 2 Content')),
+              ],
+            ),
+          ),
+        ));
   }
 }

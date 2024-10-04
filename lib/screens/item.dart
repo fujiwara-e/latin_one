@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:latin_one/screens/menu.dart';
+import 'package:latin_one/screens/order.dart';
 import 'package:latin_one/screens/product.dart';
 import 'package:latin_one/screens/shops.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -11,6 +12,7 @@ import 'package:latin_one/config/size_config.dart';
 import 'package:latin_one/entities/shop.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:geolocator/geolocator.dart';
 
 enum TabItem {
   home,
@@ -21,6 +23,154 @@ enum TabItem {
 enum SubTabItem {
   home,
   inbox,
+}
+
+class StoreTabItem extends StatefulWidget {
+  const StoreTabItem(
+      {Key? key,
+      required this.shop,
+      required this.favoritelist,
+      required this.position})
+      : super(key: key);
+
+  final Shop shop;
+  final List<int> favoritelist;
+  final Position? position;
+
+  @override
+  State<StoreTabItem> createState() => _StoreTabItemState();
+}
+
+class _StoreTabItemState extends State<StoreTabItem> {
+  double distance = 0;
+  List<String> favoriteshops = [];
+  bool isContained() {
+    return widget.favoritelist.any((favorite) => favorite == widget.shop.id);
+  }
+
+  Future<void> _saveFavoriteShops(List<String> shops) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setStringList('favoriteshops', shops);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    distance = caluculateDistance(
+        widget.position!.latitude,
+        widget.position!.longitude,
+        widget.shop.latitude,
+        widget.shop.longitude);
+
+    return Padding(
+        padding: const EdgeInsets.only(left: 10),
+        child: Column(
+          children: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Container(
+                  color: Colors.white,
+                  child: Text(widget.shop.name,
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: Colors.black,
+                        fontFamily: 'gothic',
+                      )),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        if (!isContained()) {
+                          setState(() {
+                            var tmpfavoriteList = widget.favoritelist;
+                            tmpfavoriteList.add(widget.shop.id);
+                            List<String> stringList = tmpfavoriteList
+                                .map((int number) => number.toString())
+                                .toList();
+                            _saveFavoriteShops(stringList);
+                          });
+                        } else {
+                          setState(() {
+                            var tmpfavoriteList = widget.favoritelist;
+                            tmpfavoriteList.remove(widget.shop.id);
+                            List<String> stringList = tmpfavoriteList
+                                .map((int number) => number.toString())
+                                .toList();
+                            _saveFavoriteShops(stringList);
+                          });
+                        }
+                      },
+                      icon: isContained()
+                          ? Icon(
+                              Icons.favorite,
+                            )
+                          : Icon(
+                              Icons.favorite_outline,
+                            ),
+                      color: isContained() ? Colors.yellow[800] : Colors.grey,
+                    ),
+                    IconButton(
+                      onPressed: () =>
+                          Navigator.of(context, rootNavigator: true).push(
+                        MaterialPageRoute(
+                          builder: (context) => ShopPage(shop: widget.shop),
+                          fullscreenDialog: true,
+                        ),
+                      ),
+                      icon: Icon(
+                        Icons.info_outline,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            Container(
+                alignment: Alignment.centerLeft,
+                child: Text(widget.shop.address,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.black54,
+                      fontFamily: 'gothic',
+                    ))),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Container(
+                    margin:
+                        EdgeInsets.only(left: 0, top: 0, right: 10, bottom: 0),
+                    child: TextButton(
+                      style: TextButton.styleFrom(
+                        backgroundColor: Colors.yellow[800],
+                        foregroundColor: Colors.white,
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ProductPage()),
+                        );
+                        var currentShop = context.read<SelectedShopModel>();
+                        currentShop.set(widget.shop);
+                      },
+                      child: Text('選択する'),
+                    ),
+                  ),
+                ),
+                Text(distance.toString() + "km"),
+              ],
+            ),
+            Container(
+              height: 2,
+              color: Colors.black12,
+            )
+          ],
+        ));
+  }
 }
 
 class UrlLauncher {
@@ -250,11 +400,11 @@ class _StoreItemState extends State<StoreItem> {
 }
 
 class AddressItem extends StatelessWidget {
-  final String text;
+  final Shop shop;
 
   const AddressItem({
     Key? key,
-    required this.text,
+    required this.shop,
   }) : super(key: key);
 
   @override
@@ -269,7 +419,7 @@ class AddressItem extends StatelessWidget {
             margin: EdgeInsets.only(left: 20, top: 0, right: 0, bottom: 0),
             height: SizeConfig.blockSizeVertical * 10,
             width: SizeConfig.screenWidth * 0.67,
-            child: Text(text,
+            child: Text(shop.address,
                 style: TextStyle(
                   fontSize: 10,
                   color: Colors.black,
@@ -278,16 +428,14 @@ class AddressItem extends StatelessWidget {
           ),
           IconButton(
               onPressed: () {
-                print(SizeConfig.blockSizeVertical);
                 final urlLauncher = UrlLauncher();
-                urlLauncher.makePhoneCall('088-846-0408');
+                urlLauncher.makePhoneCall(shop.phoneNumber);
               },
               icon: Icon(Icons.phone)),
           IconButton(
               onPressed: () async {
                 print(SizeConfig.blockSizeVertical);
-                final url =
-                    Uri.parse("https://maps.app.goo.gl/zTAPviyi3NyRxvwt5");
+                final url = Uri.parse(shop.mapurl);
                 await launchUrl(url);
               },
               icon: Icon(Icons.map_outlined))
@@ -402,19 +550,35 @@ class HomeItem extends StatelessWidget {
   }
 }
 
-class BottomSheetItem extends StatelessWidget {
+class BottomSheetItem extends StatefulWidget {
   final VoidCallback onTap;
+  final List<int> favoritelist;
   final Shop shop;
   const BottomSheetItem({
     Key? key,
     required this.onTap,
+    required this.favoritelist,
     required this.shop,
   }) : super(key: key);
 
   @override
+  State<BottomSheetItem> createState() => _BottomSheetItemState();
+}
+
+class _BottomSheetItemState extends State<BottomSheetItem> {
+  @override
+  Future<void> _saveFavoriteShops(List<String> favoriteshops) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setStringList('favoriteshops', favoriteshops);
+  }
+
+  bool isContained() {
+    return widget.favoritelist.any((favorite) => favorite == widget.shop.id);
+  }
+
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: onTap,
+      onTap: widget.onTap,
       child: Container(
           height: SizeConfig.blockSizeVertical * 30,
           color: Colors.white,
@@ -435,16 +599,39 @@ class BottomSheetItem extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   IconButton(
-                    onPressed: () => {},
-                    icon: Icon(
-                      Icons.favorite_outline,
-                    ),
+                    onPressed: () {
+                      if (!isContained()) {
+                        setState(() {
+                          widget.favoritelist.add(widget.shop.id);
+                          List<String> stringList = widget.favoritelist
+                              .map((int number) => number.toString())
+                              .toList();
+                          _saveFavoriteShops(stringList);
+                        });
+                      } else {
+                        setState(() {
+                          widget.favoritelist.remove(widget.shop.id);
+                          List<String> stringList = widget.favoritelist
+                              .map((int number) => number.toString())
+                              .toList();
+                          _saveFavoriteShops(stringList);
+                        });
+                      }
+                    },
+                    icon: isContained()
+                        ? Icon(
+                            Icons.favorite,
+                          )
+                        : Icon(
+                            Icons.favorite_outline,
+                          ),
+                    color: isContained() ? Colors.yellow[800] : Colors.grey,
                   ),
                   IconButton(
                     onPressed: () =>
                         Navigator.of(context, rootNavigator: true).push(
                       MaterialPageRoute(
-                        builder: (context) => ShopPage(shop: shop),
+                        builder: (context) => ShopPage(shop: widget.shop),
                         fullscreenDialog: true,
                       ),
                     ),
@@ -461,7 +648,7 @@ class BottomSheetItem extends StatelessWidget {
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    shop.name,
+                    widget.shop.name,
                     style: TextStyle(
                       fontSize: 18,
                       color: Colors.black,
@@ -477,7 +664,7 @@ class BottomSheetItem extends StatelessWidget {
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    shop.address,
+                    widget.shop.address,
                     style: TextStyle(
                       fontSize: 15,
                       color: Colors.black54,
@@ -502,7 +689,7 @@ class BottomSheetItem extends StatelessWidget {
                         MaterialPageRoute(builder: (context) => ProductPage()),
                       );
                       var currentShop = context.read<SelectedShopModel>();
-                      currentShop.set(shop);
+                      currentShop.set(widget.shop);
                       print(currentShop.selectedShop!.name);
                     },
                     child: Text('選択する'),
