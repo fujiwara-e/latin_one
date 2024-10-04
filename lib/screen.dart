@@ -6,6 +6,7 @@ import 'package:latin_one/navigator/tab_navigator.dart';
 import 'package:latin_one/entities/catalog.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:latin_one/network/connectivity.dart';
 
 int selectedIndex = 0;
 bool canPopValue = true;
@@ -64,9 +65,9 @@ class ScreenState extends State<Screen> {
         },
         child: Scaffold(
             body: Stack(children: <Widget>[
-              _buildTabItem(TabItem.home, '/home'),
-              _buildTabItem(TabItem.shops, '/shops'),
-              _buildTabItem(TabItem.order, '/order')
+              ConnectivityCheck(child: _buildTabItem(TabItem.home, '/home')),
+              ConnectivityCheck(child: _buildTabItem(TabItem.shops, '/shops')),
+              ConnectivityCheck(child: _buildTabItem(TabItem.order, '/order')),
             ]),
             bottomNavigationBar: BottomNavigation(
               currentTab: _currentTab,
@@ -90,10 +91,13 @@ class ScreenState extends State<Screen> {
   }
 
   void onSelect(TabItem tabItem) {
-    if (_currentTab == TabItem.home)
-      _navigatorKeys[_currentTab]!
-          .currentState!
-          .popUntil((route) => route.isFirst);
+    if (_currentTab == TabItem.home) {
+      if (_navigatorKeys[_currentTab]?.currentState != null) {
+        _navigatorKeys[_currentTab]!
+            .currentState!
+            .popUntil((route) => route.isFirst);
+      }
+    }
     setState(() {
       _currentTab = tabItem;
       _current_index = tabItem.index;

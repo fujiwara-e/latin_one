@@ -43,7 +43,7 @@ class StoreTabItem extends StatefulWidget {
 
 class _StoreTabItemState extends State<StoreTabItem> {
   double distance = 0;
-  List<String> favoriteshops = []; //debug
+  List<String> favoriteshops = [];
   bool isContained() {
     return widget.favoritelist.any((favorite) => favorite == widget.shop.id);
   }

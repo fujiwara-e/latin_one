@@ -6,6 +6,7 @@ import 'package:latin_one/main.dart';
 import 'package:latin_one/screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:latin_one/screens/menu.dart';
+import 'package:latin_one/network/connectivity.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -36,10 +37,7 @@ class _HomePageState extends State<HomePage> {
           SliverAppBar(
             backgroundColor: Colors.white,
             expandedHeight: SizeConfig.blockSizeVertical * 0.96,
-            // forceElevated: true,
-            // elevation:20,
             pinned: true,
-            // expandedHeight: 100.0,
             flexibleSpace: FlexibleSpaceBar(),
             leadingWidth: 120,
             leading: TextButton.icon(
@@ -70,8 +68,6 @@ class _HomePageState extends State<HomePage> {
                 setState(() {
                   canPopValue = false;
                 });
-                print(canPopValue);
-                print("クリックされたぞ");
               },
             ),
           ),

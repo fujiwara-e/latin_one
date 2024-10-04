@@ -17,6 +17,7 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:latin_one/network/connectivity.dart';
 
 class OrderPage extends StatefulWidget {
   const OrderPage({super.key});
@@ -359,7 +360,7 @@ class OrderCompletionPage extends StatelessWidget {
           width: SizeConfig.screenWidth,
           child: Align(
             child: Text(
-              'ご注文ありがとうございました．\n\nご注文内容がメールにコピーされました．',
+              'ご注文ありがとうございました。\n\nご注文内容がメールにコピーされました。',
               style: TextStyle(fontSize: 20, fontFamily: 'gothic'),
             ),
           ),
@@ -413,9 +414,6 @@ class _FormPageState extends State<FormPage> {
                   child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        // SizedBox(
-                        //   height: 20,
-                        // ),
                         SizedBox(
                           height: SizeConfig.FormSize,
                           child: Row(children: [
@@ -432,9 +430,6 @@ class _FormPageState extends State<FormPage> {
                             )),
                           ]),
                         ),
-                        // SizedBox(
-                        //   height: 20,
-                        // ),
                         SizedBox(
                           height: SizeConfig.FormSize,
                           child: FormItem(
@@ -442,9 +437,6 @@ class _FormPageState extends State<FormPage> {
                             controller: _mail_controller,
                           ),
                         ),
-                        // SizedBox(
-                        //   height: 20,
-                        // ),
                         SizedBox(
                           height: SizeConfig.FormSize,
                           child: Row(
@@ -469,9 +461,6 @@ class _FormPageState extends State<FormPage> {
                             ],
                           ),
                         ),
-                        // SizedBox(
-                        //   height: 12,
-                        // ),
                         SizedBox(
                           height: SizeConfig.FormSize,
                           child: FormItem(
@@ -668,6 +657,9 @@ class _StorePageState extends State<StorePage>
         if (snapshot.hasData) {
           position = snapshot.data!;
         }
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        }
         return DefaultTabController(
             length: 3,
             child: Scaffold(
@@ -792,34 +784,25 @@ Future<Position> _determinePosition() async {
   bool serviceEnabled;
   LocationPermission permission;
 
-  // 位置情報サービスが有効かどうかをテストします。
   serviceEnabled = await Geolocator.isLocationServiceEnabled();
   if (!serviceEnabled) {
-    // 位置情報サービスが有効でない場合、続行できません。
-    // 位置情報にアクセスし、ユーザーに対して
-    // 位置情報サービスを有効にするようアプリに要請する。
     return Future.error('Location services are disabled.');
   }
 
   permission = await Geolocator.checkPermission();
   if (permission == LocationPermission.denied) {
-    // ユーザーに位置情報を許可してもらうよう促す
     permission = await Geolocator.requestPermission();
     if (permission == LocationPermission.denied) {
-      // 拒否された場合エラーを返す
       return Future.error('Location permissions are denied');
     }
   }
 
-  // 永久に拒否されている場合のエラーを返す
   if (permission == LocationPermission.deniedForever) {
     return Future.error(
         'Location permissions are permanently denied, we cannot request permissions.');
   }
 
   return await Geolocator.getCurrentPosition();
-  // ここまでたどり着くと、位置情報に対しての権限が許可されているということなので
-  // デバイスの位置情報を返す。
 }
 
 double caluculateDistance(
