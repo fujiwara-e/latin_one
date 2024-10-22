@@ -43,12 +43,15 @@ void main() async {
     await androidImplementation?.requestNotificationsPermission();
   }
 
-  // 通知設定の初期化を行う
   _initNotification();
 
-  // アプリ停止時に通知をタップした場合はgetInitialMessageでメッセージデータを取得できる
   final message = await FirebaseMessaging.instance.getInitialMessage();
   // 取得したmessageを利用した処理などを記載する
+
+  final messageForAllProduct = await FirebaseMessaging.instance.subscribeToTopic("Product");
+  final messageForAllShop = await FirebaseMessaging.instance.subscribeToTopic("Shop");
+  final messageForAllAnnounce = await FirebaseMessaging.instance.subscribeToTopic("Announce");
+
   runApp(
     const MyApp(),
   );
