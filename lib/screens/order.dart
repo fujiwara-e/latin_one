@@ -17,7 +17,7 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:latin_one/network/connectivity.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class OrderPage extends StatefulWidget {
   const OrderPage({super.key});
@@ -244,6 +244,35 @@ class _OrderPageState extends State<OrderPage> {
 class Alert extends StatelessWidget {
   const Alert({Key? key}) : super(key: key);
 
+  Future AddOrderData(customer,cart) async{
+    FirebaseFirestore db = FirebaseFirestore.instance;
+    var i;
+    var name;
+    var quantity;
+    var now;
+    var items=[];
+
+    for (i = 0; i < cart.items.length; i++) {
+      name = cart.items[i].name;
+      quantity = cart.items[i].quantity;
+      items.add({i.toString(): {'name': name, 'quantity': quantity}});
+    }
+
+    now = DateTime.now();
+
+    final orderData ={
+      'address': customer.address,
+      'date': now,
+      'items': items,
+      'mail_address': customer.mail,
+      'status': '未確認',
+      'name': customer.firstName+customer.lastName,
+      'zipcode': customer.zipcode,
+    };
+
+    await db.collection('Orders').add(orderData);
+  }
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -274,29 +303,12 @@ class Alert extends StatelessWidget {
             var cart = context.read<CartModel>();
             var shop = context.read<SelectedShopModel>();
             var customer = context.read<CustomerModel>();
-            String name;
-            int quantity;
-            int i;
-            String data_tmp = '';
-            data_tmp = 'お名前: ${customer.firstName} ${customer.lastName}\n';
-            data_tmp = '${data_tmp}連絡先: ${customer.mail}\n';
-            data_tmp = '${data_tmp}配達先: ${customer.address}\n';
-            data_tmp = '${data_tmp}ご注文内容\n';
-            data_tmp =
-                '${data_tmp}----------------------------------------------------------------------\n';
-            for (i = 0; i < cart.items.length; i++) {
-              name = cart.items[i].name;
-              quantity = cart.items[i].quantity;
-              data_tmp = '${data_tmp}${name}: ${quantity}点\n';
-            }
-            data_tmp =
-                '${data_tmp}----------------------------------------------------------------------\n';
-            final data = ClipboardData(text: data_tmp);
-            Clipboard.setData(data);
+            AddOrderData(customer, cart);
+
             cart.reset();
             shop.reset();
             customer.reset();
-            launch_mail("コーヒー注文", data_tmp, shop.selectedShop!.mail);
+            launch_mail("コーヒー注文", "", shop.selectedShop!.mail);
             Navigator.pop(context);
             Navigator.of(context).push(
               MaterialPageRoute(
