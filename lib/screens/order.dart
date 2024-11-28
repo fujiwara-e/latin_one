@@ -18,6 +18,7 @@ import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class OrderPage extends StatefulWidget {
   const OrderPage({super.key});
@@ -244,7 +245,7 @@ class _OrderPageState extends State<OrderPage> {
 class Alert extends StatelessWidget {
   const Alert({Key? key}) : super(key: key);
 
-  Future AddOrderData(customer,cart) async{
+  Future AddOrderData(cart, customer) async{
     FirebaseFirestore db = FirebaseFirestore.instance;
     var i;
     var name;
@@ -260,12 +261,17 @@ class Alert extends StatelessWidget {
 
     now = DateTime.now();
 
+    final messagingInstance = FirebaseMessaging.instance;
+    messagingInstance.requestPermission();
+    final fcmToken = await messagingInstance.getToken();
+
     final orderData ={
       'address': customer.address,
       'date': now,
       'items': items,
       'mail_address': customer.mail,
       'status': '未確認',
+      'token': fcmToken,
       'name': customer.firstName+customer.lastName,
       'zipcode': customer.zipcode,
     };
@@ -303,12 +309,11 @@ class Alert extends StatelessWidget {
             var cart = context.read<CartModel>();
             var shop = context.read<SelectedShopModel>();
             var customer = context.read<CustomerModel>();
-            AddOrderData(customer, cart);
+            AddOrderData(cart, customer);
 
             cart.reset();
             shop.reset();
             customer.reset();
-            launch_mail("コーヒー注文", "", shop.selectedShop!.mail);
             Navigator.pop(context);
             Navigator.of(context).push(
               MaterialPageRoute(
@@ -492,6 +497,7 @@ class _FormPageState extends State<FormPage> {
                     foregroundColor: Colors.white,
                   ),
                   onPressed: () {
+                    var customer = context.read<CustomerModel>();
                     if (_previousInputs != []) {
                       setState(() {
                         _firstName_controller.text = _previousInputs[0];
@@ -501,6 +507,7 @@ class _FormPageState extends State<FormPage> {
                         _address_controller.text = _previousInputs[4];
                       });
                     }
+
                   },
                   child: Text('前回の内容を入力する'),
                 ),
@@ -526,6 +533,7 @@ class _FormPageState extends State<FormPage> {
                         _zipcode_controller.text,
                         _address_controller.text
                       ];
+                      print(inputs[0]);
                       customer.set(inputs[0], inputs[1], inputs[2], inputs[3],
                           inputs[4]);
                       _savePreviousInputs(inputs);

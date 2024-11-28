@@ -169,15 +169,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.18.1"
-<<<<<<< Updated upstream
   firebase_messaging:
     dependency: "direct main"
     description:
       name: firebase_messaging
-      sha256: "29941ba5a3204d80656c0e52103369aa9a53edfd9ceae05a2bb3376f24fda453"
+      sha256: "4d0968ecb860d7baa15a6e2af3469ec5b0d959e51c59ce84a52b0f7632a4aa5a"
       url: "https://pub.dev"
     source: hosted
-    version: "15.1.0"
+    version: "15.1.5"
   firebase_messaging_platform_interface:
     dependency: transitive
     description:
@@ -194,8 +193,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.9.4"
-=======
->>>>>>> Stashed changes
   fixnum:
     dependency: transitive
     description:
@@ -221,10 +218,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_local_notifications
-      sha256: "49eeef364fddb71515bc78d5a8c51435a68bccd6e4d68e25a942c5e47761ae71"
+      sha256: "674173fd3c9eda9d4c8528da2ce0ea69f161577495a9cc835a2a4ecd7eadeb35"
       url: "https://pub.dev"
     source: hosted
-    version: "17.2.3"
+    version: "17.2.4"
   flutter_local_notifications_linux:
     dependency: transitive
     description:
@@ -632,7 +629,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.2"
-<<<<<<< Updated upstream
   timezone:
     dependency: transitive
     description:
@@ -641,8 +637,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.9.4"
-=======
->>>>>>> Stashed changes
   tuple:
     dependency: transitive
     description:
@@ -788,10 +782,5 @@ packages:
     source: hosted
     version: "6.5.0"
 sdks:
-<<<<<<< Updated upstream
-  dart: ">=3.4.0 <4.0.0"
-  flutter: ">=3.22.0"
-=======
   dart: ">=3.5.0 <4.0.0"
   flutter: ">=3.24.0"
->>>>>>> Stashed changes
