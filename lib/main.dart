@@ -20,9 +20,12 @@ FirebaseFirestore db = FirebaseFirestore.instance;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+
+  if (Firebase.apps.isEmpty) {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  }
   final messagingInstance = FirebaseMessaging.instance;
   messagingInstance.requestPermission();
   final fcmToken = await messagingInstance.getToken();
