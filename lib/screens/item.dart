@@ -943,3 +943,110 @@ class FormItem extends StatelessWidget {
     );
   }
 }
+
+class InboxItem extends StatefulWidget {
+  const InboxItem({
+    Key? key,
+    required this.title,
+    required this.body,
+    required this.imagepath,
+    required this.date,
+    required this.widget,
+  }) : super(key: key);
+
+  final String title;
+  final String body;
+  final String imagepath;
+  final String date;
+  final Widget widget;
+
+  @override
+  State<InboxItem> createState() => _InboxItemState();
+}
+
+class _InboxItemState extends State<InboxItem> {
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => widget.widget),
+          );
+        },
+        child: Column(
+          children: <Widget>[
+            SizedBox(
+              width: SizeConfig.screenWidth,
+              height: SizeConfig.blockSizeVertical * 10,
+              child: Row(children: <Widget>[
+                Container(
+                  alignment: Alignment.centerLeft,
+                  margin: const EdgeInsets.only(
+                      left: 20, top: 0, right: 0, bottom: 0),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image(
+                      image: AssetImage("assets/images/store.png"),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+                Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Column(children: [
+                        Container(
+                          margin: const EdgeInsets.only(
+                              left: 20, top: 0, right: 0, bottom: 0),
+                          width: SizeConfig.screenWidth * 0.66,
+                          child: Text(widget.title,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Colors.black,
+                                fontFamily: 'gothic',
+                              )),
+                        ),
+                        Container(
+                          alignment: Alignment.centerLeft,
+                          margin: const EdgeInsets.only(
+                              left: 20, top: 0, right: 0, bottom: 0),
+                          width: SizeConfig.screenWidth * 0.66,
+                          child: Text(widget.date,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.black54,
+                                fontFamily: 'gothic',
+                              )),
+                        ),
+                      ]),
+                      Container(
+                        alignment: Alignment.centerLeft,
+                        margin: const EdgeInsets.only(
+                            left: 20, top: 0, right: 0, bottom: 0),
+                        width: SizeConfig.screenWidth * 0.66,
+                        child: Text(widget.body,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.black87,
+                              fontFamily: 'gothic',
+                            )),
+                      ),
+                    ]),
+                Container(
+                  alignment: Alignment.centerLeft,
+                  margin: const EdgeInsets.only(
+                      left: 0, top: 0, right: 0, bottom: 0),
+                  child: const Icon(Icons.arrow_forward_ios),
+                )
+              ]),
+            ),
+            Container(
+              height: 2,
+              width: SizeConfig.screenWidth,
+              color: Colors.black12,
+            ),
+          ],
+        ));
+  } // widget build
+}

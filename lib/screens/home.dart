@@ -7,6 +7,7 @@ import 'package:latin_one/screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:latin_one/screens/menu.dart';
 import 'package:latin_one/network/connectivity.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -127,48 +128,70 @@ class InboxPage extends StatefulWidget {
 class _InboxPageState extends State<InboxPage> {
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-        length: 2,
-        child: Scaffold(
-          body: NestedScrollView(
-            headerSliverBuilder:
-                (BuildContext context, bool innerBoxIsScrolled) {
-              return <Widget>[
-                SliverAppBar(
-                  pinned: true,
-                  backgroundColor: Colors.white,
-                  expandedHeight: SizeConfig.blockSizeVertical * 8,
-                  flexibleSpace: FlexibleSpaceBar(
-                    title: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          "Inbox",
-                          style: TextStyle(
-                            fontSize: SizeConfig.TitleSize,
-                            color: Colors.black,
-                            fontFamily: 'ozworld',
-                          ),
-                        )),
-                    titlePadding:
-                        EdgeInsets.only(top: 0, right: 0, bottom: 0, left: 20),
-                    collapseMode: CollapseMode.parallax,
-                  ),
-                  bottom: TabBar(
+    Future<List<Map<String, dynamic>>> getInboxData() async {
+      QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance.collection('Inbox').get();
+      List<Map<String, dynamic>> inboxList = [];
+      for (var element in querySnapshot.docs) {
+        inboxList.add(element.data() as Map<String, dynamic>);
+      }
+      return inboxList;
+    }
+
+    return Scaffold(
+      body: FutureBuilder(
+          future: getInboxData(),
+          builder: (context, querySnapshot) {
+            if (querySnapshot.connectionState != ConnectionState.done) {
+              return const CircularProgressIndicator();
+            }
+
+            if (!querySnapshot.hasData) {
+              return const Text('No data');
+            }
+
+            List<MapEntry<String, dynamic>> messageList =
+                querySnapshot.data![0].entries.toList();
+            List<MapEntry<String, dynamic>> whatsnewList =
+                querySnapshot.data![1].entries.toList();
+
+            return DefaultTabController(
+              length: 2,
+              child: Scaffold(
+                appBar: AppBar(
+                  title: const Text('Inbox'),
+                  bottom: const TabBar(
                     tabs: [
-                      Tab(text: "What's New"),
-                      Tab(text: "Message"),
+                      Tab(text: 'What\'s New'),
+                      Tab(text: 'Message'),
                     ],
                   ),
                 ),
-              ];
-            },
-            body: TabBarView(
-              children: [
-                Center(child: Text('Tab 1 Content')),
-                Center(child: Text('Tab 2 Content')),
-              ],
-            ),
-          ),
-        ));
+                body: TabBarView(
+                  children: [
+                    inboxList(messageList),
+                    inboxList(whatsnewList),
+                  ],
+                ),
+              ),
+            );
+          }),
+    );
   }
+}
+
+Widget inboxList(List<MapEntry<String, dynamic>> inboxList) {
+  return ListView.builder(
+    itemCount: inboxList.length,
+    itemBuilder: (context, index) {
+      final inbox = inboxList[index].value;
+      return InboxItem(
+        title: inbox['title'],
+        body: inbox['body'],
+        imagepath: inbox['imagePath'],
+        date: inbox['date'],
+        widget: Text("test"),
+      );
+    },
+  );
 }
