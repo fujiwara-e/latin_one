@@ -245,7 +245,7 @@ class _OrderPageState extends State<OrderPage> {
 class Alert extends StatelessWidget {
   const Alert({Key? key}) : super(key: key);
 
-  Future AddOrderData(cart, customer) async{
+  Future<bool> AddOrderData(cart, customer) async{
     FirebaseFirestore db = FirebaseFirestore.instance;
     var i;
     var name;
@@ -276,7 +276,14 @@ class Alert extends StatelessWidget {
       'zipcode': customer.zipcode,
     };
 
-    await db.collection('Orders').add(orderData);
+    try {
+      final docRef = await db.collection('Orders').add(orderData);
+      print("Order added with ID: ${docRef.id}");
+      return true;
+    } catch (e) {
+      print("Error adding order: $e");
+      return false;
+    }
   }
 
   @override
@@ -305,22 +312,39 @@ class Alert extends StatelessWidget {
             backgroundColor: Colors.yellow[800],
             shape: const StadiumBorder(),
           ),
-          onPressed: () {
+          onPressed: () async {
             var cart = context.read<CartModel>();
             var shop = context.read<SelectedShopModel>();
             var customer = context.read<CustomerModel>();
-            AddOrderData(cart, customer);
+            bool isOrdered = await AddOrderData(cart, customer);
 
             cart.reset();
             shop.reset();
             customer.reset();
             Navigator.pop(context);
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                  settings: RouteSettings(name: '/order/info'),
-                  builder: (context) => const OrderCompletionPage(),
-                  fullscreenDialog: true),
-            );
+            if (isOrdered) {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                    builder: (context) => const OrderCompletionPage(),
+                    fullscreenDialog: true),
+              );
+            } else {
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: Text('エラー'),
+                    content: Text('注文の登録に失敗しました。再度お試しください。'),
+                    actions: [
+                      ElevatedButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: Text('OK'),
+                      ),
+                    ],
+                  );
+                },
+              );
+            }
           },
         ),
       ],
@@ -377,7 +401,7 @@ class OrderCompletionPage extends StatelessWidget {
           width: SizeConfig.screenWidth,
           child: Align(
             child: Text(
-              'ご注文ありがとうございました。\n\nご注文内容がメールにコピーされました。',
+              'ご注文ありがとうございました。\n\n商品到着までしばらくお待ちください。',
               style: TextStyle(fontSize: 20, fontFamily: 'gothic'),
             ),
           ),
