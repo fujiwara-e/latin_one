@@ -108,7 +108,16 @@ class SelectedShopModel extends ChangeNotifier {
   bool get isSelected => _isSelected;
   ShopModel get shopList => _shopList;
 
-  void init() {
+  Future<List<Shop>> fetchShopList() async {
+    List<Shop> shopList = [];
+    init();
+    for (int i = 0; i < _shopList.shopNames.length; i++) {
+      shopList.add(_shopList.getById(i));
+    }
+    return shopList;
+  }
+
+  Future<List<Shop>> init() async {
     final FirebaseFirestore db = FirebaseFirestore.instance;
 
     Future<List<String>> shopsnames_from_firebase() async {
@@ -118,7 +127,7 @@ class SelectedShopModel extends ChangeNotifier {
       return shopnames;
     }
 
-    void shops_from_firebase() async {
+    Future<ShopModel> shops_from_firebase() async {
       shopNames = await shopsnames_from_firebase();
       shopNames.forEach((shop) {
         var docRef = db.collection("shops").doc(shop);
@@ -137,9 +146,15 @@ class SelectedShopModel extends ChangeNotifier {
               doc.get('map_url'));
         });
       });
+      return _shopList;
     }
 
-    shops_from_firebase();
+    var tmp = await shops_from_firebase();
+    List<Shop> shopList = [];
+    for (int i = 0; i < tmp.shopNames.length; i++) {
+      shopList.add(_shopList.getById(i));
+    }
+    return shopList;
   }
 
   set shopList(ShopModel newShopList) {
