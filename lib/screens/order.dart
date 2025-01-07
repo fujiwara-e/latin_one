@@ -245,18 +245,18 @@ class _OrderPageState extends State<OrderPage> {
 class Alert extends StatelessWidget {
   const Alert({Key? key}) : super(key: key);
 
-  Future<bool> AddOrderData(cart, customer) async{
+  Future<bool> AddOrderData(cart, customer) async {
     FirebaseFirestore db = FirebaseFirestore.instance;
     var i;
     var name;
     var quantity;
     var now;
-    var items=[];
+    var items = [];
 
     for (i = 0; i < cart.items.length; i++) {
       name = cart.items[i].name;
       quantity = cart.items[i].quantity;
-      items.add({i.toString(): {'name': name, 'quantity': quantity}});
+      items.add({'name': name, 'quantity': quantity});
     }
 
     now = DateTime.now();
@@ -265,14 +265,14 @@ class Alert extends StatelessWidget {
     messagingInstance.requestPermission();
     final fcmToken = await messagingInstance.getToken();
 
-    final orderData ={
+    final orderData = {
       'address': customer.address,
       'date': now,
       'items': items,
       'mail_address': customer.mail,
       'status': '未確認',
       'token': fcmToken,
-      'name': customer.firstName+customer.lastName,
+      'name': customer.firstName + customer.lastName,
       'zipcode': customer.zipcode,
     };
 
@@ -531,7 +531,6 @@ class _FormPageState extends State<FormPage> {
                         _address_controller.text = _previousInputs[4];
                       });
                     }
-
                   },
                   child: Text('前回の内容を入力する'),
                 ),

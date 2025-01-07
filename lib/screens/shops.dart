@@ -72,6 +72,7 @@ class ShopsPage extends StatefulWidget {
 class _ShopsPageState extends State<ShopsPage> {
   @override
   List<Marker> createMarkersinShops(BuildContext context, List<Shop> shopList) {
+    print(shopList);
     return shopList.map((shop) {
       return Marker(
         width: 40,
@@ -97,55 +98,65 @@ class _ShopsPageState extends State<ShopsPage> {
 
   Widget build(BuildContext context) {
     var shopmodel = context.read<SelectedShopModel>();
-    List<Shop> shopList = [];
-    for (int i = 0; i < shopmodel.shopList.shopNames.length; i++) {
-      shopList.add(shopmodel.shopList.getById(i));
-    }
+    var shopFetch = shopmodel.init();
 
-    return Scaffold(
-        appBar: PreferredSize(
-            preferredSize: Size.fromHeight(SizeConfig.blockSizeVertical * 10),
-            child: AppBar(
-              automaticallyImplyLeading: false,
-              backgroundColor: Colors.white,
-              title: Align(
-                alignment: Alignment.bottomLeft,
-                child: Text('Shops',
-                    style: TextStyle(
-                      fontSize: SizeConfig.TitleSize,
-                      color: Colors.black,
-                      fontFamily: 'ozworld',
-                    )),
-              ),
-            )),
-        body: FlutterMap(
-          options: MapOptions(
-            center: LatLng(33.57454362494296, 133.578431168963),
-            zoom: 15.0,
-            minZoom: 10,
-            maxZoom: 18,
-            interactiveFlags:
-                InteractiveFlag.all & ~InteractiveFlag.rotate, // 回転を無効にする
-          ),
-          children: [
-            TileLayer(
-              urlTemplate:
-                  'https://api.maptiler.com/maps/jp-mierune-streets/{z}/{x}/{y}.png?key=2YhYCGe6F0g5cNXrFsOp',
-            ),
-            MarkerLayer(markers: createMarkersinShops(context, shopList)),
-            RichAttributionWidget(
-              attributions: [
-                TextSourceAttribution('MapTiler',
-                    onTap: () => launchUrl(
-                        Uri.parse("https://www.maptiler.com/copyright/"))),
-                TextSourceAttribution('OpenStreetMap contributors',
-                    onTap: () => launchUrl(
-                        Uri.parse("https://www.openstreetmap.org/copyright"))),
-                TextSourceAttribution('MIERUNE',
-                    onTap: () => launchUrl(Uri.parse("https://maptiler.jp/"))),
-              ],
-            )
-          ],
-        ));
+    return FutureBuilder<List<Shop>>(
+        future: shopFetch,
+        builder: (BuildContext context, AsyncSnapshot<List<Shop>> snapshot) {
+          var shopList;
+          if (snapshot.hasData) {
+            shopList = snapshot.data!;
+          }
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
+          return Scaffold(
+              appBar: PreferredSize(
+                  preferredSize:
+                      Size.fromHeight(SizeConfig.blockSizeVertical * 10),
+                  child: AppBar(
+                    automaticallyImplyLeading: false,
+                    backgroundColor: Colors.white,
+                    title: Align(
+                      alignment: Alignment.bottomLeft,
+                      child: Text('Shops',
+                          style: TextStyle(
+                            fontSize: SizeConfig.TitleSize,
+                            color: Colors.black,
+                            fontFamily: 'ozworld',
+                          )),
+                    ),
+                  )),
+              body: FlutterMap(
+                options: MapOptions(
+                  center: LatLng(33.57454362494296, 133.578431168963),
+                  zoom: 15.0,
+                  minZoom: 10,
+                  maxZoom: 18,
+                  interactiveFlags:
+                      InteractiveFlag.all & ~InteractiveFlag.rotate, // 回転を無効にする
+                ),
+                children: [
+                  TileLayer(
+                    urlTemplate:
+                        'https://api.maptiler.com/maps/jp-mierune-streets/{z}/{x}/{y}.png?key=2YhYCGe6F0g5cNXrFsOp',
+                  ),
+                  MarkerLayer(markers: createMarkersinShops(context, shopList)),
+                  RichAttributionWidget(
+                    attributions: [
+                      TextSourceAttribution('MapTiler',
+                          onTap: () => launchUrl(Uri.parse(
+                              "https://www.maptiler.com/copyright/"))),
+                      TextSourceAttribution('OpenStreetMap contributors',
+                          onTap: () => launchUrl(Uri.parse(
+                              "https://www.openstreetmap.org/copyright"))),
+                      TextSourceAttribution('MIERUNE',
+                          onTap: () =>
+                              launchUrl(Uri.parse("https://maptiler.jp/"))),
+                    ],
+                  )
+                ],
+              ));
+        });
   }
 }
