@@ -1,9 +1,9 @@
 <p align="center">
 <img src="./assets/images/linkedin_banner_image_2.png" alt="TUI">
-商品注文アプリケーション ☕️☕️☕️
+コーヒー豆注文アプリケーション ☕️☕️☕️
 </p>
 <p align="center">
-<img src="https://img.shields.io/badge/Flutter-blue?color=45b8cd&logo=flutter&style=flat">
+<img src="https://img.shields.io/badge/Flutter-blue?color=45b8cd&logo=flutter&style=flat-square">
 <img src="https://img.shields.io/badge/-Firebase-ef5350.svg?logo=firebase&style=flat-square">
 <a href="https://github.com/hosokawa-kenshin/Gcal.js/blob/main/README-ja.md">
     <img height="20px" src="https://img.shields.io/badge/JA-flag.svg?color=45b8cd&style=flat-square&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA5MDAgNjAwIj4NCjxwYXRoIGZpbGw9IiNmZmYiIGQ9Im0wLDBoOTAwdjYwMGgtOTAweiIvPg0KPGNpcmNsZSBmaWxsPSIjYmUwMDI2IiBjeD0iNDUwIiBjeT0iMzAwIiByPSIxODAiLz4NCjwvc3ZnPg0K">
@@ -17,19 +17,47 @@
 <a href="https://github.com/hosokawa-kenshin/Gcal.js" target="__blank"><img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/hosokawa-kenshin/latin_one?logoColor=black"></a>
 </p>
 
-# LatinOne
+<p align="center">
+<img src="./assets/images/latinone_home.png" alt="LatinOne Home" width="200">
+<img src="./assets/images/latinone_storeselect.png" alt="LatinOne Home" width="200">
+<img src="./assets/images/latinone_product_summary.png" alt="LatinOne Home" width="200">
+</p>
 
-2024年乃村研究室勉強会.
+## LatinOne
+本リポジトリは，2024年度乃村研究室勉強会の題材として開発したコーヒー豆注文アプリのリポジトリである．
 
-## Getting Started
+## SDK Version
+```bash
+Doctor summary (to see all details, run flutter doctor -v):
+[✓] Flutter (Channel stable, 3.24.5, on macOS 12.6 21G115 darwin-arm64, locale ja-JP)
+[✓] Android toolchain - develop for Android devices (Android SDK version 34.0.0)
+[✓] Xcode - develop for iOS and macOS (Xcode 14.2)
+[✓] Chrome - develop for the web
+[✓] Android Studio (version 2023.2)
+[✓] VS Code (version 1.96.2)
+[✓] Connected device (3 available)
+```
 
-This project is a starting point for a Flutter application.
+## Setup
+1. 本プロジェクト を clone する
+```bash
+git clone git@github.com:hosokawa-kenshin/latin_one.git
+```
+2. 依存関係をインストールする
+```bash
+cd latin_one
+flutter pub get
+```
+3. アプリを実行する
+```bash
+flutter run
+```
 
-A few resources to get you started if this is your first Flutter project:
+## Features
+- データベース (Firebase Firestore)
+- プッシュ通知 (Firebase Cloud Messaging)
+- コーヒー豆の注文
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## License
+このプロジェクトはBSD 3-Clause Licenseの下でライセンスされている．
+詳細については，[LICENSE](LICENSE)ファイルを参照．
