@@ -278,10 +278,8 @@ class Alert extends StatelessWidget {
 
     try {
       final docRef = await db.collection('Orders').add(orderData);
-      print("Order added with ID: ${docRef.id}");
       return true;
     } catch (e) {
-      print("Error adding order: $e");
       return false;
     }
   }
@@ -556,7 +554,6 @@ class _FormPageState extends State<FormPage> {
                         _zipcode_controller.text,
                         _address_controller.text
                       ];
-                      print(inputs[0]);
                       customer.set(inputs[0], inputs[1], inputs[2], inputs[3],
                           inputs[4]);
                       _savePreviousInputs(inputs);

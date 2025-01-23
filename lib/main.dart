@@ -29,7 +29,6 @@ void main() async {
   final messagingInstance = FirebaseMessaging.instance;
   messagingInstance.requestPermission();
   final fcmToken = await messagingInstance.getToken();
-  debugPrint('FCM Token: $fcmToken');
 
   final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   if (Platform.isAndroid) {
@@ -49,7 +48,6 @@ void main() async {
   _initNotification();
 
   final message = await FirebaseMessaging.instance.getInitialMessage();
-  // 取得したmessageを利用した処理などを記載する
 
   final messageForAllProduct =
       await FirebaseMessaging.instance.subscribeToTopic("Product");
@@ -66,21 +64,13 @@ void main() async {
 Future<void> _initNotification() async {
   final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
-  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-    // バックグラウンド起動中に通知をタップした場合の処理
-  });
+  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {});
 
   FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
     final notification = message.notification;
     final android = message.notification?.android;
 
-    // フォアグラウンド起動中に通知が来た場合の処理
-
-    // フォアグラウンド起動中に通知が来た場合、
-    // Androidは通知が表示されないため、ローカル通知として表示する
-    // https://firebase.flutter.dev/docs/messaging/notifications#application-in-foreground
     if (Platform.isAndroid) {
-      // プッシュ通知をローカルから表示する
       await FlutterLocalNotificationsPlugin().show(
         0,
         notification!.title,
@@ -89,7 +79,7 @@ Future<void> _initNotification() async {
           android: AndroidNotificationDetails(
             'default_notification_channel',
             'プッシュ通知のチャンネル名',
-            importance: Importance.max, // 通知の重要度の設定
+            importance: Importance.max,
             icon: android?.smallIcon,
           ),
         ),
@@ -98,18 +88,15 @@ Future<void> _initNotification() async {
     }
   });
 
-  // ローカルから表示したプッシュ通知をタップした場合の処理を設定
   flutterLocalNotificationsPlugin.initialize(
     const InitializationSettings(
-      android: AndroidInitializationSettings(
-          '@mipmap/ic_launcher'), //通知アイコンの設定は適宜行ってください
+      android: AndroidInitializationSettings('@mipmap/ic_launcher'),
       iOS: DarwinInitializationSettings(),
     ),
     onDidReceiveNotificationResponse: (details) {
       if (details.payload != null) {
         final payloadMap =
             json.decode(details.payload!) as Map<String, dynamic>;
-        debugPrint(payloadMap.toString());
       }
     },
   );
