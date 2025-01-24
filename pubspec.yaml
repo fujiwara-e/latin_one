@@ -45,6 +45,7 @@ dependencies:
   connectivity_plus: ^5.0.2
   firebase_messaging: ^15.1.0
   flutter_local_notifications: ^17.2.3
+  go_router: ^14.7.1
 
 dev_dependencies:
   flutter_test:
@@ -87,6 +88,7 @@ flutter:
     - assets/images/CoffeeBean.jpg
     - assets/images/Latte.jpg
     - assets/images/Machine.jpg
+    - assets/images/coffeebeans.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

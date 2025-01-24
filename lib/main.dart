@@ -135,7 +135,7 @@ class MyApp extends StatelessWidget {
             if (selectedShop == null) {
               throw ArgumentError.notNull('selectedShop');
             }
-            selectedShop.shopList = shopList;
+            // selectedShop.shopList = shopList;
             return selectedShop;
           }),
           ChangeNotifierProvider<CustomerModel>(

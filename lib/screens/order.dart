@@ -628,17 +628,18 @@ class _StorePageState extends State<StorePage>
   }
 
   Widget build(BuildContext context) {
-    var shopmodel = context.read<SelectedShopModel>();
-    List<Shop> shopList = [];
-    for (int i = 0; i < shopmodel.shopList.shopNames.length; i++) {
-      shopList.add(shopmodel.shopList.getById(i));
-    }
+    // var shopmodel = context.read<SelectedShopModel>();
+
+    // List<Shop> shopList = [];
+    // for (int i = 0; i < shopmodel.shopList.shopNames.length; i++) {
+    // shopList.add(shopmodel.shopList.getById(i));
+    // }
 
     Position? position;
 
     intfavoriteList = favoriteshops.map((str) => int.parse(str)).toList();
 
-    void nearbyListgen() {
+    void nearbyListgen(shopList) {
       nearbyshopList = [];
       for (int i = 0; i < shopList.length; i++) {
         if (caluculateDistance(position!.latitude, position!.longitude,
@@ -649,8 +650,8 @@ class _StorePageState extends State<StorePage>
       }
     }
 
-    List<StoreTabItem> genNearbyShopList() {
-      nearbyListgen();
+    List<StoreTabItem> genNearbyShopList(shopList) {
+      nearbyListgen(shopList);
       return nearbyshopList.map((id) {
         var shopList = context.read<SelectedShopModel>();
         var shop = shopList.shopList.getById(id);
@@ -691,11 +692,14 @@ class _StorePageState extends State<StorePage>
       }).toList();
     }
 
-    return FutureBuilder<Position>(
-      future: _futurePosition,
-      builder: (BuildContext content, AsyncSnapshot<Position> snapshot) {
+    var shopmodel = context.read<SelectedShopModel>();
+    var shopList;
+    return FutureBuilder<List<dynamic>>(
+      future: Future.wait([_futurePosition, shopmodel.init()]),
+      builder: (BuildContext content, AsyncSnapshot<List<dynamic>> snapshot) {
         if (snapshot.hasData) {
-          position = snapshot.data!;
+          position = snapshot.data![0];
+          shopList = snapshot.data![1];
         }
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
@@ -775,7 +779,7 @@ class _StorePageState extends State<StorePage>
                     Center(
                         child: ListView(
                             padding: EdgeInsets.zero,
-                            children: genNearbyShopList())),
+                            children: genNearbyShopList(shopList))),
                     Center(
                       child: ListView(
                         padding: EdgeInsets.zero,
