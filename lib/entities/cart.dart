@@ -21,7 +21,7 @@ class CartModel extends ChangeNotifier {
 
   int get totalPrice => _totalprice;
 
-  void init() {
+  Future<void> init() async {
     final FirebaseFirestore db = FirebaseFirestore.instance;
 
     Future<List<String>> documentnames_from_firebase() async {
@@ -32,7 +32,7 @@ class CartModel extends ChangeNotifier {
       return documentNames;
     }
 
-    void category_from_firebase() async {
+    Future<void> category_from_firebase() async {
       _categorynames = await documentnames_from_firebase();
       catalog.setCategoryNames(_categorynames);
       _categorynames.forEach((category) {
@@ -51,7 +51,7 @@ class CartModel extends ChangeNotifier {
       });
     }
 
-    category_from_firebase();
+    await category_from_firebase();
   }
 
   void totalprice() {

@@ -72,12 +72,14 @@ class ScreenState extends State<Screen> {
   }
 
   void onSelect(int index) {
-    setState(() {
-      _current_index = index;
-    });
+    print(_current_index);
     switch (index) {
       case 0:
-        goRouter.go('/');
+        if (_current_index == 0) {
+          goRouter.go('/');
+        } else {
+          goRouter.go('/');
+        }
         break;
       case 1:
         goRouter.go('/Shops');
@@ -85,6 +87,9 @@ class ScreenState extends State<Screen> {
       case 2:
         goRouter.go('/Order');
     }
+    setState(() {
+      _current_index = index;
+    });
   }
 
   // void onSelect(int index) {

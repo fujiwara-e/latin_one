@@ -46,23 +46,23 @@ class CategoryPage extends StatelessWidget {
               itemExtent: SizeConfig.blockSizeVertical * 10,
               delegate: SliverChildListDelegate([
                 MenuItem(
-                    image: "assets/images/store.png",
+                    image: "assets/images/coffeebeans.jpg",
                     text: "BLEND COFFEE",
                     index: 0),
                 MenuItem(
-                    image: "assets/images/store.png",
+                    image: "assets/images/coffeebeans.jpg",
                     text: "FRENCH ROAST",
                     index: 1),
                 MenuItem(
-                    image: "assets/images/store.png",
+                    image: "assets/images/coffeebeans.jpg",
                     text: "ITALY ROAST",
                     index: 2),
                 MenuItem(
-                    image: "assets/images/store.png",
+                    image: "assets/images/coffeebeans.jpg",
                     text: "SPECIALTY COFFEE",
                     index: 3),
                 MenuItem(
-                    image: "assets/images/store.png",
+                    image: "assets/images/coffeebeans.jpg",
                     text: "SPECIALTY COFFEE MEDIUM",
                     index: 4),
               ]),
@@ -96,7 +96,7 @@ class _MenusPageState extends State<MenusPage> {
   @override
   void initState() {
     super.initState();
-    var catalog = context.read<CatalogModel>();
+    // var catalog = context.read<CatalogModel>();
 
     _categories = [
       _blend_coffee,
@@ -105,97 +105,99 @@ class _MenusPageState extends State<MenusPage> {
       _special_coffee,
       _special_coffee_medium,
     ];
-
-    void product_from_category(
-        String category, List<ProductItem> targetlist, int categorynum) {
-      List<Item> itemlist = [];
-      for (int i = 0;
-          i < catalog.catalog[category]!['itemNames']!.length;
-          i++) {
-        Item item = catalog.getById(i, category, categorynum);
-        itemlist.add(item);
-      }
-
-      for (var item in itemlist) {
-        targetlist.add(ProductItem(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => MenuPage(item: item),
-                  fullscreenDialog: true),
-            );
-          },
-          image: item.imagePath,
-          name: item.name,
-          price: item.price.toString(),
-        ));
-      }
-    }
-
-    void productitem_from_category() {
-      List<String> categoryNames = catalog.categoryNames;
-      categoryNames.sort;
-      int categoryIndex = 0;
-      categoryNames.forEach((category) {
-        product_from_category(
-            category, _categories[categoryIndex], categoryIndex);
-        categoryIndex++;
-      });
-    }
-
-    productitem_from_category();
   }
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-        canPop: false,
-        onPopInvoked: (bool didpop) {
-          if (didpop) {
-            return;
-          }
-          Navigator.pop(context);
-        },
-        child: Scaffold(
-            body: CustomScrollView(slivers: <Widget>[
-          SliverAppBar(
-            backgroundColor: Colors.white,
-            expandedHeight: SizeConfig.blockSizeVertical * 8,
-            pinned: true,
-            flexibleSpace: FlexibleSpaceBar(
-              title: Align(
-                  alignment: Alignment.bottomLeft,
-                  child: Text(
-                    "Products",
-                    style: TextStyle(
-                      fontSize: SizeConfig.TitleSize,
-                      color: Colors.black,
-                      fontFamily: 'ozworld',
-                    ),
-                  )),
-              titlePadding:
-                  EdgeInsets.only(top: 0, right: 0, bottom: 0, left: 20),
-              collapseMode: CollapseMode.parallax,
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.only(left: 15),
-              child: Container(
-                  height: SizeConfig.blockSizeVertical * 5,
-                  alignment: Alignment.centerLeft,
-                  child: Text('表示価格はすべて税込み価格です',
+    return Consumer<CartModel>(builder: (context, cart, child) {
+      var catalog = cart.catalog;
+      void product_from_category(
+          String category, List<ProductItem> targetlist, int categorynum) {
+        List<Item> itemlist = [];
+        for (int i = 0;
+            i < catalog.catalog[category]!['itemNames']!.length;
+            i++) {
+          Item item = catalog.getById(i, category, categorynum);
+          itemlist.add(item);
+        }
+
+        for (var item in itemlist) {
+          targetlist.add(ProductItem(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => MenuPage(item: item),
+                    fullscreenDialog: true),
+              );
+            },
+            image: item.imagePath,
+            name: item.name,
+            price: item.price.toString(),
+          ));
+        }
+      }
+
+      void productitem_from_category() {
+        List<String> categoryNames = catalog.categoryNames;
+        categoryNames.sort;
+        int categoryIndex = 0;
+        categoryNames.forEach((category) {
+          product_from_category(
+              category, _categories[categoryIndex], categoryIndex);
+          categoryIndex++;
+        });
+      }
+
+      productitem_from_category();
+      return PopScope(
+          canPop: false,
+          onPopInvoked: (bool didpop) {
+            if (didpop) {
+              return;
+            }
+            Navigator.pop(context);
+          },
+          child: Scaffold(
+              body: CustomScrollView(slivers: <Widget>[
+            SliverAppBar(
+              backgroundColor: Colors.white,
+              expandedHeight: SizeConfig.blockSizeVertical * 8,
+              pinned: true,
+              flexibleSpace: FlexibleSpaceBar(
+                title: Align(
+                    alignment: Alignment.bottomLeft,
+                    child: Text(
+                      "Products",
                       style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.black54,
-                        fontFamily: 'gothic',
-                      ))),
+                        fontSize: SizeConfig.TitleSize,
+                        color: Colors.black,
+                        fontFamily: 'ozworld',
+                      ),
+                    )),
+                titlePadding:
+                    EdgeInsets.only(top: 0, right: 0, bottom: 0, left: 20),
+                collapseMode: CollapseMode.parallax,
+              ),
             ),
-          ),
-          SliverText(text: widget.text),
-          ProductsItem(products: _categories[widget.index]),
-        ])));
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.only(left: 15),
+                child: Container(
+                    height: SizeConfig.blockSizeVertical * 5,
+                    alignment: Alignment.centerLeft,
+                    child: Text('表示価格はすべて税込み価格です',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.black54,
+                          fontFamily: 'gothic',
+                        ))),
+              ),
+            ),
+            SliverText(text: widget.text),
+            ProductsItem(products: _categories[widget.index]),
+          ])));
+    });
   }
 }
 
