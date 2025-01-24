@@ -969,10 +969,10 @@ class _InboxItemState extends State<InboxItem> {
   Widget build(BuildContext context) {
     return InkWell(
         onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => widget.widget),
-          );
+          // Navigator.push(
+          //   context,
+          //   MaterialPageRoute(builder: (context) => widget.widget),
+          // );
         },
         child: Column(
           children: <Widget>[
@@ -984,13 +984,7 @@ class _InboxItemState extends State<InboxItem> {
                   alignment: Alignment.centerLeft,
                   margin: const EdgeInsets.only(
                       left: 20, top: 0, right: 0, bottom: 0),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: Image(
-                      image: AssetImage("assets/images/store.png"),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
+                  child: const Icon(Icons.info_outline),
                 ),
                 Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
