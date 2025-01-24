@@ -100,7 +100,6 @@ class Shop {
 }
 
 class SelectedShopModel extends ChangeNotifier {
-  List<String> shopNames = [];
   late ShopModel _shopList;
   Shop? _selectedShop;
   bool _isSelected = false;
@@ -108,58 +107,45 @@ class SelectedShopModel extends ChangeNotifier {
   bool get isSelected => _isSelected;
   ShopModel get shopList => _shopList;
 
-  Future<List<Shop>> fetchShopList() async {
-    List<Shop> shopList = [];
-    init();
-    for (int i = 0; i < _shopList.shopNames.length; i++) {
-      shopList.add(_shopList.getById(i));
-    }
-    return shopList;
-  }
-
   Future<List<Shop>> init() async {
     final FirebaseFirestore db = FirebaseFirestore.instance;
 
-    Future<List<String>> shopsnames_from_firebase() async {
+    List<Shop> shopList = [];
+    _shopList = ShopModel();
+
+    try {
       CollectionReference collectionRef = db.collection('shops');
       QuerySnapshot querySnapshot = await collectionRef.get();
-      List<String> shopnames = querySnapshot.docs.map((doc) => doc.id).toList();
-      return shopnames;
+
+      for (var doc in querySnapshot.docs) {
+        final data = doc.data() as Map<String, dynamic>;
+        final shopId = doc.id;
+
+        _shopList.setItem(
+          shopId,
+          data['address'] ?? '',
+          data['opening_hours'] ?? '',
+          data['closing_hours'] ?? '',
+          data['phone_number'] ?? '',
+          data['payment'] ?? '',
+          data['holiday'] ?? '',
+          data['latitude'] ?? 0.0,
+          data['longitude'] ?? 0.0,
+          data['mail_address'] ?? '',
+          data['map_url'] ?? '',
+        );
+      }
+
+      for (int i = 0; i < _shopList.shopNames.length; i++) {
+        shopList.add(_shopList.getById(i));
+      }
+
+      notifyListeners();
+    } catch (e) {
+      print("Error fetching shops: $e");
     }
 
-    Future<ShopModel> shops_from_firebase() async {
-      shopNames = await shopsnames_from_firebase();
-      shopNames.forEach((shop) {
-        var docRef = db.collection("shops").doc(shop);
-        docRef.get().then((DocumentSnapshot doc) {
-          _shopList.setItem(
-              shop,
-              doc.get('address'),
-              doc.get('opening_hours'),
-              doc.get('closing_hours'),
-              doc.get('phone_number'),
-              doc.get('payment'),
-              doc.get('holiday'),
-              doc.get('latitude'),
-              doc.get('longitude'),
-              doc.get('mail_address'),
-              doc.get('map_url'));
-        });
-      });
-      return _shopList;
-    }
-
-    var tmp = await shops_from_firebase();
-    List<Shop> shopList = [];
-    for (int i = 0; i < tmp.shopNames.length; i++) {
-      shopList.add(_shopList.getById(i));
-    }
     return shopList;
-  }
-
-  set shopList(ShopModel newShopList) {
-    _shopList = newShopList;
-    notifyListeners();
   }
 
   Shop? get selectedShop => _selectedShop;

@@ -98,36 +98,39 @@ class _ShopsPageState extends State<ShopsPage> {
 
   Widget build(BuildContext context) {
     var shopmodel = context.read<SelectedShopModel>();
-    var shopFetch = shopmodel.init();
+    return Scaffold(
+        appBar: PreferredSize(
+            preferredSize: Size.fromHeight(SizeConfig.blockSizeVertical * 10),
+            child: AppBar(
+              automaticallyImplyLeading: false,
+              backgroundColor: Colors.white,
+              title: Align(
+                alignment: Alignment.bottomLeft,
+                child: Text('Shops',
+                    style: TextStyle(
+                      fontSize: SizeConfig.TitleSize,
+                      color: Colors.black,
+                      fontFamily: 'ozworld',
+                    )),
+              ),
+            )),
+        body: FutureBuilder<List<Shop>>(
+            future: shopmodel.init(),
+            builder:
+                (BuildContext context, AsyncSnapshot<List<Shop>> snapshot) {
+              if (snapshot.hasError) {
+                return const Text('Error');
+              }
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
-    return FutureBuilder<List<Shop>>(
-        future: shopFetch,
-        builder: (BuildContext context, AsyncSnapshot<List<Shop>> snapshot) {
-          var shopList;
-          if (snapshot.hasData) {
-            shopList = snapshot.data!;
-          }
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          }
-          return Scaffold(
-              appBar: PreferredSize(
-                  preferredSize:
-                      Size.fromHeight(SizeConfig.blockSizeVertical * 10),
-                  child: AppBar(
-                    automaticallyImplyLeading: false,
-                    backgroundColor: Colors.white,
-                    title: Align(
-                      alignment: Alignment.bottomLeft,
-                      child: Text('Shops',
-                          style: TextStyle(
-                            fontSize: SizeConfig.TitleSize,
-                            color: Colors.black,
-                            fontFamily: 'ozworld',
-                          )),
-                    ),
-                  )),
-              body: FlutterMap(
+              if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                return const Center(child: Text('No Data'));
+              }
+              final shopList = snapshot.data!;
+
+              return FlutterMap(
                 options: MapOptions(
                   center: LatLng(33.57454362494296, 133.578431168963),
                   zoom: 15.0,
@@ -156,7 +159,7 @@ class _ShopsPageState extends State<ShopsPage> {
                     ],
                   )
                 ],
-              ));
-        });
+              );
+            }));
   }
 }
