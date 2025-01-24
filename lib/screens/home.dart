@@ -80,7 +80,7 @@ class _HomePageState extends State<HomePage> {
                   final screenstate =
                       context.findAncestorStateOfType<ScreenState>();
                   if (screenstate != null) {
-                    screenstate.onSelect(TabItem.order);
+                    screenstate.onSelect(2);
                   }
                 },
                 image: 'assets/images/CoffeeBean.jpg',
@@ -104,7 +104,7 @@ class _HomePageState extends State<HomePage> {
                   final screenstate =
                       context.findAncestorStateOfType<ScreenState>();
                   if (screenstate != null) {
-                    screenstate.onSelect(TabItem.shops);
+                    screenstate.onSelect(1);
                   }
                 },
                 image: 'assets/images/Machine.jpg',

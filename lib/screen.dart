@@ -7,6 +7,7 @@ import 'package:latin_one/entities/catalog.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:latin_one/network/connectivity.dart';
+import 'package:latin_one/navigator/router.dart';
 
 int selectedIndex = 0;
 bool canPopValue = true;
@@ -23,84 +24,80 @@ class Screen extends StatefulWidget {
 class ScreenState extends State<Screen> {
   int _current_index = 0;
 
-  TabItem _currentTab = TabItem.home;
-  Map<TabItem, GlobalKey<NavigatorState>> _navigatorKeys = {
-    TabItem.home: GlobalKey<NavigatorState>(),
-    TabItem.shops: GlobalKey<NavigatorState>(),
-    TabItem.order: GlobalKey<NavigatorState>(),
-  };
-
-  // debug
-  void printNavigationKeys() {
-    print("Home Navigator Key: ${_navigatorKeys[TabItem.home]?.currentState}");
-    print(
-        "Shops Navigator Key: ${_navigatorKeys[TabItem.shops]?.currentState}");
-    print(
-        "Order Navigator Key: ${_navigatorKeys[TabItem.order]?.currentState}");
-  }
-
-  void checkTabItem() {
-    String? currentRoute = ModalRoute.of(context)?.settings.name;
-    print("current route is $currentRoute");
-
-    if (currentRoute == null) {
-      canPopValue = false;
-      print("ModalRoute is NULL!!!");
-    } else if (_currentTab == TabItem.home) {
-      setState(() {
-        canPopValue = true;
-      });
-    } else {
-      canPopValue = false;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    checkTabItem();
     return PopScope(
         canPop: canPopValue,
         onPopInvoked: (bool didpop) {
-          onSelect(TabItem.home);
+          onSelect(0);
         },
         child: Scaffold(
-            body: Stack(children: <Widget>[
-              ConnectivityCheck(child: _buildTabItem(TabItem.home, '/home')),
-              ConnectivityCheck(child: _buildTabItem(TabItem.shops, '/shops')),
-              ConnectivityCheck(child: _buildTabItem(TabItem.order, '/order')),
-            ]),
-            bottomNavigationBar: BottomNavigation(
-              currentTab: _currentTab,
-              onSelect: onSelect,
-              currentIndex: _current_index,
-            )));
+          body: MaterialApp.router(
+            routerConfig: goRouter,
+          ),
+          bottomNavigationBar: NavigationBar(
+            onDestinationSelected: (index) {
+              onSelect(index);
+            },
+            indicatorColor: Colors.yellow[800],
+            selectedIndex: _current_index,
+            destinations: <Widget>[
+              NavigationDestination(
+                icon: Image.asset(
+                  'assets/images/home.png',
+                  width: 25,
+                  height: 25,
+                ),
+                label: 'Home',
+              ),
+              NavigationDestination(
+                icon: Image.asset(
+                  'assets/images/store.png',
+                  width: 25,
+                  height: 25,
+                ),
+                label: 'Shops',
+              ),
+              NavigationDestination(
+                icon: Image.asset(
+                  'assets/images/coffee.png',
+                  width: 25,
+                  height: 25,
+                ),
+                label: 'Order',
+              )
+            ],
+          ),
+        ));
   }
 
-  Widget _buildTabItem(
-    TabItem tabItem,
-    String root,
-  ) {
-    return Offstage(
-      offstage: _currentTab != tabItem,
-      child: TabNavigator(
-        navigationKey: _navigatorKeys[tabItem]!,
-        tabItem: tabItem,
-        routerName: root,
-      ),
-    );
-  }
-
-  void onSelect(TabItem tabItem) {
-    if (_currentTab == TabItem.home) {
-      if (_navigatorKeys[_currentTab]?.currentState != null) {
-        _navigatorKeys[_currentTab]!
-            .currentState!
-            .popUntil((route) => route.isFirst);
-      }
-    }
+  void onSelect(int index) {
     setState(() {
-      _currentTab = tabItem;
-      _current_index = tabItem.index;
+      _current_index = index;
     });
+    switch (index) {
+      case 0:
+        goRouter.go('/');
+        break;
+      case 1:
+        goRouter.go('/Shops');
+        break;
+      case 2:
+        goRouter.go('/Order');
+    }
   }
+
+  // void onSelect(int index) {
+  //   if (_currentTab == TabItem.home) {
+  //     if (_navigatorKeys[_currentTab]?.currentState != null) {
+  //       _navigatorKeys[_currentTab]!
+  //           .currentState!
+  //           .popUntil((route) => route.isFirst);
+  //     }
+  //   }
+  //   setState(() {
+  //     _currentTab = tabItem;
+  //     _current_index = tabItem.index;
+  //   });
+  // }
 }
